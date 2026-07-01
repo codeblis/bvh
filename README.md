@@ -43,6 +43,7 @@ El sitio incluye:
 ---
 
 ## 📁 Estructura de archivos
+```
 /
 ├── index.html # Página principal (todo el HTML + CSS inline + JavaScript inline)
 ├── README.md # Este archivo
@@ -52,6 +53,7 @@ El sitio incluye:
     ├── logo_dark.svg # Logo empleado en el modo oscuro
     ├── logotipo.svg # Logotipo empleado en el modo claro
     └── logotipo_dark.svg # Logotipo empleado en el modo oscuro
+```
 
 > **Nota:** No se utilizan imágenes externas ni fuentes de terceros; todo el contenido (incluidos íconos y logo) está incrustado en el HTML/CSS para máxima portabilidad.
 
