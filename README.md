@@ -53,4 +53,23 @@ El sitio incluye:
     ├── logotipo.svg # Logotipo empleado en el modo claro
     ├── logotipo_dark.svg # Logotipo empleado en el modo oscuro
 
+> **Nota:** No se utilizan imágenes externas ni fuentes de terceros; todo el contenido (incluidos íconos y logo) está incrustado en el HTML/CSS para máxima portabilidad.
 
+---
+
+## 🛠️ Tecnologías utilizadas
+
+- **HTML5** semántico y accesible.
+- **CSS3** con variables CSS, flexbox, grid, animaciones y `@media queries`.
+- **JavaScript vanilla** (DOM, eventos, `localStorage`, `setInterval`).
+- **SVG** para el logo y gráficos decorativos.
+- **GitHub Pages** para el despliegue gratuito.
+
+---
+
+## ⚙️ Cómo ejecutar localmente
+
+1. **Clona este repositorio:**
+   ```bash
+   git clone https://github.com/tu-usuario/bvh-landing.git
+   cd bvh-landing
