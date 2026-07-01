@@ -1,4 +1,4 @@
-# 🏛️ BVH · Bolsa de Valores de La Habana
+# 🏛️ BVH · Bolsa de Valores de La Habana (work in progress...)
 
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Deployed-brightgreen)](https://tusuario.github.io/bvh-landing/)
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -47,11 +47,11 @@ El sitio incluye:
 ├── index.html # Página principal (todo el HTML + CSS inline + JavaScript inline)
 ├── README.md # Este archivo
 ├── LICENCE # Archivo de Licencia de uso del software
-├── svg # Carpeta que contiene los archivos svg utilizados en el proyecto
+└── svg # Carpeta que contiene los archivos svg utilizados en el proyecto
     ├── logo.svg # Logo empleado en el modo claro
     ├── logo_dark.svg # Logo empleado en el modo oscuro
     ├── logotipo.svg # Logotipo empleado en el modo claro
-    ├── logotipo_dark.svg # Logotipo empleado en el modo oscuro
+    └── logotipo_dark.svg # Logotipo empleado en el modo oscuro
 
 > **Nota:** No se utilizan imágenes externas ni fuentes de terceros; todo el contenido (incluidos íconos y logo) está incrustado en el HTML/CSS para máxima portabilidad.
 
