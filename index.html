@@ -1,0 +1,1063 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BVH · Bolsa de Valores de La Habana</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="bvh-root">
+      <h2 class="sr-only">
+        Bolsa de Valores de La Habana — página institucional
+      </h2>
+
+      <!-- TICKER -->
+      <div class="ticker-bar">
+        <div class="ticker-label">BVH Live</div>
+        <div style="overflow: hidden; flex: 1; display: flex">
+          <div class="ticker-track" id="ticker">
+            <div class="ticker-item">
+              <span class="ticker-name">AZCUBA</span>
+              <span class="ticker-price">142.50</span>
+              <span class="ticker-change up">▲ +2.3%</span>
+            </div>
+            <div class="ticker-item">
+              <span class="ticker-name">ETECSA</span>
+              <span class="ticker-price">89.20</span>
+              <span class="ticker-change up">▲ +0.8%</span>
+            </div>
+            <div class="ticker-item">
+              <span class="ticker-name">CIMEX</span>
+              <span class="ticker-price">67.80</span>
+              <span class="ticker-change down">▼ −1.2%</span>
+            </div>
+            <div class="ticker-item">
+              <span class="ticker-name">GAESA</span>
+              <span class="ticker-price">215.00</span>
+              <span class="ticker-change up">▲ +3.1%</span>
+            </div>
+            <div class="ticker-item">
+              <span class="ticker-name">BFI</span>
+              <span class="ticker-price">45.60</span>
+              <span class="ticker-change down">▼ −0.5%</span>
+            </div>
+            <div class="ticker-item">
+              <span class="ticker-name">CUBACAB</span>
+              <span class="ticker-price">33.40</span>
+              <span class="ticker-change up">▲ +1.7%</span>
+            </div>
+            <div class="ticker-item">
+              <span class="ticker-name">ISLAZUL</span>
+              <span class="ticker-price">58.90</span>
+              <span class="ticker-change up">▲ +0.4%</span>
+            </div>
+            <div class="ticker-item">
+              <span class="ticker-name">CUBANA</span>
+              <span class="ticker-price">121.30</span>
+              <span class="ticker-change down">▼ −2.8%</span>
+            </div>
+            <div class="ticker-item">
+              <span class="ticker-name">TRD</span>
+              <span class="ticker-price">76.50</span>
+              <span class="ticker-change up">▲ +1.1%</span>
+            </div>
+            <div class="ticker-item">
+              <span class="ticker-name">CUPET</span>
+              <span class="ticker-price">188.70</span>
+              <span class="ticker-change down">▼ −0.9%</span>
+            </div>
+            <!-- duplicate for seamless loop -->
+            <div class="ticker-item">
+              <span class="ticker-name">AZCUBA</span>
+              <span class="ticker-price">142.50</span>
+              <span class="ticker-change up">▲ +2.3%</span>
+            </div>
+            <div class="ticker-item">
+              <span class="ticker-name">ETECSA</span>
+              <span class="ticker-price">89.20</span>
+              <span class="ticker-change up">▲ +0.8%</span>
+            </div>
+            <div class="ticker-item">
+              <span class="ticker-name">CIMEX</span>
+              <span class="ticker-price">67.80</span>
+              <span class="ticker-change down">▼ −1.2%</span>
+            </div>
+            <div class="ticker-item">
+              <span class="ticker-name">GAESA</span>
+              <span class="ticker-price">215.00</span>
+              <span class="ticker-change up">▲ +3.1%</span>
+            </div>
+            <div class="ticker-item">
+              <span class="ticker-name">BFI</span>
+              <span class="ticker-price">45.60</span>
+              <span class="ticker-change down">▼ −0.5%</span>
+            </div>
+            <div class="ticker-item">
+              <span class="ticker-name">CUBACAB</span>
+              <span class="ticker-price">33.40</span>
+              <span class="ticker-change up">▲ +1.7%</span>
+            </div>
+            <div class="ticker-item">
+              <span class="ticker-name">ISLAZUL</span>
+              <span class="ticker-price">58.90</span>
+              <span class="ticker-change up">▲ +0.4%</span>
+            </div>
+            <div class="ticker-item">
+              <span class="ticker-name">CUBANA</span>
+              <span class="ticker-price">121.30</span>
+              <span class="ticker-change down">▼ −2.8%</span>
+            </div>
+            <div class="ticker-item">
+              <span class="ticker-name">TRD</span>
+              <span class="ticker-price">76.50</span>
+              <span class="ticker-change up">▲ +1.1%</span>
+            </div>
+            <div class="ticker-item">
+              <span class="ticker-name">CUPET</span>
+              <span class="ticker-price">188.70</span>
+              <span class="ticker-change down">▼ −0.9%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NAV -->
+      <nav>
+        <a
+          href="#"
+          style="
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            flex-shrink: 0;
+          "
+        >
+          <img id="nav-logo" src="/assets/svg/logo.svg" alt="" width="50" />
+          <span class="nav-name">Bolsa de Valores de la Habana</span>
+        </a>
+
+        <button class="mobile-toggle" aria-label="Menú">☰</button>
+
+        <ul class="nav-links" id="navLinks">
+          <li><a href="#mercado">Índices Y Mercado</a></li>
+          <li><a href="#instituto">Instituto</a></li>
+          <li><a href="#nosotros">Nosotros</a></li>
+          <li><a href="#hse" class="nav-cta">Habana SE →</a></li>
+        </ul>
+      </nav>
+
+      <!-- HERO -->
+      <div class="hero">
+        <svg
+          style="
+            position: absolute;
+            inset: 0;
+            opacity: 0.04;
+            pointer-events: none;
+            width: 100%;
+            height: 100%;
+          "
+          viewBox="0 0 800 400"
+          preserveAspectRatio="none"
+        >
+          <polyline
+            points="0,300 80,260 160,280 240,200 320,220 400,140 480,160 560,80 640,100 720,40 800,60"
+            fill="none"
+            stroke="#FFFFFC"
+            stroke-width="2"
+          />
+        </svg>
+        <div>
+          <div class="hero-eyebrow">
+            Cuba · 2026 · Primera Infraestructura Financiera Moderna
+          </div>
+          <h1>La <em>casa</em> del emprendedor cubano</h1>
+          <p class="hero-desc">
+            Transparencia, datos confiables y educación financiera para los
+            emprendedores cubanos, dentro y fuera de la isla. Construyendo el
+            mercado de valores que Cuba necesita para el siglo XXI.
+          </p>
+          <div class="hero-actions">
+            <a href="#mercado" class="btn-primary">Explorar el mercado</a>
+            <a href="#instituto" class="btn-secondary">Instituto BVH</a>
+          </div>
+        </div>
+        <div class="hero-index-panel">
+          <div class="hip-header">Índices principales · Hoy</div>
+          <div class="index-row">
+            <span class="index-name">BVH General</span
+            ><span class="index-val">1,847.32</span
+            ><span class="index-chg up">+2.14%</span>
+          </div>
+          <div class="index-row">
+            <span class="index-name">BVH Tecnología</span
+            ><span class="index-val">324.80</span
+            ><span class="index-chg up">+0.97%</span>
+          </div>
+          <div class="index-row">
+            <span class="index-name">BVH Turismo</span
+            ><span class="index-val">512.60</span
+            ><span class="index-chg down">−1.32%</span>
+          </div>
+          <div class="index-row">
+            <span class="index-name">BVH Agroindustria</span
+            ><span class="index-val">218.45</span
+            ><span class="index-chg up">+3.08%</span>
+          </div>
+          <div class="index-row">
+            <span class="index-name">BVH Energía</span
+            ><span class="index-val">409.17</span
+            ><span class="index-chg down">−0.44%</span>
+          </div>
+          <div
+            style="
+              margin-top: 18px;
+              padding-top: 14px;
+              border-top: 1px solid rgba(255, 255, 255, 0.08);
+              font-size: 10px;
+              color: rgba(255, 255, 255, 0.25);
+            "
+          >
+            Datos simulados · BVH © 2026
+          </div>
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <div class="stats-bar">
+        <div class="stat-item">
+          <div class="stat-num">14<span>+</span></div>
+          <div class="stat-label">Empresas cotizando</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">5</div>
+          <div class="stat-label">Índices sectoriales</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">3<span>K+</span></div>
+          <div class="stat-label">Emprendedores registrados</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">2026</div>
+          <div class="stat-label">Año de fundación</div>
+        </div>
+      </div>
+
+      <!-- HISTORIA -->
+      <section class="section-alt" id="nosotros">
+        <div class="section-header">
+          <div class="section-eyebrow">Historia & Valores</div>
+          <h2 class="section-title">
+            Un legado centenario, una visión para el siglo XXI
+          </h2>
+          <p class="section-desc">
+            La Bolsa de Valores de La Habana tiene sus raíces en la histórica
+            bolsa que operó en Cuba durante la primera mitad del siglo XX,
+            cuando La Habana era un importante centro financiero del Caribe.
+          </p>
+        </div>
+        <div class="historia-grid">
+          <div class="historia-timeline">
+            <div class="tl-item">
+              <div class="tl-dot"></div>
+              <div class="tl-year">Siglo XX</div>
+              <div class="tl-title">
+                La Habana, centro financiero del Caribe
+              </div>
+              <div class="tl-text">
+                La bolsa original operó durante la primera mitad del siglo XX,
+                posicionando a Cuba como hub financiero regional.
+              </div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot"></div>
+              <div class="tl-year">2026</div>
+              <div class="tl-title">Renacimiento del mercado</div>
+              <div class="tl-text">
+                Un grupo de emprendedores, analistas y profesionales decide
+                rescatar y modernizar este legado para crear una infraestructura
+                actualizada.
+              </div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot gold"></div>
+              <div class="tl-year">Hoy</div>
+              <div class="tl-title">La BVH en operación</div>
+              <div class="tl-text">
+                Plataforma sólida y profesional que facilita el acceso a
+                información de mercados y capacitación financiera para
+                emprendedores cubanos.
+              </div>
+            </div>
+          </div>
+          <div class="historia-values">
+            <div class="value-card">
+              <div class="value-name">Transparencia</div>
+              <div class="value-desc">
+                Datos abiertos y claridad en toda la información proporcionada.
+              </div>
+            </div>
+            <div class="value-card gold">
+              <div class="value-name">Rigor técnico</div>
+              <div class="value-desc">
+                Análisis basado en evidencia y metodologías profesionales
+                internacionales.
+              </div>
+            </div>
+            <div class="value-card">
+              <div class="value-name">Neutralidad</div>
+              <div class="value-desc">
+                Independencia absoluta respecto a cualquier actor del mercado.
+              </div>
+            </div>
+            <div class="value-card red">
+              <div class="value-name">Excelencia</div>
+              <div class="value-desc">
+                Estándares internacionales de calidad y ética operativa.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- INDICES -->
+      <section id="mercado">
+        <div class="section-header">
+          <div class="section-eyebrow">Índices & Mercado</div>
+          <h2 class="section-title" id="indices">
+            Inteligencia de mercado adaptada al contexto cubano
+          </h2>
+          <p class="section-desc">
+            Índices económicos, tasas de cambio y sectores clave publicados con
+            metodología transparente.
+          </p>
+        </div>
+        <div class="indices-grid">
+          <div class="idx-card">
+            <div class="idx-ticker">BVHG</div>
+            <div class="idx-name">BVH General</div>
+            <div class="idx-value">1,847.32</div>
+            <div class="idx-meta">
+              <span class="idx-change up">▲ +2.14%</span
+              ><span class="idx-time">28 jun, 14:35</span>
+            </div>
+          </div>
+          <div class="idx-card gold">
+            <div class="idx-ticker">BVHT</div>
+            <div class="idx-name">BVH Turismo & Hotelería</div>
+            <div class="idx-value">512.60</div>
+            <div class="idx-meta">
+              <span class="idx-change down">▼ −1.32%</span
+              ><span class="idx-time">28 jun, 14:35</span>
+            </div>
+          </div>
+          <div class="idx-card red-c">
+            <div class="idx-ticker">BVHA</div>
+            <div class="idx-name">BVH Agroindustria</div>
+            <div class="idx-value">218.45</div>
+            <div class="idx-meta">
+              <span class="idx-change up">▲ +3.08%</span
+              ><span class="idx-time">28 jun, 14:35</span>
+            </div>
+          </div>
+        </div>
+
+        <table class="empresas-table">
+          <thead>
+            <tr>
+              <th>Símbolo</th>
+              <th>Empresa</th>
+              <th>Sector</th>
+              <th>Precio (CUP)</th>
+              <th>Variación</th>
+              <th>Volumen</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="ticker-sym">AZCUBA</td>
+              <td>Grupo Empresarial AZCUBA</td>
+              <td><span class="sector-tag">Agroindustria</span></td>
+              <td class="price-cell">142.50</td>
+              <td><span class="change-badge up">▲ +2.3%</span></td>
+              <td>18,450</td>
+            </tr>
+            <tr>
+              <td class="ticker-sym">ETECSA</td>
+              <td>Empresa de Telecomunicaciones</td>
+              <td><span class="sector-tag">Tecnología</span></td>
+              <td class="price-cell">89.20</td>
+              <td><span class="change-badge up">▲ +0.8%</span></td>
+              <td>32,100</td>
+            </tr>
+            <tr>
+              <td class="ticker-sym">CIMEX</td>
+              <td>CIMEX S.A.</td>
+              <td><span class="sector-tag">Comercio</span></td>
+              <td class="price-cell">67.80</td>
+              <td><span class="change-badge down">▼ −1.2%</span></td>
+              <td>9,870</td>
+            </tr>
+            <tr>
+              <td class="ticker-sym">GAESA</td>
+              <td>Grupo de Administración Empresarial</td>
+              <td><span class="sector-tag">Conglomerado</span></td>
+              <td class="price-cell">215.00</td>
+              <td><span class="change-badge up">▲ +3.1%</span></td>
+              <td>5,200</td>
+            </tr>
+            <tr>
+              <td class="ticker-sym">ISLAZUL</td>
+              <td>Cadena Islazul</td>
+              <td><span class="sector-tag">Turismo</span></td>
+              <td class="price-cell">58.90</td>
+              <td><span class="change-badge up">▲ +0.4%</span></td>
+              <td>7,640</td>
+            </tr>
+            <tr>
+              <td class="ticker-sym">CUPET</td>
+              <td>Unión Cuba-Petróleo</td>
+              <td><span class="sector-tag">Energía</span></td>
+              <td class="price-cell">188.70</td>
+              <td><span class="change-badge down">▼ −0.9%</span></td>
+              <td>14,300</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- SERVICIOS -->
+      <section class="section-alt" id="servicios">
+        <div class="section-header">
+          <div class="section-eyebrow">Funciones & Servicios</div>
+          <h2 class="section-title">
+            Todo lo que necesita el emprendedor cubano, en un solo lugar
+          </h2>
+        </div>
+        <div class="servicios-grid">
+          <div class="serv-card">
+            <div class="serv-num">01</div>
+            <div class="serv-title">Generación de transparencia</div>
+            <div class="serv-desc">
+              Publicamos índices económicos, análisis de tasas de cambio y
+              commodities con metodología abierta y verificable.
+            </div>
+            <span class="serv-tag">Datos abiertos →</span>
+          </div>
+          <div class="serv-card">
+            <div class="serv-num">02</div>
+            <div class="serv-title">Inteligencia de mercado</div>
+            <div class="serv-desc">
+              Estudios de análisis fundamental y técnico adaptados al contexto
+              cubano, producidos por nuestro equipo especializado.
+            </div>
+            <span class="serv-tag">Ver análisis →</span>
+          </div>
+          <div class="serv-card">
+            <div class="serv-num">03</div>
+            <div class="serv-title">Educación financiera</div>
+            <div class="serv-desc">
+              Formación para emprendedores a través del Instituto BVH. Cursos,
+              talleres y certificaciones en finanzas.
+            </div>
+            <span class="serv-tag">Instituto BVH →</span>
+          </div>
+          <div class="serv-card">
+            <div class="serv-num">04</div>
+            <div class="serv-title">Consultoría estratégica</div>
+            <div class="serv-desc">
+              Acompañamos a MIPYMES y emprendedores en modelado de negocios,
+              gestión de divisas y preparación para crecer.
+            </div>
+            <span class="serv-tag">Solicitar consulta →</span>
+          </div>
+          <div class="serv-card">
+            <div class="serv-num">05</div>
+            <div class="serv-title">Club de Inversión BVH</div>
+            <div class="serv-desc">
+              Comunidad que conecta el ahorro con oportunidades productivas
+              reales dentro y fuera de Cuba.
+            </div>
+            <span class="serv-tag">Unirse al club →</span>
+          </div>
+          <div class="serv-card">
+            <div class="serv-num">06</div>
+            <div class="serv-title">Habana Stock Exchange</div>
+            <div class="serv-desc">
+              El corazón del startup. BVH capacita, fideliza e informa a los
+              participantes del mercado cubano.
+            </div>
+            <span class="serv-tag">Conocer el HSE →</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- INSTITUTO -->
+      <section id="instituto">
+        <div class="instituto-wrap">
+          <div>
+            <div class="section-header" style="margin-bottom: 32px">
+              <div class="section-eyebrow">Instituto BVH</div>
+              <h2 class="section-title">
+                Formación financiera de excelencia para Cuba
+              </h2>
+              <p class="section-desc">
+                El Instituto BVH forma a la próxima generación de emprendedores
+                e inversores cubanos con estándares internacionales.
+              </p>
+            </div>
+            <div
+              style="
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                margin-bottom: 28px;
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                  font-size: 13px;
+                  color: var(--bvh-text-muted);
+                "
+              >
+                <div
+                  style="
+                    width: 6px;
+                    height: 6px;
+                    background: var(--bvh-gold);
+                    border-radius: 50%;
+                    flex-shrink: 0;
+                  "
+                ></div>
+                Instructores con experiencia internacional en mercados
+                financieros
+              </div>
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                  font-size: 13px;
+                  color: var(--bvh-text-muted);
+                "
+              >
+                <div
+                  style="
+                    width: 6px;
+                    height: 6px;
+                    background: var(--bvh-gold);
+                    border-radius: 50%;
+                    flex-shrink: 0;
+                  "
+                ></div>
+                Metodología adaptada al contexto económico cubano
+              </div>
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                  font-size: 13px;
+                  color: var(--bvh-text-muted);
+                "
+              >
+                <div
+                  style="
+                    width: 6px;
+                    height: 6px;
+                    background: var(--bvh-gold);
+                    border-radius: 50%;
+                    flex-shrink: 0;
+                  "
+                ></div>
+                Certificaciones reconocidas y currículo actualizado
+              </div>
+            </div>
+            <a
+              href="#"
+              style="
+                background: var(--bvh-blue);
+                color: var(--bvh-white);
+                padding: 12px 24px;
+                font-size: 12px;
+                font-weight: 600;
+                letter-spacing: 0.06em;
+                text-transform: uppercase;
+                text-decoration: none;
+                display: inline-block;
+                border-radius: 6px;
+                transition: background 0.2s;
+              "
+              onmouseover="this.style.background = '#1f5a6b'"
+              onmouseout="this.style.background = 'var(--bvh-blue)'"
+              >Ver todos los cursos →</a
+            >
+          </div>
+          <div class="instituto-courses">
+            <div class="course-card">
+              <div>
+                <div class="course-name">
+                  Fundamentos de mercados financieros
+                </div>
+                <div class="course-meta">
+                  8 semanas · Online · Próxima cohorte: agosto 2026
+                </div>
+              </div>
+              <span class="course-level">Básico</span>
+            </div>
+            <div class="course-card gold">
+              <div>
+                <div class="course-name">Análisis técnico & fundamental</div>
+                <div class="course-meta">
+                  12 semanas · Online + presencial · La Habana
+                </div>
+              </div>
+              <span class="course-level gold">Intermedio</span>
+            </div>
+            <div class="course-card red">
+              <div>
+                <div class="course-name">Gestión de divisas para MIPYMES</div>
+                <div class="course-meta">4 semanas · Online intensivo</div>
+              </div>
+              <span class="course-level">Básico</span>
+            </div>
+            <div class="course-card gold">
+              <div>
+                <div class="course-name">Valoración de empresas y startups</div>
+                <div class="course-meta">16 semanas · Certificación BVH</div>
+              </div>
+              <span class="course-level adv">Avanzado</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- HSE -->
+      <section class="hse-section" id="hse">
+        <div class="hse-inner">
+          <div>
+            <div class="hse-label">Habana Stock Exchange</div>
+            <h2 class="hse-title">El corazón del mercado cubano</h2>
+            <p class="hse-desc">
+              El Habana Stock Exchange es la plataforma de operaciones central
+              del ecosistema BVH. Diseñado para conectar capital con
+              oportunidades productivas en Cuba.
+            </p>
+            <div class="hse-features">
+              <div class="hse-feat">
+                <div class="hse-feat-icon">◎</div>
+                <div class="hse-feat-text">
+                  <strong>Operaciones en tiempo real</strong> — cotizaciones y
+                  órdenes actualizadas al instante.
+                </div>
+              </div>
+              <div class="hse-feat">
+                <div class="hse-feat-icon">⬡</div>
+                <div class="hse-feat-text">
+                  <strong>Acceso gradual</strong> — desde observador hasta
+                  operador activo, según tu nivel de formación.
+                </div>
+              </div>
+              <div class="hse-feat">
+                <div class="hse-feat-icon">◈</div>
+                <div class="hse-feat-text">
+                  <strong>Compliance total</strong> — cada operación documentada
+                  con estándares internacionales.
+                </div>
+              </div>
+            </div>
+            <a href="#" class="btn-primary">Acceder al Habana SE →</a>
+          </div>
+          <div class="hse-visual">
+            <div class="hse-viz-header">
+              <span>Libro de órdenes · ETECSA</span
+              ><span class="hse-viz-live">● En vivo</span>
+            </div>
+            <div
+              style="
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 16px;
+                margin-bottom: 16px;
+              "
+            >
+              <div>
+                <div
+                  style="
+                    font-size: 9px;
+                    font-weight: 600;
+                    letter-spacing: 0.1em;
+                    text-transform: uppercase;
+                    color: #4ade80;
+                    margin-bottom: 8px;
+                  "
+                >
+                  Compra (Bid)
+                </div>
+                <div class="hse-row">
+                  <span class="hse-row-name">88.50</span
+                  ><span
+                    style="color: rgba(255, 255, 255, 0.5); font-size: 11px"
+                    >1,200</span
+                  ><span class="hse-row-action">Comprar</span>
+                </div>
+                <div class="hse-row">
+                  <span class="hse-row-name">88.20</span
+                  ><span
+                    style="color: rgba(255, 255, 255, 0.5); font-size: 11px"
+                    >800</span
+                  ><span class="hse-row-action">Comprar</span>
+                </div>
+                <div class="hse-row">
+                  <span class="hse-row-name">87.90</span
+                  ><span
+                    style="color: rgba(255, 255, 255, 0.5); font-size: 11px"
+                    >2,400</span
+                  ><span class="hse-row-action">Comprar</span>
+                </div>
+              </div>
+              <div>
+                <div
+                  style="
+                    font-size: 9px;
+                    font-weight: 600;
+                    letter-spacing: 0.1em;
+                    text-transform: uppercase;
+                    color: #f87171;
+                    margin-bottom: 8px;
+                  "
+                >
+                  Venta (Ask)
+                </div>
+                <div class="hse-row">
+                  <span class="hse-row-name">89.20</span
+                  ><span
+                    style="color: rgba(255, 255, 255, 0.5); font-size: 11px"
+                    >950</span
+                  ><span class="hse-row-action sell">Vender</span>
+                </div>
+                <div class="hse-row">
+                  <span class="hse-row-name">89.50</span
+                  ><span
+                    style="color: rgba(255, 255, 255, 0.5); font-size: 11px"
+                    >1,100</span
+                  ><span class="hse-row-action sell">Vender</span>
+                </div>
+                <div class="hse-row">
+                  <span class="hse-row-name">89.80</span
+                  ><span
+                    style="color: rgba(255, 255, 255, 0.5); font-size: 11px"
+                    >600</span
+                  ><span class="hse-row-action sell">Vender</span>
+                </div>
+              </div>
+            </div>
+            <div
+              style="
+                padding-top: 16px;
+                border-top: 1px solid rgba(255, 255, 255, 0.06);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+              "
+            >
+              <div>
+                <div
+                  style="
+                    font-size: 10px;
+                    color: rgba(255, 255, 255, 0.3);
+                    margin-bottom: 4px;
+                  "
+                >
+                  Último precio
+                </div>
+                <div
+                  style="
+                    font-family: var(--ff-display);
+                    font-size: 24px;
+                    font-weight: 700;
+                  "
+                >
+                  89.20
+                </div>
+              </div>
+              <div style="text-align: right">
+                <div
+                  style="
+                    font-size: 10px;
+                    color: rgba(255, 255, 255, 0.3);
+                    margin-bottom: 4px;
+                  "
+                >
+                  Variación 24h
+                </div>
+                <div style="font-size: 16px; font-weight: 600; color: #4ade80">
+                  ▲ +0.8%
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTACTO -->
+      <section class="contact-section" id="contacto">
+        <div class="contact-inner">
+          <div>
+            <h2 class="contact-title">Mantente informado del mercado cubano</h2>
+            <p class="contact-desc">
+              Recibe análisis de mercado, actualizaciones de índices y
+              oportunidades del Habana Stock Exchange directamente en tu correo.
+            </p>
+            <div
+              style="
+                margin-top: 28px;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                  font-size: 13px;
+                "
+              >
+                <span style="color: var(--bvh-gold)">◎</span>Boletín semanal de
+                mercado
+              </div>
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                  font-size: 13px;
+                "
+              >
+                <span style="color: var(--bvh-gold)">◎</span>Análisis de índices
+                cada viernes
+              </div>
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                  font-size: 13px;
+                "
+              >
+                <span style="color: var(--bvh-gold)">◎</span>Alertas del Habana
+                Stock Exchange
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="newsletter-form">
+              <div class="nl-row">
+                <div class="nl-field">
+                  <label class="nl-label">Nombre</label
+                  ><input
+                    class="nl-input"
+                    type="text"
+                    placeholder="Tu nombre"
+                  />
+                </div>
+                <div class="nl-field">
+                  <label class="nl-label">Apellido</label
+                  ><input
+                    class="nl-input"
+                    type="text"
+                    placeholder="Tu apellido"
+                  />
+                </div>
+              </div>
+              <div class="nl-field">
+                <label class="nl-label">Correo electrónico</label
+                ><input
+                  class="nl-input"
+                  type="email"
+                  placeholder="tu@correo.com"
+                />
+              </div>
+              <div class="nl-field">
+                <label class="nl-label">Perfil</label>
+                <select
+                  class="nl-input"
+                  style="appearance: none; cursor: pointer"
+                >
+                  <option value="" style="background: #152020">
+                    Selecciona tu perfil
+                  </option>
+                  <option style="background: #152020">
+                    Emprendedor individual
+                  </option>
+                  <option style="background: #152020">MIPYME / Empresa</option>
+                  <option style="background: #152020">
+                    Inversor / Analista
+                  </option>
+                  <option style="background: #152020">Estudiante</option>
+                  <option style="background: #152020">
+                    Cubano en el exterior
+                  </option>
+                </select>
+              </div>
+              <button
+                class="nl-submit"
+                onclick="this.textContent = '¡Registrado! ✓'"
+              >
+                Suscribirme al boletín →
+              </button>
+              <p class="nl-disclaimer">
+                Sin spam. Puedes cancelar en cualquier momento. Tus datos no se
+                comparten con terceros.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FOOTER -->
+      <footer class="footer-main">
+        <div class="footer-grid">
+          <div class="footer-col">
+            <div class="footer-logo">
+              <img
+                id="footer-logotipo"
+                src="/assets/svg/logotipo.svg"
+                alt=""
+                width="175"
+                style="display: inline"
+              />
+
+              <div
+                style="
+                  font-size: 10px;
+                  font-weight: 600;
+                  letter-spacing: 0.1em;
+                  text-transform: uppercase;
+                  margin-top: 4px;
+                "
+              >
+                Bolsa de Valores de La Habana
+              </div>
+              <p class="footer-tagline">
+                La primera infraestructura financiera moderna de Cuba para el
+                siglo XXI.
+              </p>
+              <div class="footer-social">
+                <a href="#" class="social-btn" aria-label="LinkedIn"
+                  ><svg viewBox="0 0 24 24">
+                    <path
+                      d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
+                    /></svg
+                ></a>
+                <a href="#" class="social-btn" aria-label="X / Twitter"
+                  ><svg viewBox="0 0 24 24">
+                    <path
+                      d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+                    /></svg
+                ></a>
+                <a href="#" class="social-btn" aria-label="Facebook"
+                  ><svg viewBox="0 0 24 24">
+                    <path
+                      d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
+                    /></svg
+                ></a>
+                <a href="#" class="social-btn" aria-label="Instagram"
+                  ><svg viewBox="0 0 24 24">
+                    <path
+                      d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"
+                    /></svg
+                ></a>
+                <a href="#" class="social-btn" aria-label="YouTube"
+                  ><svg viewBox="0 0 24 24">
+                    <path
+                      d="M23.495 6.205a3.007 3.007 0 00-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 00.527 6.205a31.247 31.247 0 00-.522 5.805 31.247 31.247 0 00.522 5.783 3.007 3.007 0 002.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 002.088-2.088 31.247 31.247 0 00.5-5.783 31.247 31.247 0 00-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"
+                    /></svg
+                ></a>
+                <a href="#" class="social-btn" aria-label="Telegram"
+                  ><svg viewBox="0 0 24 24">
+                    <path
+                      d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"
+                    /></svg
+                ></a>
+              </div>
+            </div>
+          </div>
+          <div class="footer-col">
+            <div class="footer-col-title">Mercado</div>
+            <ul>
+              <li><a href="#indices">Índices BVH</a></li>
+              <li><a href="#mercado">Empresas cotizando</a></li>
+              <li><a href="#hse">Habana Stock Exchange</a></li>
+              <li><a href="#">Análisis de mercado</a></li>
+              <li><a href="#">Club de Inversión</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <div class="footer-col-title">Instituto BVH</div>
+            <ul>
+              <li><a href="#">Todos los cursos</a></li>
+              <li><a href="#">Certificaciones</a></li>
+              <li><a href="#">Consultoría MIPYMES</a></li>
+              <li><a href="#">Blog financiero</a></li>
+              <li><a href="#">Eventos y talleres</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <div class="footer-col-title">Institución</div>
+            <ul>
+              <li><a href="#nosotros">Sobre la BVH</a></li>
+              <li><a href="#nosotros">Historia</a></li>
+              <li><a href="#nosotros">Valores institucionales</a></li>
+              <li><a href="#contacto">Contacto</a></li>
+              <li><a href="#">Política de privacidad</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <div class="footer-copy">
+            © 2026 Bolsa de Valores de La Habana · La Habana, Cuba
+          </div>
+          <div class="footer-disclaimer">
+            Los datos presentados son simulados con fines ilustrativos. La BVH
+            no constituye asesoramiento de inversión. Consulta a un profesional
+            calificado antes de tomar decisiones financieras.
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Botón flotante para cambiar tema -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Cambiar tema">
+      <!-- Icono luna (oscuro) -->
+      <svg class="moon-icon" viewBox="0 0 24 24" width="28" height="28">
+        <path
+          d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.5 5.5 0 0 1-7.54-7.54A9.02 9.02 0 0 0 12 3z"
+          fill="currentColor"
+        />
+      </svg>
+      <!-- Icono sol (claro) -->
+      <svg class="sun-icon" viewBox="0 0 24 24" width="28" height="28">
+        <circle cx="12" cy="12" r="5" fill="currentColor" />
+        <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="12" y1="1" x2="12" y2="4" />
+          <line x1="12" y1="20" x2="12" y2="23" />
+          <line x1="4.22" y1="4.22" x2="6.34" y2="6.34" />
+          <line x1="17.66" y1="17.66" x2="19.78" y2="19.78" />
+          <line x1="1" y1="12" x2="4" y2="12" />
+          <line x1="20" y1="12" x2="23" y2="12" />
+          <line x1="4.22" y1="19.78" x2="6.34" y2="17.66" />
+          <line x1="17.66" y1="6.34" x2="19.78" y2="4.22" />
+        </g>
+      </svg>
+    </button>
+
+    <script src="/main.js" />
+  </body>
+</html>
