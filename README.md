@@ -43,3 +43,14 @@ El sitio incluye:
 ---
 
 ## 📁 Estructura de archivos
+/
+├── index.html # Página principal (todo el HTML + CSS inline + JavaScript inline)
+├── README.md # Este archivo
+├── LICENCE # Archivo de Licencia de uso del software
+├── svg # Carpeta que contiene los archivos svg utilizados en el proyecto
+    ├── logo.svg # Logo empleado en el modo claro
+    ├── logo_dark.svg # Logo empleado en el modo oscuro
+    ├── logotipo.svg # Logotipo empleado en el modo claro
+    ├── logotipo_dark.svg # Logotipo empleado en el modo oscuro
+
+
