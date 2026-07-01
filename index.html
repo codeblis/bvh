@@ -1787,7 +1787,7 @@
             flex-shrink: 0;
           "
         >
-          <img id="nav-logo" src="/bvh/svg/logo-dark.svg" alt="" width="50" />
+          <img id="nav-logo" src="/svg/logo-dark.svg" alt="" width="50" />
           <span class="nav-name">Bolsa de Valores de la Habana</span>
         </a>
 
@@ -2582,7 +2582,7 @@
             <div class="footer-logo">
               <img
                 id="footer-logotipo"
-                src="/bvh/svg/logotipo-dark.svg"
+                src="/svg/logotipo-dark.svg"
                 alt=""
                 width="175"
                 style="display: inline"
@@ -2793,12 +2793,12 @@
       logotipo = document.getElementById("footer-logotipo");
       if (savedTheme === "light") {
         body.classList.add("light-theme");
-        logo.setAttribute("src", "/assets/svg/logo.svg");
-        logotipo.setAttribute("src", "/assets/svg/logotipo.svg");
+        logo.setAttribute("src", "/svg/logo.svg");
+        logotipo.setAttribute("src", "/svg/logotipo.svg");
       } else {
         body.classList.add("dark-theme");
-        logo.setAttribute("src", "/assets/svg/logo-dark.svg");
-        logotipo.setAttribute("src", "/assets/svg/logotipo-dark.svg");
+        logo.setAttribute("src", "/svg/logo-dark.svg");
+        logotipo.setAttribute("src", "/svg/logotipo-dark.svg");
       }
 
       themeBtn.addEventListener("click", function () {
@@ -2808,11 +2808,11 @@
         logo = document.getElementById("nav-logo");
         logotipo = document.getElementById("footer-logotipo");
         if (isLight) {
-          logo.setAttribute("src", "/assets/svg/logo.svg");
-          logotipo.setAttribute("src", "/assets/svg/logotipo.svg");
+          logo.setAttribute("src", "/svg/logo.svg");
+          logotipo.setAttribute("src", "/svg/logotipo.svg");
         } else {
-          logo.setAttribute("src", "/assets/svg/logo-dark.svg");
-          logotipo.setAttribute("src", "/assets/svg/logotipo-dark.svg");
+          logo.setAttribute("src", "/svg/logo-dark.svg");
+          logotipo.setAttribute("src", "/svg/logotipo-dark.svg");
         }
       });
     });
