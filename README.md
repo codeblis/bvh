@@ -6,7 +6,7 @@
 
 Landing page institucional para la **Bolsa de Valores de La Habana (BVH)**, una plataforma moderna de información financiera y educación para emprendedores cubanos, dentro y fuera de la isla.
 
-![Vista previa de BVH](https://via.placeholder.com/1200x630/0b1414/d4a853?text=BVH+Landing+Page)
+![Vista previa de BVH](https://www.image2url.com/r2/default/images/1782945410682-fdfe61de-4146-4a7d-ae72-be4e5f0b152f.png)
 
 ---
 
