@@ -46,7 +46,7 @@ El sitio incluye:
 ```
 /
 ├── index.html # Página principal (todo el HTML + CSS inline + JavaScript inline)
-├── README.md # Este archivo
+├── README.md # Este archivo que estás leyendo
 ├── LICENCE # Archivo de Licencia de uso del software
 └── svg # Carpeta que contiene los archivos svg utilizados en el proyecto
     ├── logo.svg # Logo empleado en el modo claro
