@@ -124,7 +124,7 @@
       <!-- NAV -->
       <nav>
         <a
-          href="index.html"
+          href="/bvhindex.html"
           style="
             display: flex;
             align-items: center;
@@ -132,17 +132,17 @@
             flex-shrink: 0;
           "
         >
-          <img id="nav-logo" src="/svg/logo_dark.svg" alt="" width="50" />
+          <img id="nav-logo" src="/bvh/svg/logo_dark.svg" alt="" width="50" />
           <span class="nav-name">Bolsa de Valores de la Habana</span>
         </a>
         <button class="mobile-toggle" aria-label="Menú">☰</button>
         <ul class="nav-links" id="navLinks">
-          <li><a href="index.html#mercado">Índices y Mercado</a></li>
-          <li><a href="index.html#instituto">Instituto</a></li>
-          <li><a href="index.html#nosotros">Nosotros</a></li>
+          <li><a href="/bvh/index.html#mercado">Índices y Mercado</a></li>
+          <li><a href="/bvh/index.html#instituto">Instituto</a></li>
+          <li><a href="/bvh/index.html#nosotros">Nosotros</a></li>
           <li>
             <a
-              href="noticias.html"
+              href="/bvh/noticias.html"
               style="
                 color: var(--bvh-white);
                 border-bottom-color: var(--bvh-gold);
@@ -150,8 +150,8 @@
               >Noticias</a
             >
           </li>
-          <li><a href="blog.html">Blog</a></li>
-          <li><a href="index.html#hse" class="nav-cta">Habana SE →</a></li>
+          <li><a href="/bvh/blog.html">Blog</a></li>
+          <li><a href="/bvh/index.html#hse" class="nav-cta">Habana SE →</a></li>
         </ul>
       </nav>
 
@@ -501,12 +501,12 @@
         const savedTheme = localStorage.getItem("bvh-theme");
         if (savedTheme === "light") {
           body.classList.add("light-theme");
-          if (logo) logo.setAttribute("src", "/svg/logo.svg");
-          if (logotipo) logotipo.setAttribute("src", "/svg/logotipo.svg");
+          if (logo) logo.setAttribute("src", "/bvh/svg/logo.svg");
+          if (logotipo) logotipo.setAttribute("src", "/bvh/svg/logotipo.svg");
         } else {
           body.classList.add("dark-theme");
-          if (logo) logo.setAttribute("src", "/svg/logo_dark.svg");
-          if (logotipo) logotipo.setAttribute("src", "/svg/logotipo_dark.svg");
+          if (logo) logo.setAttribute("src", "/bvh/svg/logo_dark.svg");
+          if (logotipo) logotipo.setAttribute("src", "/bvh/svg/logotipo_dark.svg");
         }
 
         themeBtn.addEventListener("click", function () {
@@ -516,13 +516,13 @@
           if (logo) {
             logo.setAttribute(
               "src",
-              isLight ? "/svg/logo.svg" : "/svg/logo_dark.svg",
+              isLight ? "/bvh/svg/logo.svg" : "/bvh/svg/logo_dark.svg",
             );
           }
           if (logotipo) {
             logotipo.setAttribute(
               "src",
-              isLight ? "/svg/logotipo.svg" : "/svg/logotipo_dark.svg",
+              isLight ? "/bvh/svg/logotipo.svg" : "/bvh/svg/logotipo_dark.svg",
             );
           }
         });
