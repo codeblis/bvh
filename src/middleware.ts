@@ -40,6 +40,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  runtime: 'edge',   // ← esta línea es la que faltaba
+  runtime: 'experimental-edge',   // ← antes: 'edge'
   matcher: ['/admin/:path*', '/instituto/:path*', '/cotizar/:path*'],
 }
