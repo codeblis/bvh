@@ -40,5 +40,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
+  runtime: 'edge',   // ← esta línea es la que faltaba
   matcher: ['/admin/:path*', '/instituto/:path*', '/cotizar/:path*'],
 }
