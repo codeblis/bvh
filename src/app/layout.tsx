@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 
 		images: [
 			{
-				url: "https://bolsadelahabana.com/logo.svg",
+				url: "https://bolsadelahabana.com/logo.png",
 
 				width: 500,
 
