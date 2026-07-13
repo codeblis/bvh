@@ -21,8 +21,45 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-	title: "Bolsa de Valores de La Habana",
+	title: "BVH | Bolsa de Valores de La Habana",
+
 	description: "La casa del emprendedor cubano.",
+
+	openGraph: {
+		title: "BVH | Bolsa de Valores de La Habana",
+
+		description: "La casa del emprendedor cubano.",
+
+		url: "https://bolsadelahabana.com/",
+
+		siteName: "Bolsa de Valores de La Habana",
+
+		images: [
+			{
+				url: "https://bolsadelahabana.com/logo.svg",
+
+				width: 500,
+
+				height: 700,
+
+				alt: "Bolsa de Valores de La Habana",
+			},
+		],
+
+		locale: "es_ES",
+
+		type: "website",
+	},
+
+	twitter: {
+		card: "summary_large_image",
+
+		title: "BVH, Bolsa de Valores de La Habana",
+
+		description: "La casa del emprendedor cubano.",
+
+		images: ["https://bolsadelahabana.com/logo.svg"],
+	},
 };
 
 export default function RootLayout({
