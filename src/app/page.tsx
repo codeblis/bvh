@@ -76,7 +76,7 @@ export default function Home() {
 				</p>
 
 				{/* Countdown */}
-				<div className="mt-14 grid grid-cols-2 gap-5 md:grid-cols-4">
+				<div className="mt-14 grid grid-cols-4 gap-2 md:grid-cols-4">
 					<TimeCard value={time.days} label="Días" />
 					<TimeCard value={time.hours} label="Horas" />
 					<TimeCard value={time.minutes} label="Minutos" />
@@ -89,9 +89,9 @@ export default function Home() {
 
 function TimeCard({ value, label }: { value: string; label: string }) {
 	return (
-		<div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
-			<div className="text-5xl font-bold">{value}</div>
-			<div className="mt-2 text-sm uppercase tracking-widest text-neutral-400">
+		<div className="rounded-2xl border border-white/10 bg-white/5 p-2 md:p-6 lg:p-7 backdrop-blur-xl">
+			<div className="text-3xl md:text-5xl lg:text-6xl font-bold">{value}</div>
+			<div className="mt-2 text-tiny md:text-xl lg:text-2xl uppercase tracking-widest text-neutral-400">
 				{label}
 			</div>
 		</div>
