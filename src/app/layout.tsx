@@ -1,86 +1,69 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Raleway, Playfair_Display } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { LiveTickerWrapper } from "@/components/bvh/LiveTickerWrapper";
 
-const playfairDisplayHeading = Playfair_Display({
-	subsets: ["latin"],
-	variable: "--font-heading",
+const playfairDisplay = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-serif",
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
 });
 
-const raleway = Raleway({ subsets: ["latin"], variable: "--font-sans" });
-
-const geistSans = Geist({
-	variable: "--font-geist-sans",
-	subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-	variable: "--font-geist-mono",
-	subsets: ["latin"],
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
-	title: "BVH | Bolsa de Valores de La Habana",
-
-	description: "La casa del emprendedor cubano.",
-
-	openGraph: {
-		title: "BVH | Bolsa de Valores de La Habana",
-
-		description: "La casa del emprendedor cubano.",
-
-		url: "https://bolsadelahabana.com/",
-
-		siteName: "Bolsa de Valores de La Habana",
-
-		images: [
-			{
-				url: "https://bolsadelahabana.com/logo.png",
-
-				width: 500,
-
-				height: 700,
-
-				alt: "Bolsa de Valores de La Habana",
-			},
-		],
-
-		locale: "es_ES",
-
-		type: "website",
-	},
-
-	twitter: {
-		card: "summary_large_image",
-
-		title: "BVH, Bolsa de Valores de La Habana",
-
-		description: "La casa del emprendedor cubano.",
-
-		images: ["https://bolsadelahabana.com/logo.svg"],
-	},
+  title: "BVH | Bolsa de Valores de La Habana",
+  description: "Bolsa de Valores de La Habana: la plataforma independiente que profesionaliza el empresariado cubano, genera transparencia y conecta talento con capital.",
+  openGraph: {
+    title: "BVH · Bolsa de Valores de La Habana",
+    description: "Bolsa de Valores de La Habana: la plataforma independiente que profesionaliza el empresariado cubano, genera transparencia y conecta talento con capital.",
+    url: "https://bolsadelahabana.com/",
+    siteName: "Bolsa de Valores de La Habana",
+    images: [
+      {
+        url: "https://bolsadelahabana.com/logo.png",
+        width: 500,
+        height: 700,
+        alt: "Bolsa de Valores de La Habana",
+      },
+    ],
+    locale: "es_ES",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "BVH, Bolsa de Valores de La Habana",
+    description: "La casa del emprendedor cubano.",
+    images: ["https://bolsadelahabana.com/logo.svg"],
+  },
 };
 
 export default function RootLayout({
-	children,
+  children,
 }: Readonly<{
-	children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-	return (
-		<html
-			lang="en"
-			className={cn(
-				"h-full",
-				"antialiased",
-				geistSans.variable,
-				geistMono.variable,
-				"font-sans",
-				raleway.variable,
-				playfairDisplayHeading.variable,
-			)}
-		>
-			<body className="min-h-full flex flex-col">{children}</body>
-		</html>
-	);
+  return (
+    <html
+      lang="es"
+      className={cn(
+        "h-full",
+        "antialiased",
+        inter.variable,
+        playfairDisplay.variable,
+        "dark"
+      )}
+    >
+      <body className="min-h-full flex flex-col">
+        <LiveTickerWrapper />
+        {children}
+      </body>
+    </html>
+  );
 }
