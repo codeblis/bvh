@@ -1,11 +1,33 @@
 {
-  "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "bvh",
-  "main": ".open-next/worker.js",
-  "compatibility_date": "2026-07-12",
-  "compatibility_flags": ["nodejs_compat"],
-  "assets": {
-    "directory": ".open-next/assets",
-    "binding": "ASSETS"
-  }
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "bvh",
+	"main": ".open-next/worker.js",
+	"compatibility_date": "2026-07-12",
+	"compatibility_flags": ["nodejs_compat"],
+	"assets": {
+		"directory": ".open-next/assets",
+		"binding": "ASSETS"
+	},
+	"routes": [{ "pattern": "bolsadelahabana.com", "custom_domain": true }],
+	"vars": {
+		"NEXT_PUBLIC_SUPABASE_URL": "https://rjrnoydmlwogpdboflrs.supabase.co",
+		"NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqcm5veWRtbHdvZ3BkYm9mbHJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM3NTE3NTEsImV4cCI6MjA5OTMyNzc1MX0.RS7XFiJyjIgwOeHuOzvC1HcQvylSRD3TTN_MjUtFOuc"
+	},
+	"env": {
+		"app": {
+			"name": "bvh-app",
+			"main": ".open-next/worker.js",
+			"assets": {
+				"directory": ".open-next/assets",
+				"binding": "ASSETS"
+			},
+			"routes": [
+				{ "pattern": "app.bolsadelahabana.com", "custom_domain": true }
+			],
+			"vars": {
+				"NEXT_PUBLIC_SUPABASE_URL": "https://rjrnoydmlwogpdboflrs.supabase.co",
+				"NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqcm5veWRtbHdvZ3BkYm9mbHJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM3NTE3NTEsImV4cCI6MjA5OTMyNzc1MX0.RS7XFiJyjIgwOeHuOzvC1HcQvylSRD3TTN_MjUtFOuc"
+			}
+		}
+	}
 }
