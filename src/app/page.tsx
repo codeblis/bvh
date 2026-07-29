@@ -30,7 +30,7 @@ function getTimeRemaining(target: Date) {
 
 export default function Home() {
 	const launchDate =
-		process.env.NEXT_PUBLIC_LAUNCH_DATE ?? "2026-08-12T00:00:00Z";
+		process.env.NEXT_PUBLIC_LAUNCH_DATE ?? "2026-08-30T00:00:00Z";
 
 	const targetDate = new Date(launchDate);
 
