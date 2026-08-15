@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Logo } from "@/components/bvh/Logo";
 import { ThemeToggle } from "@/components/bvh/ThemeToggle";
 import { User, Building2 } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 type FormData = {
   nombre: string;
@@ -48,12 +49,14 @@ export default function RegistroPage() {
 
     setLoading(true);
     try {
-      // TODO: Integrar con Supabase Auth
-      // const { error } = await supabase.auth.signUp({ email: form.email, password: form.password, options: { data: { nombre: form.nombre, tipo: form.tipo } } });
-      // if (error) throw error;
-
-      await new Promise((r) => setTimeout(r, 1000));
-      router.push("/login?registered=true");
+		const supabase = createClient();
+		const { error: authError } = await supabase.auth.signUp({
+			email: form.email,
+			password: form.password,
+			options: { data: { nombre: form.nombre, tipo: form.tipo, newsletter: form.newsletter } },
+		});
+		if (authError) throw authError;
+		router.push("/login?registered=true");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Error en el registro");
     } finally {

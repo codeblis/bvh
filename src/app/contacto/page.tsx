@@ -80,12 +80,30 @@ const ASUNTOS = [
 export default function ContactoPage() {
 	const [form, setForm] = useState<FormData>(initialForm);
 	const [enviado, setEnviado] = useState(false);
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState("");
+	const [reference, setReference] = useState("");
 
-	const handleSubmit = (e: React.FormEvent) => {
+	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		console.log("Contacto:", form);
-		setEnviado(true);
-		setForm(initialForm);
+		setLoading(true);
+		setError("");
+		try {
+			const response = await fetch("/api/contacto", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(form),
+			});
+			const result = (await response.json()) as { message?: string; reference?: string };
+			if (!response.ok) throw new Error(result.message);
+			setReference(result.reference ?? "");
+			setEnviado(true);
+			setForm(initialForm);
+		} catch (err) {
+			setError(err instanceof Error && err.message ? err.message : "No pudimos enviar el mensaje.");
+		} finally {
+			setLoading(false);
+		}
 	};
 
 	const handleChange = (
@@ -119,7 +137,7 @@ export default function ContactoPage() {
 								Mensaje enviado correctamente
 							</h3>
 							<p className="mt-2 text-muted-foreground">
-								Referencia: BVH-CON-{Date.now().toString(36).toUpperCase()}
+								Referencia: {reference}
 							</p>
 						</div>
 						<div className="flex flex-wrap gap-3 justify-center">
@@ -200,6 +218,7 @@ export default function ContactoPage() {
 							Envíanos un mensaje
 						</h3>
 						<form onSubmit={handleSubmit} className="space-y-5" noValidate>
+							{error && <p role="alert" className="rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3 text-[13px] text-destructive">{error}</p>}
 							<div className="grid gap-5 md:grid-cols-2">
 								<div>
 									<label
@@ -281,9 +300,10 @@ export default function ContactoPage() {
 							</div>
 							<button
 								type="submit"
+								disabled={loading}
 								className="w-full rounded-md bg-primary px-6 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-primary-foreground shadow-[var(--shadow-gold)] transition hover:brightness-110"
 							>
-								Enviar mensaje
+								{loading ? "Enviando…" : "Enviar mensaje"}
 							</button>
 							<p className="text-center text-[11px] text-muted-foreground">
 								Al enviar, aceptas nuestra{" "}

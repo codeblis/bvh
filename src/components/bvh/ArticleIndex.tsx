@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Search } from "lucide-react";
+import { NewsletterSignup } from "./NewsletterSignup";
 
 export type Article = {
   id: string;
@@ -75,6 +76,7 @@ export function ArticleIndex({
             const active = c === cat;
             return (
               <button
+				type="button"
                 key={c}
                 onClick={() => setCat(c)}
                 className={`rounded-full border px-3 py-1.5 text-[11px] uppercase tracking-widest transition ${
@@ -190,6 +192,7 @@ export function ArticleIndex({
               {categories.map((c) => (
                 <li key={c} className="flex items-center justify-between border-b border-border pb-2 last:border-0">
                   <button
+					type="button"
                     onClick={() => setCat(c)}
                     className={`transition ${cat === c ? "text-primary" : "text-foreground hover:text-primary"}`}
                   >
@@ -211,21 +214,7 @@ export function ArticleIndex({
             <h3 className="font-serif text-2xl leading-tight text-foreground md:text-3xl">{newsletter.title}</h3>
             <p className="mt-4 max-w-lg text-[14px] leading-relaxed text-muted-foreground">{newsletter.description}</p>
           </div>
-          <form
-            onSubmit={(e) => e.preventDefault()}
-            className="flex flex-col justify-center gap-3"
-          >
-            <input
-              required
-              type="email"
-              placeholder={newsletter.placeholder}
-              className="w-full rounded-md border border-border bg-background/80 px-4 py-3 text-[13px] text-foreground focus:border-primary focus:outline-none"
-            />
-            <button className="rounded-md bg-primary px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-primary-foreground transition hover:brightness-110">
-              {newsletter.cta}
-            </button>
-            <p className="text-[11px] text-muted-foreground">{newsletter.hint}</p>
-          </form>
+          <NewsletterSignup cta={newsletter.cta} placeholder={newsletter.placeholder} hint={newsletter.hint} source={basePath} />
         </div>
       </div>
     </section>

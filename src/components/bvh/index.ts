@@ -5,3 +5,4 @@ export { SiteFooter } from "./SiteFooter";
 export { PageHero } from "./PageHero";
 export { LiveTicker } from "./LiveTicker";
 export { NewsletterSignup } from "./NewsletterSignup";
+export { DemoNotice } from "./DemoNotice";

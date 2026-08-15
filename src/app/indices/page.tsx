@@ -4,7 +4,8 @@ import { useState, useMemo, useEffect } from "react";
 import { PageHero } from "@/components/bvh/PageHero";
 import { SiteHeader } from "@/components/bvh/SiteHeader";
 import { SiteFooter } from "@/components/bvh/SiteFooter";
-import { Download, FileText, ArrowUp, ArrowDown } from "lucide-react";
+import { DemoNotice } from "@/components/bvh/DemoNotice";
+import { ArrowUp, ArrowDown } from "lucide-react";
 import {
   AreaChart,
   Area,
@@ -16,8 +17,9 @@ import {
 } from "recharts";
 
 function mulberry32(a: number) {
-  return function () {
-    let t = (a += 0x6d2b79f5);
+	return () => {
+	a += 0x6d2b79f5;
+	let t = a;
     t = Math.imul(t ^ (t >>> 15), t | 1);
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
@@ -67,10 +69,11 @@ function generateHistory(idx: IndexDef): DataPoint[] {
 const DATA_CACHE = new Map<number, DataPoint[]>();
 
 function getHistory(idx: IndexDef): DataPoint[] {
-  if (!DATA_CACHE.has(idx.seed)) {
-    DATA_CACHE.set(idx.seed, generateHistory(idx));
-  }
-  return DATA_CACHE.get(idx.seed)!;
+	const cached = DATA_CACHE.get(idx.seed);
+	if (cached) return cached;
+	const generated = generateHistory(idx);
+	DATA_CACHE.set(idx.seed, generated);
+	return generated;
 }
 
 function filterByPeriod(data: DataPoint[], periodo: Periodo): DataPoint[] {
@@ -120,19 +123,6 @@ interface SummaryRow {
   chgMonth: number;
 }
 
-function computeSummaryRows(): SummaryRow[] {
-  return INDICES.map((idx) => {
-    const data = getHistory(idx);
-    return {
-      name: idx.name,
-      value: getLastValue(data),
-      chgDay: getDailyChange(data),
-      chgWeek: getLookbackChange(data, 7),
-      chgMonth: getLookbackChange(data, 30),
-    };
-  });
-}
-
 function getLiveHistory(idx: IndexDef, tick: number): DataPoint[] {
   if (tick === 0) return getHistory(idx);
   const data = getHistory(idx);
@@ -171,10 +161,10 @@ function formatValue(n: number) {
 }
 
 function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: { value: number }[]; label?: string }) {
-  if (!active || !payload?.length) return null;
+	if (!active || !payload?.length || !label) return null;
   return (
     <div className="rounded-lg border border-border bg-background/95 px-3 py-2 shadow-[var(--shadow-elegant)] backdrop-blur text-[13px]">
-      <div className="text-muted-foreground text-[11px]">{formatDate(label!)}</div>
+	  <div className="text-muted-foreground text-[11px]">{formatDate(label)}</div>
       <div className="font-mono font-semibold text-foreground">{formatValue(payload[0].value)}</div>
     </div>
   );
@@ -211,10 +201,11 @@ export default function IndicesPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
+	  <DemoNotice />
       <PageHero
         eyebrow="Transparencia · Datos verificables"
         title={<>Índices <span className="italic text-primary">BVH</span></>}
-        description="Consulte la evolución histórica de nuestros índices sectoriales y generales. Metodología abierta, datos auditables y actualización en tiempo real durante la sesión."
+		description="Explore una simulación de los futuros índices sectoriales y generales. La metodología y las fuentes definitivas se publicarán antes de cualquier lanzamiento operativo."
       />
       <section className="mx-auto max-w-7xl px-6 py-12 md:py-16">
         <div className="grid gap-8 lg:grid-cols-[280px_1fr]">
@@ -241,28 +232,12 @@ export default function IndicesPage() {
             <div className="rounded-xl border border-border bg-card/60 p-6">
               <h3 className="font-serif text-xl text-foreground">Metodología</h3>
               <p className="mt-3 text-[13px] leading-relaxed text-muted-foreground">
-                Los índices BVH se calculan bajo metodología de capitalización bursátil ajustada por flotante,
-                revisada trimestralmente. La base es 1000 puntos al 1 de enero de 2026.
-                <br /><br />
-                <a href="/metodologia" className="text-primary hover:underline">Ver metodología completa →</a>
+				Modelo preliminar basado en capitalización ajustada por flotante. La visualización usa una base simulada de 1000 puntos y no debe emplearse para tomar decisiones financieras.
               </p>
             </div>
             <div className="rounded-xl border border-border bg-card/60 p-6">
               <h3 className="font-serif text-xl text-foreground">Descargas</h3>
-              <div className="mt-3 space-y-2">
-                <a href="/descargas/indices-bvh-mensual.csv" className="flex items-center gap-2 rounded-md px-3 py-2 text-[13px] text-muted-foreground hover:text-foreground hover:bg-secondary">
-                  <Download className="w-4 h-4" aria-hidden="true" />
-                  CSV histórico (mensual)
-                </a>
-                <a href="/descargas/indices-bvh-anual.xlsx" className="flex items-center gap-2 rounded-md px-3 py-2 text-[13px] text-muted-foreground hover:text-foreground hover:bg-secondary">
-                  <Download className="w-4 h-4" aria-hidden="true" />
-                  Excel histórico (anual)
-                </a>
-                <a href="/descargas/metodologia-indices-bvh.pdf" className="flex items-center gap-2 rounded-md px-3 py-2 text-[13px] text-muted-foreground hover:text-foreground hover:bg-secondary">
-                  <FileText className="w-4 h-4" aria-hidden="true" />
-                  Metodología (PDF)
-                </a>
-              </div>
+			  <p className="mt-3 text-[13px] leading-relaxed text-muted-foreground">Los archivos históricos y la metodología auditada estarán disponibles cuando existan fuentes operativas verificadas.</p>
             </div>
           </aside>
 
@@ -273,8 +248,8 @@ export default function IndicesPage() {
                   <div className="flex items-center gap-2">
                     <h2 className="font-serif text-2xl text-foreground">{index.name}</h2>
                     <span className="inline-flex items-center gap-1 rounded-full border border-[color:var(--bvh-up)]/30 bg-[color:var(--bvh-up)]/10 px-2 py-0.5">
-                      <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--bvh-up)] animate-pulse" />
-                      <span className="text-[9px] font-semibold uppercase tracking-widest text-[color:var(--bvh-up)]">Live</span>
+					  <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+					  <span className="text-[9px] font-semibold uppercase tracking-widest text-primary">Simulado</span>
                     </span>
                   </div>
                   <p className="mt-1 text-[13px] text-muted-foreground">{index.desc}</p>

@@ -5,9 +5,17 @@ import { SiteHeader } from "@/components/bvh/SiteHeader";
 import { SiteFooter } from "@/components/bvh/SiteFooter";
 import { NewsletterSignup } from "@/components/bvh/NewsletterSignup";
 import { POSTS, getPost, getPostsRelacionados, BLOG_CONTENT } from "@/data/blog";
+import type { Metadata } from "next";
 
 export function generateStaticParams() {
   return POSTS.map((a) => ({ slug: a.slug }));
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+	const { slug } = await params;
+	const article = getPost(slug);
+	if (!article) return {};
+	return { title: `${article.title} | Blog BVH`, description: article.excerpt, alternates: { canonical: `/blog/${slug}` }, openGraph: { title: article.title, description: article.excerpt, type: "article", publishedTime: article.date } };
 }
 
 function fmtDate(iso: string) {
@@ -68,8 +76,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
       <article className="mx-auto max-w-3xl px-6 py-8 md:py-12">
         <div>
-          {content.map((paragraph, i) => (
-            <p key={i} className="mb-3 text-[14px] leading-6 text-foreground/80 last:mb-0">{paragraph}</p>
+		  {content.map((paragraph) => (
+			<p key={paragraph} className="mb-3 text-[14px] leading-6 text-foreground/80 last:mb-0">{paragraph}</p>
           ))}
         </div>
 

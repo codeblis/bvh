@@ -4,6 +4,7 @@ import Link from "next/link";
 import { PageHero } from "@/components/bvh/PageHero";
 import { SiteHeader } from "@/components/bvh/SiteHeader";
 import { SiteFooter } from "@/components/bvh/SiteFooter";
+import { DemoNotice } from "@/components/bvh/DemoNotice";
 import { ArrowUp, ArrowDown, ArrowRight } from "lucide-react";
 
 const EMPRESAS = [
@@ -133,7 +134,8 @@ const MERCADOS = [
 export default function MercadosPage() {
 	return (
 		<div className="min-h-screen bg-background text-foreground">
-			<SiteHeader />
+      <SiteHeader />
+	  <DemoNotice />
 			<PageHero
 				eyebrow="Mercado · Sesión en curso"
 				title={
@@ -266,7 +268,7 @@ export default function MercadosPage() {
 						))}
 					</div>
 
-					<div className="mt-16 rounded-2xl border border-border bg-card/70 p-4 sm:p-8 shadow-[var(--shadow-elegant)] backdrop-blur">
+					<div id="hse" className="mt-16 rounded-2xl border border-border bg-card/70 p-4 sm:p-8 shadow-[var(--shadow-elegant)] backdrop-blur">
 						<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
 							<div>
 								<h3 className="font-serif text-2xl text-foreground">

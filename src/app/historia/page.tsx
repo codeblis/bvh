@@ -48,7 +48,7 @@ export default function HistoriaPage() {
         </h2>
         <div className="relative">
           <div className="absolute left-6 sm:left-8 top-0 bottom-0 w-px bg-border" />
-          {HITOS.map((h, i) => (
+		  {HITOS.map((h) => (
             <div key={h.ano} className="relative pl-16 pb-8 sm:pl-20 sm:pb-12 last:pb-0">
               <div className="absolute left-6 sm:left-8 top-0 -translate-x-1/2 flex h-10 w-10 items-center justify-center rounded-full border-2 border-primary bg-background text-primary">
                 <h.icon className="w-5 h-5" aria-hidden="true" />
@@ -85,7 +85,7 @@ export default function HistoriaPage() {
 
       <section className="mx-auto max-w-7xl px-6 py-12 md:py-16">
         <div className="text-center mb-14">
-          <div className="mb-3 text-[11px] uppercase tracking-[0.24em] text-primary">Equipo directivo</div>
+		  <div className="mb-3 text-[11px] uppercase tracking-[0.24em] text-primary">Estructura propuesta · perfiles demostrativos</div>
           <h2 className="font-serif text-3xl leading-tight text-foreground md:text-4xl">
             Las personas <span className="italic text-primary">detrás de BVH</span>
           </h2>
@@ -121,9 +121,7 @@ export default function HistoriaPage() {
               <a href="/contacto" className="rounded-md bg-primary px-6 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-primary-foreground shadow-[var(--shadow-gold)] transition hover:brightness-110">
                 Contactar al equipo
               </a>
-              <a href="/docs/estatutos.pdf" className="rounded-md border border-border bg-background/60 px-6 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-foreground transition hover:bg-background">
-                Ver estatutos (PDF)
-              </a>
+			  <a href="/terminos" className="rounded-md border border-border bg-background/60 px-6 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-foreground transition hover:bg-background">Información legal</a>
             </div>
           </div>
         </div>

@@ -16,7 +16,7 @@ const SOCIALS = [
 const COLS = [
   { title: "Mercado", items: [
     { href: "/mercados", label: "Cotizaciones" },
-    { href: "/mercados", label: "Índices" },
+	{ href: "/indices", label: "Índices" },
     { href: "/noticias", label: "Análisis" },
     { href: "/blog", label: "Blog" },
   ]},
@@ -81,7 +81,7 @@ export function SiteFooter() {
       <div className="border-t border-border">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-6 py-6 text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
           <span>© 2026 Bolsa de Valores de La Habana</span>
-          <span>Hecho con rigor · La Habana, Cuba</span>
+		  <div className="flex flex-wrap gap-4"><Link href="/terminos" className="hover:text-foreground">Términos</Link><Link href="/privacidad" className="hover:text-foreground">Privacidad</Link><span>Proyecto en desarrollo · La Habana, Cuba</span></div>
         </div>
       </div>
     </footer>

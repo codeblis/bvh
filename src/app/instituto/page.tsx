@@ -292,7 +292,7 @@ export default function InstitutoPage() {
 										</td>
 										<td className="px-5 py-4 text-right">
 											<Link
-												href="/instituto/eventos"
+											href="/contacto#contact-form"
 												className="text-[11px] uppercase tracking-widest text-primary hover:underline"
 											>
 												Registrarse
@@ -328,7 +328,7 @@ export default function InstitutoPage() {
 						</p>
 						<div className="mt-8">
 							<Link
-								href="/instituto/certificacion"
+								href="/contacto#contact-form"
 								className="inline-block rounded-md bg-primary px-6 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-primary-foreground shadow-[var(--shadow-gold)] transition hover:brightness-110"
 							>
 								Ver programa de certificación →

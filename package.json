@@ -2,17 +2,20 @@
 	"name": "bvh",
 	"version": "0.1.0",
 	"private": true,
-	"packageManager": "pnpm@11.12.0",
+	"packageManager": "pnpm@11.19.0",
 	"scripts": {
 		"dev": "next dev",
 		"build": "next build",
+		"typecheck": "tsc --noEmit",
+		"test": "vitest run",
 		"start": "next start",
 		"lint": "biome lint",
 		"format": "biome format --write",
 		"preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
 		"deploy": "bash -c 'if [ \"$(git branch --show-current)\" != \"production\" ]; then echo \"⛔ Debes estar en production para desplegar\"; exit 1; fi && opennextjs-cloudflare build && opennextjs-cloudflare deploy --env app'",
 		"cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
-		"gen:types": "supabase gen types typescript --project-id rjrnoydmlwogpdboflrs --schema public > src/types/supabase.ts"
+		"gen:types": "supabase gen types typescript --project-id rjrnoydmlwogpdboflrs --schema public > src/types/supabase.ts",
+		"check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"
 	},
 	"dependencies": {
 		"@base-ui/react": "^1.6.0",
@@ -47,6 +50,7 @@
 		"babel-plugin-react-compiler": "1.0.0",
 		"tailwindcss": "^4.3.2",
 		"typescript": "^5.9.3",
+		"vitest": "^4.1.10",
 		"wrangler": "^4.110.0"
 	}
 }

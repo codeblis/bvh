@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Logo } from "./Logo";
 import { ThemeToggle } from "./ThemeToggle";
 import { Menu, X } from "lucide-react";
+import { AuthButton } from "./AuthButton";
 
 const NAV = [
   { href: "/indices", label: "Índices" },
@@ -37,7 +38,7 @@ export function SiteHeader() {
             <div className="text-[9px] uppercase tracking-[0.22em] text-muted-foreground md:text-[10px]">de La Habana</div>
           </div>
         </Link>
-        <nav className="hidden items-center gap-8 text-[13px] text-muted-foreground md:flex">
+		<nav className="hidden items-center gap-6 text-[13px] text-muted-foreground lg:flex">
           {NAV.map((n) => (
             <Link
               key={n.href}
@@ -52,22 +53,17 @@ export function SiteHeader() {
           <ThemeToggle />
           <button
             type="button"
-            className="flex items-center justify-center md:hidden"
+			className="flex h-9 w-9 items-center justify-center rounded-md border border-border lg:hidden"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
           >
             {mobileOpen ? <X className="w-5 h-5" aria-hidden="true" /> : <Menu className="w-5 h-5" aria-hidden="true" />}
           </button>
-          <Link
-            href="/login"
-            className="rounded-md border border-primary/40 bg-primary/10 px-4 py-2 text-[12px] font-semibold uppercase tracking-wider text-primary transition hover:bg-primary hover:text-primary-foreground"
-          >
-            Acceder
-          </Link>
+		  <AuthButton />
         </div>
       </div>
-      {mobileOpen && (
-        <div className="border-t border-border md:hidden">
+	  {mobileOpen && (
+		<div className="border-t border-border lg:hidden">
           <nav className="mx-auto max-w-7xl px-6 py-4 space-y-1">
             {NAV.map((n) => (
               <Link

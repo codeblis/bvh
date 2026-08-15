@@ -100,7 +100,7 @@ export default function AcercaPage() {
       <section className="border-t border-border bg-card/40">
         <div className="mx-auto max-w-7xl px-6 py-12 md:py-16">
           <div className="text-center mb-14">
-            <div className="mb-3 text-[11px] uppercase tracking-[0.24em] text-primary">Equipo directivo</div>
+		  <div className="mb-3 text-[11px] uppercase tracking-[0.24em] text-primary">Estructura propuesta · perfiles demostrativos</div>
             <h2 className="font-serif text-3xl leading-tight text-foreground md:text-4xl">
               Las personas <span className="italic text-primary">detrás de BVH</span>
             </h2>
@@ -137,9 +137,7 @@ export default function AcercaPage() {
               <a href="/contacto" className="rounded-md bg-primary px-6 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-primary-foreground shadow-[var(--shadow-gold)] transition hover:brightness-110">
                 Contactar al equipo
               </a>
-              <a href="/docs/estatutos.pdf" className="rounded-md border border-border bg-background/60 px-6 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-foreground transition hover:bg-background">
-                Ver estatutos (PDF)
-              </a>
+			  <a href="/terminos" className="rounded-md border border-border bg-background/60 px-6 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-foreground transition hover:bg-background">Información legal</a>
             </div>
           </div>
         </div>

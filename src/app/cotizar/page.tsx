@@ -80,6 +80,9 @@ const initialForm: FormData = {
 export default function CotizarPage() {
 	const [form, setForm] = useState<FormData>(initialForm);
 	const [submitted, setSubmitted] = useState(false);
+	const [loading, setLoading] = useState(false);
+	const [submitError, setSubmitError] = useState("");
+	const [reference, setReference] = useState("");
 	const [errors, setErrors] = useState<
 		Partial<Record<keyof FormData, boolean>>
 	>({});
@@ -102,11 +105,25 @@ export default function CotizarPage() {
 		return Object.keys(e).length === 0;
 	};
 
-	const handleSubmit = (e: React.FormEvent) => {
+	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (validate()) {
-			console.log("Form submitted:", form);
+		if (!validate()) return;
+		setLoading(true);
+		setSubmitError("");
+		try {
+			const response = await fetch("/api/cotizaciones", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(form),
+			});
+			const result = (await response.json()) as { message?: string; reference?: string };
+			if (!response.ok) throw new Error(result.message);
+			setReference(result.reference ?? "");
 			setSubmitted(true);
+		} catch (error) {
+			setSubmitError(error instanceof Error && error.message ? error.message : "No pudimos enviar la solicitud.");
+		} finally {
+			setLoading(false);
 		}
 	};
 
@@ -145,7 +162,7 @@ export default function CotizarPage() {
 						<p className="text-sm text-muted-foreground">
 							Referencia:{" "}
 							<span className="font-mono text-foreground">
-								BVH-{Date.now().toString(36).toUpperCase()}
+								{reference}
 							</span>
 						</p>
 						<p className="mt-2 text-sm text-muted-foreground">
@@ -332,6 +349,7 @@ export default function CotizarPage() {
 					</p>
 
 					<form onSubmit={handleSubmit} className="mt-8 space-y-5" noValidate>
+						{submitError && <p role="alert" className="rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">{submitError}</p>}
 						<div className="grid gap-5 md:grid-cols-2">
 							{field("companyName", "Razón social", {
 								placeholder: "Empresa Ejemplo S.A.",
@@ -418,9 +436,10 @@ export default function CotizarPage() {
 							</p>
 							<button
 								type="submit"
+								disabled={loading}
 								className="shrink-0 rounded-lg bg-primary px-8 py-2.5 text-xs font-semibold uppercase tracking-wider text-primary-foreground shadow-[var(--shadow-gold)] transition hover:brightness-110"
 							>
-								Enviar solicitud
+								{loading ? "Enviando…" : "Enviar solicitud"}
 							</button>
 						</div>
 					</form>

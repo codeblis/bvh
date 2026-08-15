@@ -4,12 +4,12 @@ import Link from "next/link";
 import { PageHero } from "@/components/bvh/PageHero";
 import { SiteHeader } from "@/components/bvh/SiteHeader";
 import { SiteFooter } from "@/components/bvh/SiteFooter";
-import { ArrowUp, ArrowDown } from "lucide-react";
+import { NewsletterSignup } from "@/components/bvh/NewsletterSignup";
 
 const STATS = [
-	{ n: "14", plus: "+", l: "Empresas cotizando" },
+	{ n: "14", plus: "+", l: "Empresas modelo" },
 	{ n: "5", plus: "", l: "Índices sectoriales" },
-	{ n: "3", plus: "K+", l: "Emprendedores registrados" },
+	{ n: "3", plus: "K+", l: "Meta de comunidad" },
 	{ n: "2026", plus: "", l: "Año de fundación" },
 ];
 
@@ -52,7 +52,7 @@ export default function Home() {
 			<SiteHeader />
 
 			<PageHero
-				eyebrow="Sesión 2026 · Mercado abierto"
+				eyebrow="Proyecto 2026 · Plataforma en desarrollo"
 				title={
 					<>
 						El capital cubano,
@@ -74,6 +74,12 @@ export default function Home() {
 						className="rounded-md border border-border bg-card/40 px-6 py-4 text-[12px] font-semibold uppercase tracking-[0.14em] text-foreground transition hover:bg-card"
 					>
 						Instituto BVH →
+					</Link>
+					<Link
+						href="/mercados#hse"
+						className="rounded-md border border-border bg-card/40 px-6 py-4 text-[12px] font-semibold uppercase tracking-[0.14em] text-foreground transition hover:bg-card"
+					>
+						Accede a la plataforma de negociación HSE →
 					</Link>
 				</div>
 				<div className="mt-14 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[11px] uppercase tracking-widest text-muted-foreground">
@@ -118,7 +124,7 @@ export default function Home() {
 							, en un solo lugar
 						</h2>
 					</div>
-					<div className="grid gap-px bg-border md:grid-cols-2 lg:grid-cols-3  grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-3 cursor-pointer">
+					<div className="grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
 						{SERVICIOS.map((s) => (
 							<div
 								key={s.n}
@@ -224,41 +230,9 @@ export default function Home() {
 							empresas listadas y anuncios oficiales de la Bolsa. Distinto al
 							boletín diario de noticias y a los ensayos semanales del blog.
 						</p>
-						<form
-							onSubmit={(e) => e.preventDefault()}
-							className="mt-6 space-y-3"
-						>
-							<div className="grid gap-3 sm:grid-cols-2">
-								<input
-									required
-									placeholder="Nombre"
-									className="w-full rounded-md border border-border bg-background/80 px-4 py-3 text-[13px] text-foreground focus:border-primary focus:outline-none"
-								/>
-								<input
-									required
-									type="email"
-									placeholder="tu@correo.cu"
-									className="w-full rounded-md border border-border bg-background/80 px-4 py-3 text-[13px] text-foreground focus:border-primary focus:outline-none"
-								/>
-							</div>
-							<select className="w-full rounded-md border border-border bg-background/80 px-4 py-3 text-[13px] text-foreground focus:border-primary focus:outline-none">
-								<option>Perfil: Emprendedor / MIPYME</option>
-								<option>Perfil: Inversor</option>
-								<option>Perfil: Prensa / Investigación</option>
-								<option>Perfil: Diáspora</option>
-								<option>Perfil: Otro</option>
-							</select>
-							<button
-								type="submit"
-								className="w-full rounded-md bg-primary px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-primary-foreground transition hover:brightness-110"
-							>
-								Suscribirme al boletín institucional
-							</button>
-							<p className="text-[11px] text-muted-foreground">
-								Un correo al mes · sin spam · puedes darte de baja cuando
-								quieras.
-							</p>
-						</form>
+						<div className="mt-6">
+							<NewsletterSignup detailed source="portada" cta="Suscribirme al boletín institucional" placeholder="tu@correo.cu" hint="Un correo al mes · sin spam · puedes darte de baja cuando quieras." />
+						</div>
 						<div className="mt-6 flex flex-wrap gap-2 border-t border-border pt-5 text-[11px]">
 							<Link
 								href="/noticias"

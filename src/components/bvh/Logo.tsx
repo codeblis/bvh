@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 export function Logo({ className = "h-8" }: { className?: string }) {
   const [src, setSrc] = useState("/logo.svg");
@@ -15,5 +16,5 @@ export function Logo({ className = "h-8" }: { className?: string }) {
     return () => observer.disconnect();
   }, []);
 
-  return <img src={src} alt="BVH" className={className} />;
+	return <Image src={src} alt="BVH" width={146} height={163} className={className} priority />;
 }

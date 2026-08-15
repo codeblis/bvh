@@ -1,44 +1,33 @@
-<<<<<<< HEAD
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BVH · Bolsa de Valores de La Habana
 
-## Getting Started
+Portal institucional en desarrollo para presentar la iniciativa BVH, publicar contenido económico y validar la experiencia de sus futuros servicios.
 
-First, run the development server:
+> Los índices, cotizaciones, empresas, métricas y perfiles incluidos actualmente son datos demostrativos. No constituyen información bursátil en tiempo real ni una oferta de inversión.
+
+## Desarrollo local
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
+cp .env.example .env.local
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Validación
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm check
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+El comando ejecuta lint, TypeScript, pruebas y build de producción.
 
-## Learn More
+## Integraciones
 
-To learn more about Next.js, take a look at the following resources:
+- Supabase: autenticación de usuarios.
+- Resend: contacto, solicitudes de cotización y newsletters.
+- OpenNext + Cloudflare Workers: build y despliegue.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Las integraciones fallan de forma segura cuando faltan variables de entorno: la interfaz no comunica un éxito que el servidor no haya confirmado. Consulta [.env.example](.env.example).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Despliegue
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-=======
-# 🏛️ BVH · Portal de la Bolsa de Valores de La Habana (work in progress...)
-
-[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Deployed-brightgreen)](https://tusuario.github.io/bvh-landing/)
-[![Apache 2.0 License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![Made with ❤️ in Cuba](https://img.shields.io/badge/Made%20with-❤️%20in%20Cuba-red)](https://github.com/tu-usuario/bvh-landing)
->>>>>>> 05097298c6729af7155c9d6456c197bb1e20226b
+El script `pnpm deploy` exige estar en la rama `production` y despliega el entorno `app` definido en `wrangler.jsonc`.

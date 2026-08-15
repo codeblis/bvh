@@ -51,12 +51,12 @@ export function LiveTicker() {
       <div className="flex items-center gap-3 overflow-hidden">
         <div className="flex shrink-0 items-center gap-2 border-r border-border px-4 py-2.5 text-[11px] font-semibold uppercase tracking-widest text-primary">
           <span className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-primary" aria-hidden="true" />
-          BVH Live · <span className="tabular-nums">{now}</span>
+			Demo de mercado · <span className="tabular-nums">{now}</span>
         </div>
         <div className="relative flex-1 overflow-hidden">
           <div className="ticker-track flex w-max gap-8 py-2.5 text-[12px] font-mono">
-            {doubled.map((r, i) => (
-              <span key={i} className="flex items-center gap-2 whitespace-nowrap">
+			{doubled.map((r, index) => (
+			  <span key={`${index < rows.length ? "a" : "b"}-${r.id}`} className="flex items-center gap-2 whitespace-nowrap">
                 <span className="font-semibold tracking-wider text-foreground">{r.sym}</span>
                 <span className="text-muted-foreground">{r.price.toFixed(2)}</span>
                 <span className={r.change >= 0 ? "text-[color:var(--bvh-up)]" : "text-[color:var(--bvh-down)]"}>
