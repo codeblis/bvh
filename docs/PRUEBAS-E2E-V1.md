@@ -46,10 +46,10 @@ La prueba detectó que el historial perdía título/calendario al cerrar una ofe
 
 ## Resultado conjunto
 
-- `pnpm test:e2e`: **30/30 correctas**, 1,5 min de ejecución de Playwright, después de compilar y arrancar el servidor; incluye editorial, cursos, identidad, formularios, avisos, CMS por rol, SEO, privacidad y accesibilidad.
-- `pnpm test:db`: **54/54 correctas** (28 autorización, 10 historial privado, 7 capacidad administrativa, 9 privacidad de auditoría).
+- `pnpm test:e2e`: **33/33 correctas**, 1,9 min de ejecución de Playwright, después de compilar y arrancar el servidor; incluye editorial, cursos, identidad, formularios, avisos, CMS por rol, categorías y roles, SEO, privacidad y accesibilidad.
+- `pnpm test:db`: **66/66 correctas** (28 autorización, 10 historial privado, 7 capacidad administrativa, 9 privacidad de auditoría, 12 gestión de roles).
 - `pnpm test:concurrency`: un único ganador del último cupo y reintento idempotente correctos.
-- `pnpm check`: lint (159 archivos), tipos, **35 unitarias** y build correctos, con las variables de Supabase local inyectadas.
+- `pnpm check`: lint (164 archivos), tipos, **35 unitarias** y build correctos, con las variables de Supabase local inyectadas.
 - `openspec validate deliver-v1-core-platform --strict --no-interactive`: correcto.
 - `git diff --check` y comprobación Biome de las nuevas pruebas y módulo de identidad: correctos.
 
@@ -153,6 +153,22 @@ Lo verificado:
 - En cada página pública hay exactamente una región principal y una cabecera; el primer tabulado enfoca el salto al contenido y activarlo lleva a `#contenido`.
 
 **Pendiente de esta tarea:** el recorrido con lector de pantalla real (VoiceOver o NVDA) no puede automatizarse y sigue sin hacerse. Las comprobaciones anteriores cubren estructura, foco, nombres y contraste, que es lo que ese recorrido verificaría, pero no lo sustituyen.
+
+## Categorías y roles: cobertura administrativa mínima
+
+`pnpm test:e2e admin-taxonomy` : **3/3 correctas**. `supabase/tests/admin_roles.test.sql`: **12/12 correctas**.
+
+El contrato exige que el CMS permita gestionar «categorías, usuarios y roles», y esas eran las dos pantallas que faltaban: la taxonomía editorial solo podía tocarse desde la base y el rol no tenía ninguna vía de cambio, porque el permiso por columnas de `profiles` excluye `role` y no existe política de actualización para administradores.
+
+`set_profile_role` es ahora la única vía. Exige administrador, valida el rol contra la lista permitida y **prohíbe cambiar el rol propio**: como quien ejecuta la operación ya es administrador, esa sola regla garantiza que el panel nunca se queda sin ninguno. La auditoría pasa a describir también el rol anterior y el nuevo —un rol no es dato personal— y las categorías quedan bajo el mismo registro.
+
+Lo verificado en base de datos: un usuario sin rol no puede promoverse ni promover a nadie, la escritura directa de `role` sigue denegada por permisos de columna, el anónimo no puede ni ejecutar la operación, un administrador sí promueve y retira el rol de cuentas ajenas, su propio cambio se rechaza, un rol fuera de lista y una cuenta inexistente se rechazan sin tocar nada, y la promoción queda auditada con actor, recurso y rol anterior y nuevo.
+
+Lo verificado en navegador:
+
+- Categorías: alta con slug propio, edición en línea, nombre duplicado rechazado con su motivo, y borrado que exige confirmación. Una categoría con artículos asignados no ofrece borrado y se marca «En uso», para que publicar no quede sin taxonomía.
+- Usuarios: la búsqueda acota el listado y explica el vacío; promover abre el panel a esa cuenta de verdad y retirar el rol lo cierra otra vez; la fila propia no ofrece cambio de rol.
+- Un usuario autenticado sin rol termina en `/cuenta` y un visitante en `/login`; su rol sigue intacto tras los intentos.
 
 ## Límites
 

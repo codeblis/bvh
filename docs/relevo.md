@@ -44,14 +44,15 @@ Cambio preexistente no rastreado: .claude/
 - **Actual local:** ni el HTML ni los scripts públicos llevan la clave de servicio o la del proveedor de correo; los fallos de consulta no exponen SQL al navegador; el acuse de los formularios solo devuelve la referencia; la auditoría guarda el hecho y no el contenido personal. Tarea 4.4 verificada salvo la exportación.
 - **Pendiente:** no existe ninguna exportación de datos, así que el escenario «Exportación segura» del CMS sigue sin demostrarse; construirla es decisión del propietario (6.1).
 - **Actual local:** el sitio respeta `prefers-reduced-motion`, las páginas públicas tienen región principal y salto al contenido, los flujos críticos no desbordan a 320/768/1280 px y contacto se envía solo con teclado. Tarea 4.2 verificada salvo el recorrido con lector de pantalla real.
-- **Pendiente:** gestión de categorías y usuarios/roles, antiabuso, correo de cursos y operación productiva verificada.
+- **Actual local:** el CMS gestiona categorías y roles. `set_profile_role` es la única vía de cambio de rol: exige administrador y prohíbe cambiar el propio, de modo que siempre queda alguien con acceso al panel. La auditoría describe además el rol anterior y el nuevo.
+- **Pendiente:** antiabuso, correo de cursos y operación productiva verificada.
 - **Nota:** `companies` e `indices` se administran desde el CMS pero ninguna página pública los consume todavía; `/mercados` e `/indices` siguen con datos estáticos.
 
 ## Verificación observada
 
 - `pnpm check`: pasó con configuración local; incluye lint, typecheck, 35 unitarias y build.
-- `pnpm test:e2e`: 30/30 correctas (1,5 min), sobre servidor de producción local.
-- `pnpm test:db`: 54/54 correctas; concurrencia del último cupo e idempotencia también correctas.
+- `pnpm test:e2e`: 33/33 correctas (1,9 min), sobre servidor de producción local.
+- `pnpm test:db`: 66/66 correctas; concurrencia del último cupo e idempotencia también correctas.
 - Validación OpenSpec estricta y `git diff --check`: correctos.
 
 ## Bloqueos críticos
@@ -67,7 +68,7 @@ Cambio preexistente no rastreado: .claude/
 
 ## Próximo movimiento recomendado
 
-Quedan dos tareas de la sección 4 a falta de un paso cada una: 4.2 espera un recorrido manual con lector de pantalla y 4.4 espera la decisión del propietario sobre la exportación de datos. Después, gestión CMS faltante (categorías, usuarios/roles) y correo de cursos. Turnstile y rate limit siguen esperando la cuenta Cloudflare correcta. Turnstile/rate limit espera la cuenta Cloudflare correcta. Los recorridos editoriales, de cursos e identidad se ejecutan con `pnpm test:e2e`.
+Con categorías y roles, el CMS ya cubre la lista del contrato. Quedan dos tareas de la sección 4 a falta de un paso cada una: 4.2 espera un recorrido manual con lector de pantalla y 4.4 espera la decisión del propietario sobre la exportación de datos. El resto —rotación de Resend, preview aislado, Turnstile y rate limit, aceptación y promoción— depende de cuentas y autorizaciones externas. Turnstile/rate limit espera la cuenta Cloudflare correcta. Los recorridos editoriales, de cursos e identidad se ejecutan con `pnpm test:e2e`.
 
 ## Comandos de trabajo
 
