@@ -7,12 +7,12 @@ export function invalidRequest() {
 	);
 }
 
-export function integrationUnavailable() {
+export function persistenceUnavailable() {
 	return NextResponse.json(
 		{
 			ok: false,
 			message:
-				"El envío todavía no está habilitado. Escríbenos directamente por correo.",
+				"No pudimos registrar la solicitud. Inténtalo nuevamente en unos minutos.",
 		},
 		{ status: 503 },
 	);

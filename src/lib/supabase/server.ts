@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import type { Database } from '@/types/supabase'
 
 export async function createClient() {
   const cookieStore = await cookies()
@@ -10,7 +11,7 @@ export async function createClient() {
     throw new Error("Supabase configuration is missing")
   }
 
-  return createServerClient(
+  return createServerClient<Database>(
 		url,
 		key,
     {
