@@ -1,0 +1,2 @@
+-- Datos de desarrollo se crean en las migraciones versionadas.
+-- Mantener este archivo vacío evita semillas implícitas o no reproducibles.
