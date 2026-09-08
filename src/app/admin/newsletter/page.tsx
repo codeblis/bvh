@@ -1,17 +1,34 @@
 import { requireAdmin } from "@/lib/admin";
 import { AdminPageHeader, EmptyState, table, tableWrap, td, th } from "../_ui";
+import {
+	NotificationResultBanner,
+	NotificationStatus,
+} from "../NotificationStatus";
 
-export default async function NewsletterPage() {
+export default async function NewsletterPage({
+	searchParams,
+}: {
+	searchParams: Promise<{ notification?: string; error?: string }>;
+}) {
+	const query = await searchParams;
 	const { supabase } = await requireAdmin();
-	const { data } = await supabase
+	const { data, error } = await supabase
 		.from("newsletter_subscriptions")
-		.select("*")
+		.select(
+			"id, email, full_name, profile, source, subscribed_at, is_active, notification_status, notification_attempts",
+		)
 		.order("subscribed_at", { ascending: false });
+	if (error)
+		throw new Error(`No se pudo cargar el newsletter: ${error.message}`);
 	const rows = data ?? [];
 	const active = rows.filter((r) => r.is_active).length;
 
 	return (
 		<div>
+			<NotificationResultBanner
+				result={query.notification}
+				error={query.error}
+			/>
 			<AdminPageHeader
 				title="Newsletter"
 				description={`${active} suscripción(es) activa(s) de ${rows.length} en total.`}
@@ -29,6 +46,7 @@ export default async function NewsletterPage() {
 								<th className={th}>Origen</th>
 								<th className={th}>Alta</th>
 								<th className={th}>Activa</th>
+								<th className={th}>Aviso</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -44,6 +62,14 @@ export default async function NewsletterPage() {
 											: "—"}
 									</td>
 									<td className={td}>{r.is_active ? "Sí" : "No"}</td>
+									<td className={td}>
+										<NotificationStatus
+											resourceType="newsletter_subscription"
+											id={r.id}
+											status={r.notification_status}
+											attempts={r.notification_attempts}
+										/>
+									</td>
 								</tr>
 							))}
 						</tbody>

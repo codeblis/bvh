@@ -119,3 +119,37 @@ export function SaveButton({ children = "Guardar" }: { children?: ReactNode }) {
 		</button>
 	);
 }
+
+export function FormBanner({
+	error,
+	success,
+	errorMessages,
+	successMessages,
+}: {
+	error?: string;
+	success?: string;
+	errorMessages: Record<string, string>;
+	successMessages: Record<string, string>;
+}) {
+	if (error) {
+		return (
+			<p
+				className="mb-4 rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+				role="alert"
+			>
+				{errorMessages[error] ?? "No se pudo completar la operación."}
+			</p>
+		);
+	}
+	if (success) {
+		return (
+			<p
+				className="mb-4 rounded-md border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400"
+				role="status"
+			>
+				{successMessages[success] ?? "Operación completada."}
+			</p>
+		);
+	}
+	return null;
+}

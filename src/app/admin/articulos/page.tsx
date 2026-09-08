@@ -1,14 +1,22 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/admin";
 import { AdminPageHeader, EmptyState, table, tableWrap, td, th } from "../_ui";
-import { deleteArticle } from "./actions";
+import { ConfirmSubmitButton } from "../ConfirmSubmitButton";
+import { unpublishArticle } from "./actions";
 
-export default async function ArticulosPage() {
+export default async function ArticulosPage({
+	searchParams,
+}: {
+	searchParams: Promise<{ error?: string }>;
+}) {
+	const { error: queryError } = await searchParams;
 	const { supabase } = await requireAdmin();
-	const { data } = await supabase
+	const { data, error } = await supabase
 		.from("articles")
 		.select("id, title, type, status, published_at, views")
 		.order("created_at", { ascending: false });
+	if (error)
+		throw new Error(`No se pudieron cargar los artículos: ${error.message}`);
 	const rows = data ?? [];
 
 	return (
@@ -25,6 +33,15 @@ export default async function ArticulosPage() {
 					</Link>
 				}
 			/>
+			{queryError ? (
+				<p
+					className="mb-4 rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+					role="alert"
+				>
+					No se pudo completar la operación. Revisa el registro e inténtalo de
+					nuevo.
+				</p>
+			) : null}
 			{rows.length === 0 ? (
 				<EmptyState>Sin artículos. Crea el primero.</EmptyState>
 			) : (
@@ -60,15 +77,17 @@ export default async function ArticulosPage() {
 									</td>
 									<td className={td}>{r.views ?? 0}</td>
 									<td className={td}>
-										<form action={deleteArticle}>
-											<input type="hidden" name="id" value={r.id} />
-											<button
-												type="submit"
-												className="text-xs text-destructive hover:underline"
-											>
-												Eliminar
-											</button>
-										</form>
+										{r.status === "publicado" ? (
+											<form action={unpublishArticle}>
+												<input type="hidden" name="id" value={r.id} />
+												<ConfirmSubmitButton
+													message="El artículo dejará de estar visible en el sitio público. Podrás publicarlo nuevamente."
+													className="text-xs text-destructive hover:underline"
+												>
+													Despublicar
+												</ConfirmSubmitButton>
+											</form>
+										) : null}
 									</td>
 								</tr>
 							))}

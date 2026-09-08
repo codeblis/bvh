@@ -3,57 +3,57 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/admin";
-import { slugify } from "@/lib/utils";
-import { COURSE_STATUSES, inList } from "../_status";
+import { parseCourseCatalogForm } from "@/modules/courses/schemas";
 
-function text(formData: FormData, key: string) {
-	return String(formData.get(key) ?? "").trim();
-}
-
-function num(formData: FormData, key: string) {
-	const raw = text(formData, key);
-	if (!raw) return null;
-	const parsed = Number(raw);
-	return Number.isNaN(parsed) ? null : parsed;
+function editorPath(formData: FormData) {
+	const id = String(formData.get("id") ?? "").trim();
+	return `/admin/cursos/${id || "nuevo"}`;
 }
 
 export async function saveCourse(formData: FormData) {
+	const path = editorPath(formData);
+	const parsed = parseCourseCatalogForm(formData);
+	if (!parsed.success) redirect(`${path}?error=invalid`);
+
 	const { supabase } = await requireAdmin();
-
-	const id = text(formData, "id");
-	const title = text(formData, "title");
-	if (!title) return;
-
-	const status = text(formData, "status");
+	const data = parsed.data;
 	const payload = {
-		title,
-		slug: slugify(text(formData, "slug") || title),
-		description: text(formData, "description") || null,
-		content: text(formData, "content") || null,
-		image: text(formData, "image") || null,
-		instructor: text(formData, "instructor") || null,
-		start_date: text(formData, "start_date") || null,
-		end_date: text(formData, "end_date") || null,
-		capacity: num(formData, "capacity"),
-		price: num(formData, "price"),
-		status: inList(COURSE_STATUSES, status) ? status : "activo",
+		title: data.title,
+		slug: data.slug,
+		description: data.description,
+		content: data.content,
+		image: data.image,
+		instructor: data.instructor,
+		status: data.status,
 	};
 
-	if (id) {
-		await supabase.from("courses").update(payload).eq("id", id);
-	} else {
-		await supabase.from("courses").insert(payload);
-	}
+	const result = data.id
+		? await supabase
+				.from("courses")
+				.update(payload)
+				.eq("id", data.id)
+				.select("id")
+				.single()
+		: await supabase.from("courses").insert(payload).select("id").single();
+	const { data: savedCourse, error } = result;
+	if (error) redirect(`${path}?error=save`);
 
 	revalidatePath("/admin/cursos");
 	revalidatePath("/admin");
-	redirect("/admin/cursos");
+	revalidatePath("/instituto");
+	redirect(`/admin/cursos/${savedCourse.id}?saved=true`);
 }
 
-export async function deleteCourse(formData: FormData) {
+export async function archiveCourse(formData: FormData) {
+	const id = String(formData.get("id") ?? "").trim();
+	if (!id) redirect("/admin/cursos?error=invalid");
+
 	const { supabase } = await requireAdmin();
-	const id = text(formData, "id");
-	if (id) await supabase.from("courses").delete().eq("id", id);
+	const { error } = await supabase.rpc("archive_course", { p_course_id: id });
+	if (error) redirect("/admin/cursos?error=archive");
+
 	revalidatePath("/admin/cursos");
 	revalidatePath("/admin");
+	revalidatePath("/instituto");
+	redirect("/admin/cursos");
 }

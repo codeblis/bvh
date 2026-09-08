@@ -9,8 +9,19 @@ export const APPLICATION_STATUSES = [
 
 export const ARTICLE_STATUSES = ["borrador", "publicado"] as const;
 export const ARTICLE_TYPES = ["noticia", "blog"] as const;
-export const COURSE_STATUSES = ["activo", "inactivo", "completado"] as const;
-export const COMPANY_STATUSES = ["interesada", "cotizando", "inactiva"] as const;
+export const COURSE_STATUSES = ["borrador", "activo", "archivado"] as const;
+export const ENROLLMENT_STATUSES = [
+	"pendiente",
+	"confirmada",
+	"lista_espera",
+	"cancelada",
+	"completada",
+] as const;
+export const COMPANY_STATUSES = [
+	"interesada",
+	"cotizando",
+	"inactiva",
+] as const;
 
 export function inList(list: readonly string[], value: string) {
 	return list.includes(value);

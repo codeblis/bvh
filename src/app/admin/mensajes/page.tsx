@@ -1,6 +1,10 @@
 import { requireAdmin } from "@/lib/admin";
-import { AdminPageHeader, EmptyState, table, tableWrap, td, th } from "../_ui";
 import { CONTACT_STATUSES } from "../_status";
+import { AdminPageHeader, EmptyState, table, tableWrap, td, th } from "../_ui";
+import {
+	NotificationResultBanner,
+	NotificationStatus,
+} from "../NotificationStatus";
 import { StatusSelect } from "../StatusSelect";
 import { updateMessageStatus } from "./actions";
 
@@ -8,16 +12,29 @@ function fmt(value: string | null) {
 	return value ? new Date(value).toLocaleString("es") : "—";
 }
 
-export default async function MensajesPage() {
+export default async function MensajesPage({
+	searchParams,
+}: {
+	searchParams: Promise<{ notification?: string; error?: string }>;
+}) {
+	const query = await searchParams;
 	const { supabase } = await requireAdmin();
-	const { data } = await supabase
+	const { data, error } = await supabase
 		.from("contact_messages")
-		.select("*")
+		.select(
+			"id, name, email, subject, message, status, created_at, notification_status, notification_attempts",
+		)
 		.order("created_at", { ascending: false });
+	if (error)
+		throw new Error(`No se pudieron cargar los mensajes: ${error.message}`);
 	const rows = data ?? [];
 
 	return (
 		<div>
+			<NotificationResultBanner
+				result={query.notification}
+				error={query.error}
+			/>
 			<AdminPageHeader
 				title="Mensajes de contacto"
 				description={`${rows.length} mensaje(s) recibido(s).`}
@@ -33,12 +50,15 @@ export default async function MensajesPage() {
 								<th className={th}>Remitente</th>
 								<th className={th}>Asunto y mensaje</th>
 								<th className={th}>Estado</th>
+								<th className={th}>Aviso</th>
 							</tr>
 						</thead>
 						<tbody>
 							{rows.map((r) => (
 								<tr key={r.id}>
-									<td className={`${td} whitespace-nowrap`}>{fmt(r.created_at)}</td>
+									<td className={`${td} whitespace-nowrap`}>
+										{fmt(r.created_at)}
+									</td>
 									<td className={td}>
 										<div className="font-medium">{r.name}</div>
 										<a
@@ -60,6 +80,14 @@ export default async function MensajesPage() {
 											id={r.id}
 											current={r.status ?? "pendiente"}
 											options={CONTACT_STATUSES}
+										/>
+									</td>
+									<td className={td}>
+										<NotificationStatus
+											resourceType="contact_message"
+											id={r.id}
+											status={r.notification_status}
+											attempts={r.notification_attempts}
 										/>
 									</td>
 								</tr>

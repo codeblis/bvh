@@ -1,14 +1,24 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/admin";
 import { AdminPageHeader, EmptyState, table, tableWrap, td, th } from "../_ui";
-import { deleteCourse } from "./actions";
+import { ConfirmSubmitButton } from "../ConfirmSubmitButton";
+import { archiveCourse } from "./actions";
 
-export default async function CursosPage() {
+export default async function CursosPage({
+	searchParams,
+}: {
+	searchParams: Promise<{ error?: string }>;
+}) {
+	const { error: queryError } = await searchParams;
 	const { supabase } = await requireAdmin();
-	const { data } = await supabase
+	const { data, error } = await supabase
 		.from("courses")
-		.select("id, title, instructor, start_date, capacity, price, status")
-		.order("start_date", { ascending: true });
+		.select(
+			"id, title, instructor, status, course_offerings(starts_at, capacity, price, currency, status)",
+		)
+		.order("title");
+	if (error)
+		throw new Error(`No se pudieron cargar los cursos: ${error.message}`);
 	const rows = data ?? [];
 
 	return (
@@ -17,14 +27,30 @@ export default async function CursosPage() {
 				title="Cursos"
 				description="Catálogo del Instituto de Bolsa."
 				action={
-					<Link
-						href="/admin/cursos/nuevo"
-						className="rounded-md bg-primary px-4 py-2 text-xs font-semibold uppercase tracking-wide text-primary-foreground"
-					>
-						Nuevo curso
-					</Link>
+					<div className="flex flex-wrap gap-2">
+						<Link
+							href="/admin/cursos/inscripciones"
+							className="rounded-md border border-border px-4 py-2 text-xs font-semibold uppercase tracking-wide"
+						>
+							Inscripciones
+						</Link>
+						<Link
+							href="/admin/cursos/nuevo"
+							className="rounded-md bg-primary px-4 py-2 text-xs font-semibold uppercase tracking-wide text-primary-foreground"
+						>
+							Nuevo curso
+						</Link>
+					</div>
 				}
 			/>
+			{queryError ? (
+				<p
+					className="mb-4 rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+					role="alert"
+				>
+					No se pudo completar la operación con el curso.
+				</p>
+			) : null}
 			{rows.length === 0 ? (
 				<EmptyState>Sin cursos. Crea el primero.</EmptyState>
 			) : (
@@ -42,40 +68,48 @@ export default async function CursosPage() {
 							</tr>
 						</thead>
 						<tbody>
-							{rows.map((r) => (
-								<tr key={r.id}>
-									<td className={td}>
-										<Link
-											href={`/admin/cursos/${r.id}`}
-											className="font-medium text-primary hover:underline"
-										>
-											{r.title}
-										</Link>
-									</td>
-									<td className={td}>{r.instructor || "—"}</td>
-									<td className={`${td} whitespace-nowrap`}>
-										{r.start_date
-											? new Date(r.start_date).toLocaleDateString("es")
-											: "—"}
-									</td>
-									<td className={td}>{r.capacity ?? "—"}</td>
-									<td className={td}>
-										{r.price != null ? `$${r.price}` : "—"}
-									</td>
-									<td className={td}>{r.status}</td>
-									<td className={td}>
-										<form action={deleteCourse}>
-											<input type="hidden" name="id" value={r.id} />
-											<button
-												type="submit"
-												className="text-xs text-destructive hover:underline"
+							{rows.map((r) => {
+								const offering =
+									r.course_offerings.find(
+										(item) => item.status === "abierta",
+									) ?? r.course_offerings[0];
+								return (
+									<tr key={r.id}>
+										<td className={td}>
+											<Link
+												href={`/admin/cursos/${r.id}`}
+												className="font-medium text-primary hover:underline"
 											>
-												Eliminar
-											</button>
-										</form>
-									</td>
-								</tr>
-							))}
+												{r.title}
+											</Link>
+										</td>
+										<td className={td}>{r.instructor || "—"}</td>
+										<td className={`${td} whitespace-nowrap`}>
+											{offering?.starts_at
+												? new Date(offering.starts_at).toLocaleDateString("es")
+												: "—"}
+										</td>
+										<td className={td}>{offering?.capacity ?? "—"}</td>
+										<td className={td}>
+											{offering?.price != null
+												? `${offering.price} ${offering.currency}`
+												: "—"}
+										</td>
+										<td className={td}>{r.status}</td>
+										<td className={td}>
+											<form action={archiveCourse}>
+												<input type="hidden" name="id" value={r.id} />
+												<ConfirmSubmitButton
+													message="Archivar el curso cerrará todas sus ediciones abiertas. El historial se conservará."
+													className="text-xs text-destructive hover:underline"
+												>
+													Archivar
+												</ConfirmSubmitButton>
+											</form>
+										</td>
+									</tr>
+								);
+							})}
 						</tbody>
 					</table>
 				</div>

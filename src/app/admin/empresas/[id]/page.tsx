@@ -3,25 +3,37 @@ import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/admin";
 import type { Tables } from "@/types/supabase";
 import { COMPANY_STATUSES } from "../../_status";
-import { Field, SaveButton } from "../../_ui";
+import { Field, FormBanner, SaveButton } from "../../_ui";
 import { saveCompany } from "../actions";
+
+const errorMessages: Record<string, string> = {
+	invalid: "Revisa los campos obligatorios y sus formatos.",
+	save: "No se pudo guardar la empresa. Inténtalo nuevamente.",
+	duplicate: "Ya existe una empresa con ese nombre o slug.",
+	"not-found": "Esa empresa ya no existe en el directorio.",
+};
 
 export default async function EmpresaEditor({
 	params,
+	searchParams,
 }: {
 	params: Promise<{ id: string }>;
+	searchParams: Promise<{ error?: string }>;
 }) {
 	const { id } = await params;
+	const query = await searchParams;
 	const { supabase } = await requireAdmin();
 	const isNew = id === "nuevo";
 
 	let company: Tables<"companies"> | null = null;
 	if (!isNew) {
-		const { data } = await supabase
+		const { data, error } = await supabase
 			.from("companies")
 			.select("*")
 			.eq("id", id)
 			.maybeSingle();
+		if (error)
+			throw new Error(`No se pudo cargar la empresa: ${error.message}`);
 		if (!data) notFound();
 		company = data;
 	}
@@ -37,9 +49,19 @@ export default async function EmpresaEditor({
 			<h1 className="mt-2 mb-6 font-serif text-2xl">
 				{isNew ? "Nueva empresa" : "Editar empresa"}
 			</h1>
+			<FormBanner
+				error={query.error}
+				errorMessages={errorMessages}
+				successMessages={{}}
+			/>
 			<form action={saveCompany} className="space-y-4">
 				{company ? <input type="hidden" name="id" value={company.id} /> : null}
-				<Field label="Nombre" name="name" defaultValue={company?.name} required />
+				<Field
+					label="Nombre"
+					name="name"
+					defaultValue={company?.name}
+					required
+				/>
 				<Field
 					label="Slug"
 					name="slug"

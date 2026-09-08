@@ -5,41 +5,93 @@ import { card } from "./_ui";
 export default async function AdminHome() {
 	const { supabase } = await requireAdmin();
 
-	const [messages, applications, subscribers, drafts, published, courses] =
-		await Promise.all([
-			supabase
-				.from("contact_messages")
-				.select("*", { count: "exact", head: true })
-				.eq("status", "pendiente"),
-			supabase
-				.from("company_applications")
-				.select("*", { count: "exact", head: true })
-				.eq("status", "nueva"),
-			supabase
-				.from("newsletter_subscriptions")
-				.select("*", { count: "exact", head: true })
-				.eq("is_active", true),
-			supabase
-				.from("articles")
-				.select("*", { count: "exact", head: true })
-				.eq("status", "borrador"),
-			supabase
-				.from("articles")
-				.select("*", { count: "exact", head: true })
-				.eq("status", "publicado"),
-			supabase
-				.from("courses")
-				.select("*", { count: "exact", head: true })
-				.eq("status", "activo"),
-		]);
+	const [
+		messages,
+		applications,
+		subscribers,
+		drafts,
+		published,
+		courses,
+		enrollments,
+	] = await Promise.all([
+		supabase
+			.from("contact_messages")
+			.select("*", { count: "exact", head: true })
+			.eq("status", "pendiente"),
+		supabase
+			.from("company_applications")
+			.select("*", { count: "exact", head: true })
+			.eq("status", "nueva"),
+		supabase
+			.from("newsletter_subscriptions")
+			.select("*", { count: "exact", head: true })
+			.eq("is_active", true),
+		supabase
+			.from("articles")
+			.select("*", { count: "exact", head: true })
+			.eq("status", "borrador"),
+		supabase
+			.from("articles")
+			.select("*", { count: "exact", head: true })
+			.eq("status", "publicado"),
+		supabase
+			.from("courses")
+			.select("*", { count: "exact", head: true })
+			.eq("status", "activo"),
+		supabase
+			.from("course_enrollments")
+			.select("*", { count: "exact", head: true })
+			.in("status", ["pendiente", "lista_espera"]),
+	]);
+	const failed = [
+		messages,
+		applications,
+		subscribers,
+		drafts,
+		published,
+		courses,
+		enrollments,
+	].find((result) => result.error);
+	if (failed?.error) {
+		throw new Error(`No se pudo cargar el resumen: ${failed.error.message}`);
+	}
 
 	const stats = [
-		{ label: "Mensajes sin leer", value: messages.count ?? 0, href: "/admin/mensajes" },
-		{ label: "Solicitudes nuevas", value: applications.count ?? 0, href: "/admin/solicitudes" },
-		{ label: "Suscriptores activos", value: subscribers.count ?? 0, href: "/admin/newsletter" },
-		{ label: "Artículos en borrador", value: drafts.count ?? 0, href: "/admin/articulos" },
-		{ label: "Artículos publicados", value: published.count ?? 0, href: "/admin/articulos" },
-		{ label: "Cursos activos", value: courses.count ?? 0, href: "/admin/cursos" },
+		{
+			label: "Mensajes sin leer",
+			value: messages.count ?? 0,
+			href: "/admin/mensajes",
+		},
+		{
+			label: "Solicitudes nuevas",
+			value: applications.count ?? 0,
+			href: "/admin/solicitudes",
+		},
+		{
+			label: "Suscriptores activos",
+			value: subscribers.count ?? 0,
+			href: "/admin/newsletter",
+		},
+		{
+			label: "Artículos en borrador",
+			value: drafts.count ?? 0,
+			href: "/admin/articulos",
+		},
+		{
+			label: "Artículos publicados",
+			value: published.count ?? 0,
+			href: "/admin/articulos",
+		},
+		{
+			label: "Cursos activos",
+			value: courses.count ?? 0,
+			href: "/admin/cursos",
+		},
+		{
+			label: "Inscripciones pendientes",
+			value: enrollments.count ?? 0,
+			href: "/admin/cursos/inscripciones",
+		},
 	];
 
 	return (

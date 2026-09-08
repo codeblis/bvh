@@ -1,20 +1,48 @@
 import { requireAdmin } from "@/lib/admin";
-import { AdminPageHeader, EmptyState, card } from "../_ui";
+import { AdminPageHeader, card, EmptyState, FormBanner } from "../_ui";
+import { ConfirmSubmitButton } from "../ConfirmSubmitButton";
 import { deleteIndex, saveIndex } from "./actions";
+
+const errorMessages: Record<string, string> = {
+	invalid: "Revisa el nombre y el valor: son obligatorios y numéricos.",
+	save: "No se pudo guardar el índice. Inténtalo nuevamente.",
+	duplicate: "Ya existe un índice con ese nombre.",
+	delete: "No se pudo eliminar el índice. Inténtalo nuevamente.",
+	"not-found": "Ese índice ya no existe.",
+};
+
+const successMessages: Record<string, string> = {
+	created: "Índice añadido.",
+	updated: "Índice actualizado.",
+	deleted: "Índice eliminado.",
+};
 
 const numberInput =
 	"w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm focus:border-primary focus:outline-none";
 
-export default async function IndicesPage() {
+export default async function IndicesPage({
+	searchParams,
+}: {
+	searchParams: Promise<{ error?: string; saved?: string }>;
+}) {
+	const query = await searchParams;
 	const { supabase } = await requireAdmin();
-	const { data } = await supabase
+	const { data, error } = await supabase
 		.from("indices")
 		.select("*")
 		.order("name", { ascending: true });
+	if (error)
+		throw new Error(`No se pudieron cargar los índices: ${error.message}`);
 	const rows = data ?? [];
 
 	return (
 		<div>
+			<FormBanner
+				error={query.error}
+				success={query.saved}
+				errorMessages={errorMessages}
+				successMessages={successMessages}
+			/>
 			<AdminPageHeader
 				title="Índices"
 				description="Valores mostrados en la página pública de índices."
@@ -78,13 +106,13 @@ export default async function IndicesPage() {
 								>
 									Guardar
 								</button>
-								<button
-									type="submit"
+								<ConfirmSubmitButton
 									formAction={deleteIndex}
+									message={`Eliminar el índice «${r.name}». Esta acción no se puede deshacer.`}
 									className="rounded-md border border-border px-3 py-1.5 text-xs text-destructive hover:border-destructive"
 								>
 									Eliminar
-								</button>
+								</ConfirmSubmitButton>
 							</div>
 						</form>
 					))

@@ -1,6 +1,10 @@
 import { requireAdmin } from "@/lib/admin";
-import { AdminPageHeader, EmptyState, card } from "../_ui";
 import { APPLICATION_STATUSES } from "../_status";
+import { AdminPageHeader, card, EmptyState } from "../_ui";
+import {
+	NotificationResultBanner,
+	NotificationStatus,
+} from "../NotificationStatus";
 import { StatusSelect } from "../StatusSelect";
 import { updateApplicationStatus } from "./actions";
 
@@ -8,16 +12,29 @@ function fmt(value: string | null) {
 	return value ? new Date(value).toLocaleString("es") : "—";
 }
 
-export default async function SolicitudesPage() {
+export default async function SolicitudesPage({
+	searchParams,
+}: {
+	searchParams: Promise<{ notification?: string; error?: string }>;
+}) {
+	const query = await searchParams;
 	const { supabase } = await requireAdmin();
-	const { data } = await supabase
+	const { data, error } = await supabase
 		.from("company_applications")
-		.select("*")
+		.select(
+			"id, company_name, tax_id, legal_representative, corporate_email, phone, sector, founding_year, annual_revenue, employee_count, description, wants_advisor_contact, status, created_at, notification_status, notification_attempts",
+		)
 		.order("created_at", { ascending: false });
+	if (error)
+		throw new Error(`No se pudieron cargar las solicitudes: ${error.message}`);
 	const rows = data ?? [];
 
 	return (
 		<div>
+			<NotificationResultBanner
+				result={query.notification}
+				error={query.error}
+			/>
 			<AdminPageHeader
 				title="Solicitudes RIE-BVH"
 				description={`${rows.length} solicitud(es) de registro de empresas.`}
@@ -41,10 +58,19 @@ export default async function SolicitudesPage() {
 									current={r.status}
 									options={APPLICATION_STATUSES}
 								/>
+								<NotificationStatus
+									resourceType="company_application"
+									id={r.id}
+									status={r.notification_status}
+									attempts={r.notification_attempts}
+								/>
 							</div>
 							<dl className="mt-4 grid gap-x-6 gap-y-2 text-[13px] sm:grid-cols-2">
 								<Row label="NIT / ID fiscal" value={r.tax_id} />
-								<Row label="Representante legal" value={r.legal_representative} />
+								<Row
+									label="Representante legal"
+									value={r.legal_representative}
+								/>
 								<Row
 									label="Email corporativo"
 									value={
@@ -59,7 +85,10 @@ export default async function SolicitudesPage() {
 								<Row label="Teléfono" value={r.phone} />
 								<Row label="Sector" value={r.sector} />
 								<Row label="Año de fundación" value={r.founding_year ?? "—"} />
-								<Row label="Facturación anual" value={r.annual_revenue ?? "—"} />
+								<Row
+									label="Facturación anual"
+									value={r.annual_revenue ?? "—"}
+								/>
 								<Row label="Empleados" value={r.employee_count ?? "—"} />
 								<Row
 									label="Quiere asesor"
@@ -79,13 +108,7 @@ export default async function SolicitudesPage() {
 	);
 }
 
-function Row({
-	label,
-	value,
-}: {
-	label: string;
-	value: React.ReactNode;
-}) {
+function Row({ label, value }: { label: string; value: React.ReactNode }) {
 	return (
 		<div className="flex gap-2">
 			<dt className="min-w-[9rem] shrink-0 text-muted-foreground">{label}</dt>
