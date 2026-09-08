@@ -76,9 +76,10 @@ select is(
   (select count(*) from jsonb_object_keys(
      (select metadata from public.audit_events
       where resource_type = 'profiles' limit 1)
-   )),
+   ) as k
+   where k not in ('old_role', 'new_role')),
   0::bigint,
-  'el evento de perfil no guarda ningún campo del registro'
+  'el evento de perfil solo puede describir el rol, ningún otro campo'
 );
 
 select is(
@@ -109,9 +110,9 @@ select is(
 select is(
   (select count(*) from public.audit_events e,
      lateral jsonb_object_keys(e.metadata) as k
-   where k not in ('old_status', 'new_status')),
+   where k not in ('old_status', 'new_status', 'old_role', 'new_role')),
   0::bigint,
-  'ningún evento guarda claves distintas del estado'
+  'ningún evento guarda claves distintas del estado o el rol'
 );
 
 select is(
