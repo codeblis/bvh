@@ -1,3 +1,5 @@
+> **Documentación canónica:** consulta primero [`docs/README.md`](docs/README.md), el cambio activo [`deliver-v1-core-platform`](openspec/changes/deliver-v1-core-platform/proposal.md), la [`SPEC V1`](docs/SPEC-V1-BVH.md) y el [`ADR`](docs/ADR-Arquitectura-BVH.md). El detalle de este archivo es una fotografía subordinada y puede quedar desactualizado; no reemplaza OpenSpec, specs, ADR, código ni migraciones.
+
 ## Objective
 Rediseño completo del sitio BVH con glassmorphism, responsive mobile-first, gráficos Recharts en índices, y secciones de noticias/blog con buscador/categorías/populares y páginas de detalle.
 
@@ -12,34 +14,36 @@ Rediseño completo del sitio BVH con glassmorphism, responsive mobile-first, gr�
 
 ## Architecture
 - **Framework**: Next.js 16.2.10 (Turbopack), App Router
-- **Build**: `pnpm build` — 27 rutas SSG + 12 rutas SSG dinámicas (noticias/blog [slug])
+- **Build**: `pnpm build` — rutas institucionales estáticas; contenido y cursos dinámicos desde Supabase
 - **Layout**: Root layout (`src/app/layout.tsx`) solo tiene `<LiveTickerWrapper />` + children. Cada página incluye `SiteHeader` y `SiteFooter` explícitamente.
 - **Barrel**: `src/components/bvh/index.ts` — re-exporta Logo, ThemeToggle, SiteHeader, SiteFooter, PageHero, LiveTicker, NewsletterSignup
-- **Middleware**: `src/middleware.ts` (edge runtime), warning de deprecación "middleware → proxy"
+- **Proxy**: `src/proxy.ts` refresca sesión y protege navegación de `/admin` y `/cuenta`; acciones y RLS siguen siendo la frontera real.
 - **Dynamic routes**: `params` es Promise en Next.js 16 — se debe `await params` en Server Components
-- **Server Components**: Las slug pages (`[slug]/page.tsx`) son Server Components con `generateStaticParams`. No pueden tener event handlers — el formulario newsletter se extrajo a `NewsletterSignup` Client Component.
+- **Server Components**: Las páginas públicas de contenido/cursos consultan repositorios server-only. Los formularios interactivos permanecen como islas cliente o Server Actions.
 
 ## Data Layer
-- `src/data/noticias.ts` — `NEWS: Article[]`, `CATEGORIES`, `NEWS_CONTENT: Record<string, string[]>`, helpers `getNoticia()`, `getNoticiasRelacionadas()`
-- `src/data/blog.ts` — `POSTS: Article[]`, `CATEGORIES`, `BLOG_CONTENT: Record<string, string[]>`, helpers `getPost()`, `getPostsRelacionados()`
-- `Article` type definido en `ArticleIndex.tsx` con: id, slug, cat, date, title, excerpt, author?, readMin?, views?, image?
+- `src/modules/content` — tipos, validación y repositorio server-only para noticias/blog publicados
+- `src/modules/courses` — tipos, validación, catálogo interactivo y repositorio server-only para cursos/ofertas
+- `audit_events` — auditoría transaccional de cambios sensibles, visible solo para admin
+- Supabase es la fuente canónica; no mantener arrays TypeScript como contenido productivo.
 
 ## Pages Directory
 | Route | Type | Description |
 |-------|------|-------------|
 | `/` | Static | Landing |
 | `/acerca` | Static | About |
-| `/blog` | Client | Blog index con ArticleIndex |
-| `/blog/[slug]` | SSG | Blog detail (6 slugs) |
+| `/blog` | Dynamic | Blog desde Supabase con ArticleIndex |
+| `/blog/[slug]` | Dynamic | Detalle publicado desde Supabase |
 | `/contacto` | Static | Contact form |
 | `/cotizar` | Static | Quote page |
 | `/historia` | Static | History |
 | `/indices` | Client | Indices con Recharts |
-| `/instituto` | Static | Institute |
-| `/login` | Static | OAuth login |
+| `/instituto` | Dynamic | Catálogo de cursos/ofertas |
+| `/instituto/cursos/[slug]` | Dynamic | Detalle e inscripción |
+| `/login` | Client | Login por email/contraseña |
 | `/mercados` | Static | Markets |
-| `/noticias` | Client | News index con ArticleIndex |
-| `/noticias/[slug]` | SSG | News detail (6 slugs) |
+| `/noticias` | Dynamic | Noticias desde Supabase con ArticleIndex |
+| `/noticias/[slug]` | Dynamic | Detalle publicado desde Supabase |
 | `/registro` | Static | Registration |
 
 ## Completed
@@ -49,7 +53,7 @@ Rediseño completo del sitio BVH con glassmorphism, responsive mobile-first, gr�
 - Logo con cambio de tema vía MutationObserver
 - Nav activo con `usePathname()`
 - Footer con 7 botones sociales SVG inline
-- Login: 5 botones OAuth solo icono (glassmorphism: bg-background/40, backdrop-blur-md, border-border/60, shadow-[var(--shadow-elegant)])
+- Login por email/contraseña; OAuth no configurado queda oculto
 - Responsive: hamburger menu mobile (useState + Lucide Menu/X), SiteHeader mobile drawer con onClick close, overflow-x-auto en tablas, padding responsivo (p-4 sm:p-6 md:p-8), flex-wrap, sticky condicional (lg:sticky lg:top-24)
 - Página /indices con Recharts AreaChart, datos deterministas, sidebar navegable, live tick cada 3s, tabla resumen sincronizada (valores, var% día/semana/mes con colores por signo)
 - Chart height responsive en índices
@@ -67,19 +71,18 @@ Rediseño completo del sitio BVH con glassmorphism, responsive mobile-first, gr�
 - `wrangler.jsonc` secrets removidos (bloque `vars` eliminado)
 
 ## Pending / Next
-- Páginas de login y registro con funcionalidad real (actualmente estáticas)
+- Aplicar y probar migraciones nuevas de seguridad y cursos en base desechable
+- Completar Storage/preview editorial y protección antiabuso
 - Contenido real para imágenes de artículos (actualmente gradientes determinísticos con descripción textual)
 - Integración con Resend para newsletter
-- Páginas de error 404 personalizadas
 - Pruebas unitarias/componentes
 - Meta tags dinámicos en slug pages para SEO
 - Sistema de comentarios en blog posts
 - Dark/light mode toggle real (actualmente hardcodeado "dark" en layout)
 
 ## Known Issues
-- LSP errors pre-existentes en `globals.css` (Tailwind-specific syntax disabled), `middleware.ts` (forEach callback returns value), `LiveTicker.tsx` (array index as key)
-- Middleware usa edge runtime experimental (warning en build)
-- Resend API key `re_Sk8kCHuW_...` expuesta en git history — rotar desde dashboard
+- LSP errors pre-existentes en `globals.css` (sintaxis específica de Tailwind) y `LiveTicker.tsx` (índice de array como key)
+- Credencial de Resend expuesta en git history — rotarla desde el proveedor sin registrar su valor
 - No hay imágenes reales para artículos — se usan gradientes generados por hash del slug
 
 ## Relevant Files
@@ -96,8 +99,8 @@ Rediseño completo del sitio BVH con glassmorphism, responsive mobile-first, gr�
 - `src/app/noticias/[slug]/page.tsx` — news detail SSG
 - `src/app/blog/page.tsx` — blog index
 - `src/app/blog/[slug]/page.tsx` — blog detail SSG
-- `src/data/noticias.ts` — news data + content
-- `src/data/blog.ts` — blog data + content
+- `src/modules/content/repository.server.ts` — consultas públicas de noticias/blog
+- `src/modules/courses/repository.server.ts` — consultas públicas de cursos/ofertas
 - `src/app/globals.css` — variables CSS, custom utilities, animaciones
 - `src/app/layout.tsx` — root layout con LiveTickerWrapper
 - `wrangler.jsonc` — Cloudflare config (secrets removidos)
@@ -106,5 +109,5 @@ Rediseño completo del sitio BVH con glassmorphism, responsive mobile-first, gr�
 
 ## Commands
 - `pnpm dev` — desarrollo
-- `pnpm build` — build producción (27 rutas SSG + 12 dinámicas)
+- `pnpm build` — build de producción
 - `pnpm lint` — lint
