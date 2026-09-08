@@ -135,6 +135,7 @@ export default function MercadosPage() {
 	return (
 		<div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
+      <main id="contenido">
 	  <DemoNotice />
 			<PageHero
 				eyebrow="Mercado · Sesión en curso"
@@ -291,6 +292,7 @@ export default function MercadosPage() {
 				</div>
 			</section>
 
+			</main>
 			<SiteFooter />
 		</div>
 	);

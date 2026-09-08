@@ -201,6 +201,7 @@ export default function IndicesPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
+      <main id="contenido">
 	  <DemoNotice />
       <PageHero
         eyebrow="Transparencia · Datos verificables"
@@ -374,6 +375,7 @@ export default function IndicesPage() {
           </div>
         </div>
       </section>
+      </main>
       <SiteFooter />
     </div>
   );

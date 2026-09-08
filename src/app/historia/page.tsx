@@ -36,6 +36,7 @@ export default function HistoriaPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
+      <main id="contenido">
       <PageHero
         eyebrow="Identidad · Origen · Rumbo"
         title={<>Historia de la <span className="italic text-primary">Bolsa de Valores de La Habana</span></>}
@@ -127,6 +128,7 @@ export default function HistoriaPage() {
         </div>
       </section>
 
+      </main>
       <SiteFooter />
     </div>
   );

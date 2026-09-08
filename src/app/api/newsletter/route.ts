@@ -1,48 +1,61 @@
 import { NextResponse } from "next/server";
-import { invalidRequest, integrationUnavailable } from "@/lib/api-response";
+import { invalidRequest, persistenceUnavailable } from "@/lib/api-response";
 import { createReference, escapeHtml, newsletterSchema } from "@/lib/forms";
-import { emailConfig, getResendClient } from "@/lib/resend";
-import { createClient } from "@/lib/supabase/server";
+import { readBoundedJson } from "@/lib/request";
+import { emailConfig } from "@/lib/resend";
+import { createServiceClient } from "@/lib/supabase/service";
+import { deliverEmail } from "@/modules/forms/email.server";
 
 export async function POST(request: Request) {
-	const parsed = newsletterSchema.safeParse(await request.json().catch(() => null));
+	const parsed = newsletterSchema.safeParse(await readBoundedJson(request));
 	if (!parsed.success) return invalidRequest();
 
 	const { email, nombre, perfil, source } = parsed.data;
 	const reference = createReference("BVH-NEWS");
-
-	let persisted = false;
+	let supabase: ReturnType<typeof createServiceClient>;
 	try {
-		const supabase = await createClient();
-		const { error } = await supabase.from("newsletter_subscriptions").upsert(
-			{
-				email,
-				full_name: nombre,
-				profile: perfil,
-				source,
-				is_active: true,
-				unsubscribed_at: null,
-			},
-			{ onConflict: "email" },
-		);
-		persisted = !error;
+		supabase = createServiceClient();
 	} catch {
-		persisted = false;
+		return persistenceUnavailable();
+	}
+	const persisted = await supabase
+		.rpc("submit_newsletter_subscription", {
+			p_email: email,
+			p_full_name: nombre ?? "",
+			p_profile: perfil ?? "",
+			p_source: source ?? "sitio",
+			p_reference: reference,
+		})
+		.single();
+	if (persisted.error || !persisted.data) return persistenceUnavailable();
+
+	if (!persisted.data.should_notify || !persisted.data.notification_token) {
+		return NextResponse.json({ ok: true, alreadySubscribed: true });
 	}
 
-	let notified = false;
-	const resend = getResendClient();
-	if (resend) {
-		const { error } = await resend.emails.send({
+	const delivery = await deliverEmail(
+		{
 			from: emailConfig.from,
 			to: emailConfig.to,
-			replyTo: email,
 			subject: `[${reference}] Nueva suscripción BVH`,
 			html: `<h1>Nueva suscripción</h1><p><strong>Email:</strong> ${escapeHtml(email)}</p><p><strong>Nombre:</strong> ${escapeHtml(nombre ?? "—")}</p><p><strong>Perfil:</strong> ${escapeHtml(perfil ?? "—")}</p><p><strong>Origen:</strong> ${escapeHtml(source ?? "sitio")}</p>`,
-		});
-		notified = !error;
-	}
+		},
+		reference,
+	);
+	await supabase.rpc("record_form_notification", {
+		p_resource_type: "newsletter_subscription",
+		p_resource_id: persisted.data.submission_id,
+		p_notification_token: persisted.data.notification_token,
+		p_success: delivery.success,
+		...(delivery.success
+			? delivery.providerId
+				? { p_provider_id: delivery.providerId }
+				: {}
+			: { p_error: delivery.error }),
+	});
 
-	if (!persisted && !notified) return integrationUnavailable();
-	return NextResponse.json({ ok: true, reference });
+	return NextResponse.json({
+		ok: true,
+		notification: delivery.success ? "sent" : "pending",
+	});
 }

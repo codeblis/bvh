@@ -50,6 +50,7 @@ export default function Home() {
 	return (
 		<div className="min-h-screen bg-background text-foreground">
 			<SiteHeader />
+			<main id="contenido">
 
 			<PageHero
 				eyebrow="Proyecto 2026 · Plataforma en desarrollo"
@@ -251,6 +252,7 @@ export default function Home() {
 				</div>
 			</section>
 
+			</main>
 			<SiteFooter />
 		</div>
 	);

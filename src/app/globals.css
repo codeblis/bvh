@@ -412,6 +412,29 @@
   animation: fade-up 0.8s ease-out both;
 }
 
+/* Quien pide menos movimiento no recibe animación continua: el ticker queda
+   estático y legible, y las entradas aparecen sin desplazamiento. */
+@media (prefers-reduced-motion: reduce) {
+
+  .ticker-track,
+  .pulse-dot {
+    animation: none;
+  }
+
+  .fade-up {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto;
+    transition-duration: 0.01ms;
+  }
+}
+
 .text-tiny {
   font-size: 0.625rem;
 }

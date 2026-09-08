@@ -83,6 +83,7 @@ export default function ContactoPage() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState("");
 	const [reference, setReference] = useState("");
+	const [notificationPending, setNotificationPending] = useState(false);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -94,13 +95,22 @@ export default function ContactoPage() {
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(form),
 			});
-			const result = (await response.json()) as { message?: string; reference?: string };
+			const result = (await response.json()) as {
+				message?: string;
+				reference?: string;
+				notification?: string;
+			};
 			if (!response.ok) throw new Error(result.message);
 			setReference(result.reference ?? "");
+			setNotificationPending(result.notification !== "sent");
 			setEnviado(true);
 			setForm(initialForm);
 		} catch (err) {
-			setError(err instanceof Error && err.message ? err.message : "No pudimos enviar el mensaje.");
+			setError(
+				err instanceof Error && err.message
+					? err.message
+					: "No pudimos enviar el mensaje.",
+			);
 		} finally {
 			setLoading(false);
 		}
@@ -118,8 +128,9 @@ export default function ContactoPage() {
 		return (
 			<div className="min-h-screen bg-background text-foreground">
 				<SiteHeader />
+				<main id="contenido">
 				<PageHero
-					eyebrow="Mensaje enviado"
+					eyebrow="Mensaje recibido"
 					title={
 						<>
 							¡Gracias por{" "}
@@ -134,11 +145,17 @@ export default function ContactoPage() {
 								<Check className="w-8 h-8" aria-hidden="true" />
 							</div>
 							<h3 className="font-serif text-2xl text-foreground">
-								Mensaje enviado correctamente
+								Mensaje registrado correctamente
 							</h3>
 							<p className="mt-2 text-muted-foreground">
 								Referencia: {reference}
 							</p>
+							{notificationPending && (
+								<p role="status" className="mt-3 text-sm text-muted-foreground">
+									El aviso por correo está pendiente; no necesitas reenviar el
+									formulario.
+								</p>
+							)}
 						</div>
 						<div className="flex flex-wrap gap-3 justify-center">
 							<a
@@ -156,6 +173,7 @@ export default function ContactoPage() {
 						</div>
 					</div>
 				</PageHero>
+				</main>
 				<SiteFooter />
 			</div>
 		);
@@ -164,6 +182,7 @@ export default function ContactoPage() {
 	return (
 		<div className="min-h-screen bg-background text-foreground">
 			<SiteHeader />
+			<main id="contenido">
 			<PageHero
 				eyebrow="Contacto institucional"
 				title={
@@ -176,7 +195,10 @@ export default function ContactoPage() {
 				description="Prensa, alianzas institucionales, listado de empresas o consultas del Instituto — el equipo de la BVH responde en 48 horas hábiles."
 			/>
 
-			<section className="mx-auto max-w-7xl px-6 py-12 md:py-16" id="contact-form">
+			<section
+				className="mx-auto max-w-7xl px-6 py-12 md:py-16"
+				id="contact-form"
+			>
 				<div className="grid gap-10 lg:grid-cols-[1fr_1.2fr]">
 					<div className="space-y-6">
 						{CONTACTOS.map((c) => (
@@ -218,7 +240,14 @@ export default function ContactoPage() {
 							Envíanos un mensaje
 						</h3>
 						<form onSubmit={handleSubmit} className="space-y-5" noValidate>
-							{error && <p role="alert" className="rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3 text-[13px] text-destructive">{error}</p>}
+							{error && (
+								<p
+									role="alert"
+									className="rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3 text-[13px] text-destructive"
+								>
+									{error}
+								</p>
+							)}
 							<div className="grid gap-5 md:grid-cols-2">
 								<div>
 									<label
@@ -317,6 +346,7 @@ export default function ContactoPage() {
 				</div>
 			</section>
 
+			</main>
 			<SiteFooter />
 		</div>
 	);

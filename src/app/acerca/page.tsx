@@ -39,6 +39,7 @@ export default function AcercaPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
+      <main id="contenido">
       <PageHero
         eyebrow="Identidad · Propósito · Estructura"
         title={<>Acerca de <span className="italic text-primary">BVH</span></>}
@@ -143,6 +144,7 @@ export default function AcercaPage() {
         </div>
       </section>
 
+      </main>
       <SiteFooter />
     </div>
   );

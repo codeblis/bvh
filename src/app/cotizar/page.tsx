@@ -83,6 +83,7 @@ export default function CotizarPage() {
 	const [loading, setLoading] = useState(false);
 	const [submitError, setSubmitError] = useState("");
 	const [reference, setReference] = useState("");
+	const [notificationPending, setNotificationPending] = useState(false);
 	const [errors, setErrors] = useState<
 		Partial<Record<keyof FormData, boolean>>
 	>({});
@@ -116,12 +117,21 @@ export default function CotizarPage() {
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(form),
 			});
-			const result = (await response.json()) as { message?: string; reference?: string };
+			const result = (await response.json()) as {
+				message?: string;
+				reference?: string;
+				notification?: string;
+			};
 			if (!response.ok) throw new Error(result.message);
 			setReference(result.reference ?? "");
+			setNotificationPending(result.notification !== "sent");
 			setSubmitted(true);
 		} catch (error) {
-			setSubmitError(error instanceof Error && error.message ? error.message : "No pudimos enviar la solicitud.");
+			setSubmitError(
+				error instanceof Error && error.message
+					? error.message
+					: "No pudimos enviar la solicitud.",
+			);
 		} finally {
 			setLoading(false);
 		}
@@ -146,6 +156,7 @@ export default function CotizarPage() {
 		return (
 			<div className="min-h-screen bg-background text-foreground">
 				<SiteHeader />
+				<main id="contenido">
 				<PageHero
 					eyebrow="Registro completado"
 					title={
@@ -161,14 +172,18 @@ export default function CotizarPage() {
 						</div>
 						<p className="text-sm text-muted-foreground">
 							Referencia:{" "}
-							<span className="font-mono text-foreground">
-								{reference}
-							</span>
+							<span className="font-mono text-foreground">{reference}</span>
 						</p>
 						<p className="mt-2 text-sm text-muted-foreground">
-							Confirmación enviada a{" "}
-							<span className="text-foreground">{form.email}</span>
+							La solicitud quedó registrada. Conserva esta referencia para
+							consultas futuras.
 						</p>
+						{notificationPending && (
+							<p role="status" className="mt-3 text-sm text-muted-foreground">
+								El aviso por correo está pendiente; no necesitas reenviar el
+								formulario.
+							</p>
+						)}
 					</div>
 					<div className="mt-6 flex justify-center gap-3">
 						<a
@@ -185,6 +200,7 @@ export default function CotizarPage() {
 						</a>
 					</div>
 				</PageHero>
+				</main>
 				<SiteFooter />
 			</div>
 		);
@@ -259,6 +275,7 @@ export default function CotizarPage() {
 	return (
 		<div className="min-h-screen bg-background text-foreground">
 			<SiteHeader />
+			<main id="contenido">
 			<PageHero
 				eyebrow="RIE-BVH · Registro de Empresas"
 				title={
@@ -349,7 +366,14 @@ export default function CotizarPage() {
 					</p>
 
 					<form onSubmit={handleSubmit} className="mt-8 space-y-5" noValidate>
-						{submitError && <p role="alert" className="rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">{submitError}</p>}
+						{submitError && (
+							<p
+								role="alert"
+								className="rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+							>
+								{submitError}
+							</p>
+						)}
 						<div className="grid gap-5 md:grid-cols-2">
 							{field("companyName", "Razón social", {
 								placeholder: "Empresa Ejemplo S.A.",
@@ -506,6 +530,7 @@ export default function CotizarPage() {
 				</aside>
 			</section>
 
+			</main>
 			<SiteFooter />
 		</div>
 	);
