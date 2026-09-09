@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/admin";
-import { ENROLLMENT_STATUSES } from "../../_status";
+import { ENROLLMENT_STATUSES, MODALITY_LABELS } from "../../_status";
 import {
 	AdminPageHeader,
 	buttonGhost,
 	EmptyState,
+	formatDate,
+	formatDateTime,
 	table,
 	tableWrap,
 	td,
@@ -14,10 +16,6 @@ import {
 
 import { StatusSelect } from "../../StatusSelect";
 import { updateEnrollmentStatus } from "./actions";
-
-function formatDate(value: string | null) {
-	return value ? new Date(value).toLocaleString("es-CU") : "—";
-}
 
 function first<T>(value: T | T[] | null): T | null {
 	return Array.isArray(value) ? (value[0] ?? null) : value;
@@ -97,7 +95,7 @@ export default async function CourseEnrollmentsPage({
 								return (
 									<tr key={row.id}>
 										<td className={`${td} whitespace-nowrap`}>
-											{formatDate(row.enrolled_at)}
+											{formatDateTime(row.enrolled_at)}
 										</td>
 										<td className={td}>
 											<div className="font-medium">
@@ -127,7 +125,9 @@ export default async function CourseEnrollmentsPage({
 											)}
 											<div className="mt-1 text-xs text-muted-foreground">
 												{formatDate(offering?.starts_at ?? null)} ·{" "}
-												{offering?.modality ?? "—"}
+												{MODALITY_LABELS[offering?.modality ?? ""] ??
+													offering?.modality ??
+													"—"}
 											</div>
 										</td>
 										<td className={td}>

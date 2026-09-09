@@ -44,3 +44,10 @@ export const ACTION_LABELS: Record<string, string> = {
 	update: "actualizó",
 	delete: "eliminó",
 };
+
+export const MODALITY_LABELS: Record<string, string> = {
+	online: "En línea",
+	presencial: "Presencial",
+	hibrida: "Híbrida",
+	por_confirmar: "Modalidad por confirmar",
+};

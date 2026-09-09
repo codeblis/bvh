@@ -85,11 +85,20 @@ const GROUPS = [
 	},
 ] as const;
 
+const OWN_ROUTES = GROUPS.flatMap((group) =>
+	group.items.map((item) => item.href),
+);
+
 function isActive(pathname: string, href: string) {
-	if (href === "/admin/cursos") {
-		return pathname === href || pathname.startsWith("/admin/cursos/");
-	}
-	return pathname === href || pathname.startsWith(`${href}/`);
+	if (pathname === href) return true;
+	if (!pathname.startsWith(`${href}/`)) return false;
+	// Una sección hija con entrada propia manda sobre su ancestro.
+	return !OWN_ROUTES.some(
+		(other) =>
+			other !== href &&
+			other.startsWith(`${href}/`) &&
+			(pathname === other || pathname.startsWith(`${other}/`)),
+	);
 }
 
 function NavList({

@@ -70,6 +70,13 @@ Rediseño completo del sitio BVH con glassmorphism, responsive mobile-first, gr�
 - `.gitignore` limpio: conflictos merge resueltos, `.env*` ignorado, `.wrangler/state/` agregado
 - `wrangler.jsonc` secrets removidos (bloque `vars` eliminado)
 
+## Panel administrativo
+
+- Armazón propio: cabecera con cuenta y salida, navegación agrupada (bandejas, contenido, instituto, gobierno, mercado) con contadores de trabajo pendiente, y cajón plegable en móvil.
+- `src/app/admin/_ui.tsx` concentra las primitivas: cabecera de página, estado vacío, banderas de estado, campos, botones y formato de fechas. Las pantallas heredan de ahí.
+- El editor de artículos separa manuscrito (titular en serif, entradilla, cuerpo) de la ficha de publicación, que vive fuera del `<form>` y se asocia con el atributo `form` porque la portada tiene su propia acción.
+- El dorado se reserva a la acción principal de cada pantalla y a la sección activa; los estados se muestran como banderas y las cifras son tabulares.
+
 ## Pending / Next
 - Aplicar y probar migraciones nuevas de seguridad y cursos en base desechable
 - Completar Storage/preview editorial y protección antiabuso

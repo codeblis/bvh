@@ -18,7 +18,8 @@ const successMessages: Record<string, string> = {
 };
 
 const numberInput =
-	"w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm focus:border-primary focus:outline-none";
+	"w-full rounded-lg border border-border/80 bg-background/60 px-2.5 py-1.5 text-sm transition-colors focus:border-primary focus:bg-background focus:outline-none focus:ring-2 focus:ring-primary/25";
+const figureInput = `${numberInput} text-right tabular-nums`;
 
 export default async function IndicesPage({
 	searchParams,
@@ -76,7 +77,7 @@ export default async function IndicesPage({
 									step="0.01"
 									defaultValue={r.value}
 									required
-									className={numberInput}
+									className={figureInput}
 								/>
 							</label>
 							<label className="text-[12px]">
@@ -86,7 +87,7 @@ export default async function IndicesPage({
 									type="number"
 									step="0.01"
 									defaultValue={r.change ?? ""}
-									className={numberInput}
+									className={figureInput}
 								/>
 							</label>
 							<label className="text-[12px]">
@@ -96,13 +97,13 @@ export default async function IndicesPage({
 									type="number"
 									step="0.01"
 									defaultValue={r.change_percent ?? ""}
-									className={numberInput}
+									className={figureInput}
 								/>
 							</label>
 							<div className="flex gap-2">
 								<button
 									type="submit"
-									className="rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground"
+									className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium transition hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
 								>
 									Guardar
 								</button>
@@ -136,7 +137,7 @@ export default async function IndicesPage({
 							type="number"
 							step="0.01"
 							required
-							className={numberInput}
+							className={figureInput}
 						/>
 					</label>
 					<label className="text-[12px]">
@@ -145,7 +146,7 @@ export default async function IndicesPage({
 							name="change"
 							type="number"
 							step="0.01"
-							className={numberInput}
+							className={figureInput}
 						/>
 					</label>
 					<label className="text-[12px]">
@@ -154,7 +155,7 @@ export default async function IndicesPage({
 							name="change_percent"
 							type="number"
 							step="0.01"
-							className={numberInput}
+							className={figureInput}
 						/>
 					</label>
 					<button

@@ -1,6 +1,6 @@
 import { requireAdmin } from "@/lib/admin";
 import { APPLICATION_STATUSES } from "../_status";
-import { AdminPageHeader, card, EmptyState } from "../_ui";
+import { AdminPageHeader, card, EmptyState, formatDateTime } from "../_ui";
 import {
 	NotificationResultBanner,
 	NotificationStatus,
@@ -9,7 +9,7 @@ import { StatusSelect } from "../StatusSelect";
 import { updateApplicationStatus } from "./actions";
 
 function fmt(value: string | null) {
-	return value ? new Date(value).toLocaleString("es") : "—";
+	return formatDateTime(value);
 }
 
 export default async function SolicitudesPage({
@@ -37,7 +37,11 @@ export default async function SolicitudesPage({
 			/>
 			<AdminPageHeader
 				title="Solicitudes RIE-BVH"
-				description={`${rows.length} solicitud(es) de registro de empresas.`}
+				description={
+					rows.length === 1
+						? "1 solicitud de registro de empresas."
+						: `${rows.length} solicitudes de registro de empresas.`
+				}
 			/>
 			{rows.length === 0 ? (
 				<EmptyState>Todavía no hay solicitudes.</EmptyState>
