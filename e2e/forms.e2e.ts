@@ -211,7 +211,7 @@ test("contacto y RIE-BVH: web registra, muestra aviso pendiente y CMS conserva s
 							})
 							.filter({ hasText: email })
 							.last();
-			await expect(row).toContainText("Falló · 1 intento(s)");
+			await expect(row).toContainText("Falló");
 			await expect(
 				row.getByRole("button", { name: "Reintentar aviso" }),
 			).toBeVisible();

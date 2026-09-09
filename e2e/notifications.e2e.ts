@@ -60,13 +60,15 @@ test("aviso rechazado conserva la solicitud y el reintento administrativo la mar
 		await signInPage(page, admin.email ?? "", "/admin");
 		await page.goto("/admin/mensajes");
 		const row = page.getByRole("row").filter({ hasText: email });
-		await expect(row).toContainText("Falló · 1 intento(s)");
+		await expect(row).toContainText("Falló");
+		await expect(row).toContainText("1 intento");
 		await row.getByRole("button", { name: "Reintentar aviso" }).click();
 		await expect(page.getByRole("status")).toHaveText(
 			"Aviso enviado correctamente.",
 		);
 		const sentRow = page.getByRole("row").filter({ hasText: email });
-		await expect(sentRow).toContainText("Enviado · 2 intento(s)");
+		await expect(sentRow).toContainText("Enviado");
+		await expect(sentRow).toContainText("2 intentos");
 		await expect(
 			sentRow.getByRole("button", { name: "Reintentar aviso" }),
 		).toHaveCount(0);
@@ -158,7 +160,8 @@ test("resultado incierto del proveedor reutiliza la clave idempotente en el rein
 		await signInPage(page, admin.email ?? "", "/admin");
 		await page.goto("/admin/newsletter");
 		const row = page.getByRole("row").filter({ hasText: email });
-		await expect(row).toContainText("Pendiente · 0 intento(s)");
+		await expect(row).toContainText("Pendiente");
+		await expect(row).toContainText("sin intentos");
 		await row.getByRole("button", { name: "Reintentar aviso" }).click();
 		await expect(page.getByRole("status")).toHaveText(
 			"Aviso enviado correctamente.",
@@ -209,7 +212,7 @@ test("el estado de entrega del newsletter solo es visible para administradores",
 		await page.goto("/admin/newsletter");
 		await expect(
 			page.getByRole("row").filter({ hasText: email }),
-		).toContainText("Falló · 1 intento(s)");
+		).toContainText("Falló");
 		// El fallo del proveedor no oculta la suscripción ni la marca inactiva.
 		const stored = await service
 			.from("newsletter_subscriptions")

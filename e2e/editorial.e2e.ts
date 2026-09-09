@@ -76,11 +76,11 @@ async function exerciseArticle(
 	const alt = `Portada geométrica de prueba para ${type}`;
 
 	await page.goto("/admin/articulos/nuevo");
-	await page.getByLabel("Título", { exact: true }).fill(title);
+	await page.getByLabel("Titular", { exact: true }).fill(title);
 	await page.getByLabel("Slug").fill(slug);
-	await page.getByLabel("Extracto").fill(excerpt);
+	await page.getByLabel("Entradilla").fill(excerpt);
 	await page
-		.getByLabel("Contenido")
+		.getByLabel("Cuerpo")
 		.fill(
 			`## Encabezado ${type}\n\nContenido inicial verificable para ${type}.`,
 		);
@@ -159,9 +159,9 @@ async function exerciseArticle(
 	expect(await sitemapPublished.text()).toContain(`/${section}/${slug}`);
 
 	await page.goto(editorUrl);
-	await page.getByLabel("Título", { exact: true }).fill(editedTitle);
+	await page.getByLabel("Titular", { exact: true }).fill(editedTitle);
 	await page
-		.getByLabel("Contenido")
+		.getByLabel("Cuerpo")
 		.fill(
 			`## Encabezado editado\n\nContenido actualizado y verificable para ${type}.`,
 		);

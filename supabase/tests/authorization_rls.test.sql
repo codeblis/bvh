@@ -281,8 +281,15 @@ select set_config(
   true
 );
 
+-- Un administrador ve las tres cuentas del escenario. Se cuentan por id para
+-- que la prueba no dependa de los datos que existan en la base local.
 select is(
-  (select count(*) from public.profiles),
+  (select count(*) from public.profiles
+   where id in (
+     '71000000-0000-0000-0000-000000000001',
+     '71000000-0000-0000-0000-000000000002',
+     '71000000-0000-0000-0000-000000000003'
+   )),
   3::bigint,
   'admin sees all profiles'
 );
