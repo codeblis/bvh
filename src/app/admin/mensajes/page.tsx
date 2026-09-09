@@ -9,7 +9,15 @@ import { StatusSelect } from "../StatusSelect";
 import { updateMessageStatus } from "./actions";
 
 function fmt(value: string | null) {
-	return value ? new Date(value).toLocaleString("es") : "—";
+	return value
+		? new Date(value).toLocaleString("es", {
+				day: "2-digit",
+				month: "short",
+				year: "numeric",
+				hour: "2-digit",
+				minute: "2-digit",
+			})
+		: "—";
 }
 
 export default async function MensajesPage({
@@ -37,7 +45,11 @@ export default async function MensajesPage({
 			/>
 			<AdminPageHeader
 				title="Mensajes de contacto"
-				description={`${rows.length} mensaje(s) recibido(s).`}
+				description={
+					rows.length === 1
+						? "1 mensaje recibido."
+						: `${rows.length} mensajes recibidos.`
+				}
 			/>
 			{rows.length === 0 ? (
 				<EmptyState>Todavía no hay mensajes.</EmptyState>

@@ -1,13 +1,16 @@
+import { ArrowLeft, Eye } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/admin";
 import { EDITORIAL_BUCKET } from "@/modules/content/media";
 import type { Tables } from "@/types/supabase";
 import { ARTICLE_STATUSES, ARTICLE_TYPES } from "../../_status";
-import { Field, SaveButton } from "../../_ui";
+import { buttonGhost, Field, Flag, panel, SaveButton } from "../../_ui";
 import { ConfirmSubmitButton } from "../../ConfirmSubmitButton";
 import { removeArticleCover, saveArticle } from "../actions";
 import { CoverUploadForm } from "./CoverUploadForm";
+
+const FORM_ID = "editor-articulo";
 
 export default async function ArticuloEditor({
 	params,
@@ -80,30 +83,49 @@ export default async function ArticuloEditor({
 		"published-cover": "Despublica el artículo antes de eliminar su portada.",
 	};
 
+	const publicPath =
+		article?.type === "blog"
+			? `/blog/${article.slug}`
+			: `/noticias/${article?.slug ?? ""}`;
+	const isPublished = article?.status === "publicado";
+	const words = (article?.content ?? "")
+		.trim()
+		.split(/\s+/)
+		.filter(Boolean).length;
+
 	return (
-		<div className="max-w-3xl">
+		<div>
 			<Link
 				href="/admin/articulos"
-				className="text-xs text-muted-foreground hover:text-foreground"
+				className="inline-flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
 			>
-				← Volver a artículos
+				<ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+				Artículos
 			</Link>
-			<div className="mt-2 mb-6 flex flex-wrap items-center justify-between gap-3">
-				<h1 className="font-serif text-2xl">
+
+			<div className="mt-3 mb-7 flex flex-wrap items-center gap-3 border-b border-border/60 pb-5">
+				<h1 className="mr-auto font-serif text-[26px] leading-tight sm:text-[30px]">
 					{isNew ? "Nuevo artículo" : "Editar artículo"}
 				</h1>
 				{article ? (
-					<Link
-						href={`/admin/articulos/${article.id}/preview`}
-						className="rounded-md border border-border px-4 py-2 text-xs hover:border-primary hover:text-primary"
-					>
-						Vista previa
-					</Link>
+					<>
+						<Flag tone={isPublished ? "hecho" : "espera"}>
+							{isPublished ? "Publicado" : "Borrador"}
+						</Flag>
+						<Link
+							href={`/admin/articulos/${article.id}/preview`}
+							className={buttonGhost}
+						>
+							<Eye className="h-4 w-4" aria-hidden="true" />
+							Vista previa
+						</Link>
+					</>
 				) : null}
 			</div>
+
 			{query.error ? (
 				<p
-					className="mb-4 rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+					className="mb-5 rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
 					role="alert"
 				>
 					{errorMessages[query.error] ?? "No se pudo completar la operación."}
@@ -111,7 +133,7 @@ export default async function ArticuloEditor({
 			) : null}
 			{query.saved === "true" || query.cover ? (
 				<p
-					className="mb-4 rounded-md border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400"
+					className="mb-5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400"
 					role="status"
 				>
 					{query.cover === "removed"
@@ -124,111 +146,176 @@ export default async function ArticuloEditor({
 						: ""}
 				</p>
 			) : null}
-			<form action={saveArticle} className="space-y-4">
-				{article ? <input type="hidden" name="id" value={article.id} /> : null}
-				<Field
-					label="Título"
-					name="title"
-					defaultValue={article?.title}
-					required
-				/>
-				<Field
-					label="Slug"
-					name="slug"
-					defaultValue={article?.slug}
-					hint="Se genera a partir del título si lo dejas vacío."
-				/>
-				<Field
-					label="Extracto"
-					name="excerpt"
-					defaultValue={article?.excerpt}
-					textarea
-				/>
-				<Field
-					label="Contenido"
-					name="content"
-					defaultValue={article?.content}
-					textarea
-					required
-				/>
-				<Field
-					label="Tipo"
-					name="type"
-					defaultValue={article?.type ?? "noticia"}
-					options={ARTICLE_TYPES}
-				/>
-				<label className="block text-[13px]">
-					<span className="font-medium text-foreground">Categoría</span>
-					<select
-						name="category_id"
-						defaultValue={article?.category_id ?? ""}
-						className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-					>
-						<option value="">Sin categoría</option>
-						{(categories ?? []).map((c) => (
-							<option key={c.id} value={c.id}>
-								{c.name}
-							</option>
-						))}
-					</select>
-				</label>
-				<Field
-					label="Estado"
-					name="status"
-					defaultValue={article?.status ?? "borrador"}
-					options={ARTICLE_STATUSES}
-				/>
-				<Field
-					label="Fecha de publicación"
-					name="published_at"
-					type="datetime-local"
-					defaultValue={publishedLocal}
-					hint="Si se deja vacío y el estado es «publicado», se usa la fecha actual."
-				/>
-				<SaveButton />
-			</form>
 
-			<section className="mt-8 rounded-xl border border-border bg-card/40 p-5">
-				<h2 className="font-serif text-lg">Portada</h2>
-				<p className="mt-1 text-xs text-muted-foreground">
-					JPG, PNG, WebP o AVIF. Máximo 5 MB. La ruta final la genera el
-					servidor.
-				</p>
-				{!article ? (
-					<p className="mt-4 text-sm text-muted-foreground">
-						Guarda el borrador antes de subir una portada.
-					</p>
-				) : (
-					<>
-						{coverUrl ? (
-							// biome-ignore lint/performance/noImgElement: Storage host is configured at runtime.
-							<img
-								src={coverUrl}
-								alt={article.featured_image_alt ?? "Portada actual"}
-								width={960}
-								height={540}
-								className="mt-4 aspect-video w-full rounded-lg border border-border object-cover"
+			<div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-10">
+				<form action={saveArticle} id={FORM_ID} className="min-w-0">
+					{article ? (
+						<input type="hidden" name="id" value={article.id} />
+					) : null}
+
+					{/* Manuscrito: el titular se escribe con la voz con la que se publica. */}
+					<div className="space-y-6">
+						<div>
+							<label
+								htmlFor="title"
+								className="mb-2 block text-[13px] font-medium text-foreground"
+							>
+								Titular
+							</label>
+							<input
+								id="title"
+								name="title"
+								defaultValue={article?.title ?? ""}
+								required
+								placeholder="El titular que leerá el público"
+								className="w-full border-0 border-b border-border/70 bg-transparent px-0 pb-3 font-serif text-[26px] leading-tight text-foreground transition-colors placeholder:text-muted-foreground/40 focus:border-primary focus:outline-none sm:text-[32px]"
 							/>
-						) : null}
-						<CoverUploadForm
-							articleId={article.id}
-							defaultAlt={article.featured_image_alt}
-							hasCover={Boolean(coverUrl)}
+						</div>
+
+						<Field
+							label="Entradilla"
+							name="excerpt"
+							defaultValue={article?.excerpt}
+							textarea
+							rows={3}
+							placeholder="Dos o tres líneas que resuman la pieza. Obligatoria para publicar."
+							hint="Se usa en los índices, en la portada del artículo y en las tarjetas que se comparten."
 						/>
-						{coverUrl ? (
-							<form action={removeArticleCover} className="mt-3">
-								<input type="hidden" name="id" value={article.id} />
-								<ConfirmSubmitButton
-									message="¿Quitar esta portada? El archivo dejará de estar asociado al borrador."
-									className="text-xs text-destructive hover:underline"
+
+						<div>
+							<div className="mb-1.5 flex items-baseline justify-between gap-3">
+								<label
+									htmlFor="content"
+									className="text-[13px] font-medium text-foreground"
 								>
-									Quitar portada
-								</ConfirmSubmitButton>
-							</form>
-						) : null}
-					</>
-				)}
-			</section>
+									Cuerpo
+								</label>
+								<span className="text-[11px] tabular-nums text-muted-foreground">
+									{words > 0 ? `${words} palabras` : "Markdown"}
+								</span>
+							</div>
+							<textarea
+								id="content"
+								name="content"
+								defaultValue={article?.content ?? ""}
+								required
+								rows={22}
+								placeholder="Escribe en Markdown. Los encabezados, listas y enlaces se respetan; el HTML no se ejecuta."
+								className="w-full rounded-lg border border-border/80 bg-background/60 px-4 py-3.5 text-[15px] leading-[1.75] text-foreground transition-colors placeholder:text-muted-foreground/50 focus:border-primary focus:bg-background focus:outline-none focus:ring-2 focus:ring-primary/25"
+							/>
+						</div>
+					</div>
+				</form>
+
+				{/* Ficha de publicación: decide y publica sin bajar hasta el final.
+				    Vive fuera del formulario y se asocia por atributo, para que la
+				    subida de portada pueda tener su propia acción. */}
+				<aside className="space-y-5 lg:sticky lg:top-24">
+					<div className={`${panel} space-y-4 p-5`}>
+						<h2 className="font-serif text-lg">Publicación</h2>
+						<Field
+							form={FORM_ID}
+							label="Estado"
+							name="status"
+							defaultValue={article?.status ?? "borrador"}
+							options={ARTICLE_STATUSES}
+						/>
+						<Field
+							form={FORM_ID}
+							label="Tipo"
+							name="type"
+							defaultValue={article?.type ?? "noticia"}
+							options={ARTICLE_TYPES}
+						/>
+						<div>
+							<label
+								htmlFor="category_id"
+								className="mb-1.5 block text-[13px] font-medium text-foreground"
+							>
+								Categoría
+							</label>
+							<select
+								id="category_id"
+								name="category_id"
+								form={FORM_ID}
+								defaultValue={article?.category_id ?? ""}
+								className="w-full rounded-lg border border-border/80 bg-background/60 px-3 py-2.5 text-sm text-foreground transition-colors focus:border-primary focus:bg-background focus:outline-none focus:ring-2 focus:ring-primary/25"
+							>
+								<option value="">Sin categoría</option>
+								{(categories ?? []).map((c) => (
+									<option key={c.id} value={c.id}>
+										{c.name}
+									</option>
+								))}
+							</select>
+						</div>
+						<Field
+							form={FORM_ID}
+							label="Fecha de publicación"
+							name="published_at"
+							type="datetime-local"
+							defaultValue={publishedLocal}
+							hint="Vacío y en «publicado» usa la fecha de guardado."
+						/>
+						<Field
+							form={FORM_ID}
+							label="Slug"
+							name="slug"
+							defaultValue={article?.slug}
+							hint={
+								article
+									? `Dirección pública: ${publicPath}`
+									: "Se genera a partir del titular."
+							}
+						/>
+						<SaveButton full form={FORM_ID}>
+							{isPublished ? "Guardar cambios" : "Guardar borrador"}
+						</SaveButton>
+					</div>
+
+					<div className={`${panel} p-5`}>
+						<h2 className="font-serif text-lg">Portada</h2>
+						<p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+							JPG, PNG, WebP o AVIF, hasta 5 MB. Obligatoria para publicar,
+							junto con su texto alternativo.
+						</p>
+						{!article ? (
+							<p className="mt-4 text-sm text-muted-foreground">
+								Guarda el borrador y podrás subirla aquí.
+							</p>
+						) : (
+							<>
+								{coverUrl ? (
+									// biome-ignore lint/performance/noImgElement: Storage host is configured at runtime.
+									<img
+										src={coverUrl}
+										alt={article.featured_image_alt ?? "Portada actual"}
+										width={640}
+										height={360}
+										className="mt-4 aspect-video w-full rounded-lg border border-border object-cover"
+									/>
+								) : null}
+								<CoverUploadForm
+									articleId={article.id}
+									defaultAlt={article.featured_image_alt}
+									hasCover={Boolean(coverUrl)}
+								/>
+								{coverUrl ? (
+									<form action={removeArticleCover} className="mt-3">
+										<input type="hidden" name="id" value={article.id} />
+										<ConfirmSubmitButton
+											message="¿Quitar esta portada? El archivo dejará de estar asociado al borrador."
+											className="text-xs text-destructive hover:underline"
+										>
+											Quitar portada
+										</ConfirmSubmitButton>
+									</form>
+								) : null}
+							</>
+						)}
+					</div>
+				</aside>
+			</div>
 		</div>
 	);
 }

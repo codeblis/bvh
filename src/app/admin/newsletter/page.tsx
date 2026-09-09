@@ -31,7 +31,11 @@ export default async function NewsletterPage({
 			/>
 			<AdminPageHeader
 				title="Newsletter"
-				description={`${active} suscripción(es) activa(s) de ${rows.length} en total.`}
+				description={`${
+					active === 1
+						? "1 suscripción activa"
+						: `${active} suscripciones activas`
+				} de ${rows.length} en total.`}
 			/>
 			{rows.length === 0 ? (
 				<EmptyState>Sin suscriptores todavía.</EmptyState>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireAdmin } from "@/lib/admin";
 import {
 	AdminPageHeader,
+	buttonPrimary,
 	EmptyState,
 	FormBanner,
 	table,
@@ -9,6 +10,7 @@ import {
 	td,
 	th,
 } from "../_ui";
+
 import { ConfirmSubmitButton } from "../ConfirmSubmitButton";
 import { deleteCompany } from "./actions";
 
@@ -51,10 +53,7 @@ export default async function EmpresasPage({
 				title="Empresas"
 				description="Directorio público de empresas cotizando o interesadas."
 				action={
-					<Link
-						href="/admin/empresas/nuevo"
-						className="rounded-md bg-primary px-4 py-2 text-xs font-semibold uppercase tracking-wide text-primary-foreground"
-					>
+					<Link href="/admin/empresas/nuevo" className={buttonPrimary}>
 						Nueva empresa
 					</Link>
 				}

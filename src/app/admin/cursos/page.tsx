@@ -1,6 +1,16 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/admin";
-import { AdminPageHeader, EmptyState, table, tableWrap, td, th } from "../_ui";
+import {
+	AdminPageHeader,
+	buttonGhost,
+	buttonPrimary,
+	EmptyState,
+	Flag,
+	table,
+	tableWrap,
+	td,
+	th,
+} from "../_ui";
 import { ConfirmSubmitButton } from "../ConfirmSubmitButton";
 import { archiveCourse } from "./actions";
 
@@ -28,16 +38,10 @@ export default async function CursosPage({
 				description="Catálogo del Instituto de Bolsa."
 				action={
 					<div className="flex flex-wrap gap-2">
-						<Link
-							href="/admin/cursos/inscripciones"
-							className="rounded-md border border-border px-4 py-2 text-xs font-semibold uppercase tracking-wide"
-						>
+						<Link href="/admin/cursos/inscripciones" className={buttonGhost}>
 							Inscripciones
 						</Link>
-						<Link
-							href="/admin/cursos/nuevo"
-							className="rounded-md bg-primary px-4 py-2 text-xs font-semibold uppercase tracking-wide text-primary-foreground"
-						>
+						<Link href="/admin/cursos/nuevo" className={buttonPrimary}>
 							Nuevo curso
 						</Link>
 					</div>
@@ -89,13 +93,33 @@ export default async function CursosPage({
 												? new Date(offering.starts_at).toLocaleDateString("es")
 												: "—"}
 										</td>
-										<td className={td}>{offering?.capacity ?? "—"}</td>
-										<td className={td}>
-											{offering?.price != null
-												? `${offering.price} ${offering.currency}`
-												: "—"}
+										<td className={`${td} tabular-nums text-muted-foreground`}>
+											{offering?.capacity ?? "—"}
 										</td>
-										<td className={td}>{r.status}</td>
+										<td className={td}>
+											{offering?.price === 0
+												? "Gratis"
+												: offering?.price != null
+													? `${offering.price} ${offering.currency}`
+													: "—"}
+										</td>
+										<td className={td}>
+											<Flag
+												tone={
+													r.status === "activo"
+														? "hecho"
+														: r.status === "borrador"
+															? "espera"
+															: "neutro"
+												}
+											>
+												{r.status === "activo"
+													? "Activo"
+													: r.status === "borrador"
+														? "Borrador"
+														: "Archivado"}
+											</Flag>
+										</td>
 										<td className={td}>
 											<form action={archiveCourse}>
 												<input type="hidden" name="id" value={r.id} />

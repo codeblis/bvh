@@ -1,11 +1,17 @@
+import { Flag, type FlagTone } from "./_ui";
 import { retryFormNotification } from "./notificaciones/actions";
 
-const labels: Record<string, string> = {
-	unknown: "Histórico",
-	pending: "Pendiente",
-	sent: "Enviado",
-	failed: "Falló",
+const labels: Record<string, { text: string; tone: FlagTone }> = {
+	unknown: { text: "Histórico", tone: "neutro" },
+	pending: { text: "Pendiente", tone: "espera" },
+	sent: { text: "Enviado", tone: "hecho" },
+	failed: { text: "Falló", tone: "fallo" },
 };
+
+function attemptsLabel(attempts: number) {
+	if (attempts === 0) return "sin intentos";
+	return attempts === 1 ? "1 intento" : `${attempts} intentos`;
+}
 
 export function NotificationStatus({
 	resourceType,
@@ -22,24 +28,22 @@ export function NotificationStatus({
 	attempts: number;
 }) {
 	const sent = status === "sent";
+	const flag = labels[status] ?? { text: status, tone: "neutro" as FlagTone };
+
 	return (
-		<div className="space-y-1 whitespace-nowrap text-xs">
-			<div
-				className={
-					sent
-						? "text-emerald-400"
-						: status === "failed"
-							? "text-destructive"
-							: "text-amber-300"
-				}
-			>
-				{labels[status] ?? status} · {attempts} intento(s)
+		<div className="space-y-1.5 whitespace-nowrap">
+			<Flag tone={flag.tone}>{flag.text}</Flag>
+			<div className="text-[11px] text-muted-foreground">
+				{attemptsLabel(attempts)}
 			</div>
 			{!sent ? (
 				<form action={retryFormNotification}>
 					<input type="hidden" name="id" value={id} />
 					<input type="hidden" name="resource_type" value={resourceType} />
-					<button type="submit" className="text-primary hover:underline">
+					<button
+						type="submit"
+						className="rounded-md text-xs text-primary transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+					>
 						Reintentar aviso
 					</button>
 				</form>
@@ -59,7 +63,7 @@ export function NotificationResultBanner({
 	const success = result === "sent";
 	return (
 		<p
-			className={`mb-5 rounded-md border px-4 py-3 text-sm ${success ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400" : "border-destructive/40 bg-destructive/10 text-destructive"}`}
+			className={`mb-5 rounded-lg border px-4 py-3 text-sm ${success ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400" : "border-destructive/40 bg-destructive/10 text-destructive"}`}
 			role={success ? "status" : "alert"}
 		>
 			{success

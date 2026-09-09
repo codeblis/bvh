@@ -26,7 +26,7 @@ export function StatusSelect({
 				onChange={() => {
 					startTransition(() => formRef.current?.requestSubmit());
 				}}
-				className="rounded-md border border-border bg-background px-2 py-1 text-xs disabled:opacity-50"
+				className="rounded-lg border border-border/80 bg-background/60 px-2.5 py-1.5 text-xs text-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/25 disabled:opacity-50"
 			>
 				{options.map((o) => (
 					<option key={o} value={o}>

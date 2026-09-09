@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-export function SignOutButton() {
+export function SignOutButton({ quiet }: { quiet?: boolean } = {}) {
 	const router = useRouter();
 	const [error, setError] = useState("");
 	const [pending, setPending] = useState(false);
@@ -29,7 +29,11 @@ export function SignOutButton() {
 				type="button"
 				onClick={signOut}
 				disabled={pending}
-				className="rounded-md border border-border px-5 py-3 text-xs font-semibold uppercase tracking-wider hover:border-primary disabled:opacity-60"
+				className={
+					quiet
+						? "rounded-md px-2 py-1 text-[12px] text-muted-foreground transition hover:bg-secondary/60 hover:text-foreground disabled:opacity-60"
+						: "rounded-md border border-border px-5 py-3 text-xs font-semibold uppercase tracking-wider hover:border-primary disabled:opacity-60"
+				}
 			>
 				{pending ? "Cerrando sesión…" : "Cerrar sesión"}
 			</button>

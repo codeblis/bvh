@@ -26,3 +26,21 @@ export const COMPANY_STATUSES = [
 export function inList(list: readonly string[], value: string) {
 	return list.includes(value);
 }
+
+export const RESOURCE_LABELS: Record<string, string> = {
+	articles: "artículo",
+	categories: "categoría",
+	company_applications: "solicitud RIE-BVH",
+	contact_messages: "mensaje de contacto",
+	course_enrollments: "inscripción",
+	course_offerings: "edición de curso",
+	courses: "curso",
+	newsletter_subscriptions: "suscripción",
+	profiles: "perfil",
+};
+
+export const ACTION_LABELS: Record<string, string> = {
+	insert: "creó",
+	update: "actualizó",
+	delete: "eliminó",
+};

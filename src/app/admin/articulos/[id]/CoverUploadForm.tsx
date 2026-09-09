@@ -5,6 +5,7 @@ import {
 	EDITORIAL_IMAGE_ACCEPT,
 	validateEditorialImage,
 } from "@/modules/content/media";
+import { buttonPrimary } from "../../_ui";
 import { uploadArticleCover } from "../actions";
 
 const errorMessages = {
@@ -78,10 +79,7 @@ export function CoverUploadForm({
 					{error}
 				</p>
 			) : null}
-			<button
-				type="submit"
-				className="rounded-md bg-primary px-5 py-2.5 text-xs font-semibold uppercase tracking-wide text-primary-foreground transition hover:brightness-110"
-			>
+			<button type="submit" className={buttonPrimary}>
 				{hasCover ? "Reemplazar portada" : "Subir portada"}
 			</button>
 		</form>

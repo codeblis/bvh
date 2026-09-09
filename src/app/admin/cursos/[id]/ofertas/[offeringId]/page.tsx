@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/admin";
 import type { Tables } from "@/types/supabase";
-import { Field, SaveButton } from "../../../../_ui";
+import { buttonGhost, Field, SaveButton } from "../../../../_ui";
 import { ConfirmSubmitButton } from "../../../../ConfirmSubmitButton";
 import { closeCourseOffering, saveCourseOffering } from "../actions";
 
@@ -177,7 +177,7 @@ export default async function OfferingEditor({
 					{offering ? (
 						<Link
 							href={`/admin/cursos/inscripciones?offering=${offering.id}`}
-							className="rounded-md border border-border px-5 py-2.5 text-xs font-semibold uppercase tracking-wide"
+							className={buttonGhost}
 						>
 							Ver inscripciones
 						</Link>

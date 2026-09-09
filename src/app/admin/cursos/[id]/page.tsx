@@ -4,6 +4,7 @@ import { requireAdmin } from "@/lib/admin";
 import type { Tables } from "@/types/supabase";
 import { COURSE_STATUSES } from "../../_status";
 import {
+	buttonPrimary,
 	EmptyState,
 	Field,
 	SaveButton,
@@ -12,6 +13,7 @@ import {
 	td,
 	th,
 } from "../../_ui";
+
 import { saveCourse } from "../actions";
 
 function formatDate(value: string | null) {
@@ -143,7 +145,7 @@ export default async function CursoEditor({
 						</div>
 						<Link
 							href={`/admin/cursos/${course.id}/ofertas/nueva`}
-							className="rounded-md bg-primary px-4 py-2 text-xs font-semibold uppercase tracking-wide text-primary-foreground"
+							className={buttonPrimary}
 						>
 							Nueva edición
 						</Link>

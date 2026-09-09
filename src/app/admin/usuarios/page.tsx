@@ -1,6 +1,7 @@
 import { requireAdmin } from "@/lib/admin";
 import {
 	AdminPageHeader,
+	buttonGhost,
 	EmptyState,
 	FormBanner,
 	table,
@@ -8,6 +9,7 @@ import {
 	td,
 	th,
 } from "../_ui";
+
 import { ConfirmSubmitButton } from "../ConfirmSubmitButton";
 import { updateProfileRole } from "./actions";
 
@@ -64,7 +66,13 @@ export default async function UsuariosPage({
 			/>
 			<AdminPageHeader
 				title="Usuarios y roles"
-				description={`${rows.length} cuenta(s) mostradas, ${admins} con rol administrador. El listado se limita a ${PAGE_SIZE} y se filtra por búsqueda.`}
+				description={`${
+					rows.length === 1 ? "1 cuenta" : `${rows.length} cuentas`
+				}, ${
+					admins === 1
+						? "1 con rol administrador"
+						: `${admins} con rol administrador`
+				}. Se muestran hasta ${PAGE_SIZE}; usa la búsqueda para acotar.`}
 			/>
 
 			<form method="get" className="mb-5 flex flex-wrap gap-2">
@@ -78,10 +86,7 @@ export default async function UsuariosPage({
 					placeholder="Buscar por correo o nombre"
 					className="w-full max-w-sm rounded-md border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none"
 				/>
-				<button
-					type="submit"
-					className="rounded-md border border-border px-4 py-2 text-xs font-semibold uppercase tracking-wide hover:border-primary hover:text-primary"
-				>
+				<button type="submit" className={buttonGhost}>
 					Buscar
 				</button>
 			</form>

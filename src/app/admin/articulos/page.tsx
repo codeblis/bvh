@@ -1,6 +1,16 @@
+import { PenLine } from "lucide-react";
 import Link from "next/link";
 import { requireAdmin } from "@/lib/admin";
-import { AdminPageHeader, EmptyState, table, tableWrap, td, th } from "../_ui";
+import {
+	AdminPageHeader,
+	buttonPrimary,
+	EmptyState,
+	Flag,
+	table,
+	tableWrap,
+	td,
+	th,
+} from "../_ui";
 import { ConfirmSubmitButton } from "../ConfirmSubmitButton";
 import { unpublishArticle } from "./actions";
 
@@ -25,10 +35,8 @@ export default async function ArticulosPage({
 				title="Artículos"
 				description="Noticias y entradas de blog del sitio público."
 				action={
-					<Link
-						href="/admin/articulos/nuevo"
-						className="rounded-md bg-primary px-4 py-2 text-xs font-semibold uppercase tracking-wide text-primary-foreground"
-					>
+					<Link href="/admin/articulos/nuevo" className={buttonPrimary}>
+						<PenLine className="h-4 w-4" aria-hidden="true" />
 						Nuevo artículo
 					</Link>
 				}
@@ -43,7 +51,16 @@ export default async function ArticulosPage({
 				</p>
 			) : null}
 			{rows.length === 0 ? (
-				<EmptyState>Sin artículos. Crea el primero.</EmptyState>
+				<EmptyState
+					action={
+						<Link href="/admin/articulos/nuevo" className={buttonPrimary}>
+							Escribir el primero
+						</Link>
+					}
+				>
+					Aquí aparecerán las noticias y entradas de blog. Todavía no hay
+					ninguna.
+				</EmptyState>
 			) : (
 				<div className={tableWrap}>
 					<table className={table}>
@@ -59,23 +76,38 @@ export default async function ArticulosPage({
 						</thead>
 						<tbody>
 							{rows.map((r) => (
-								<tr key={r.id}>
+								<tr
+									key={r.id}
+									className="transition-colors hover:bg-secondary/20"
+								>
 									<td className={td}>
 										<Link
 											href={`/admin/articulos/${r.id}`}
-											className="font-medium text-primary hover:underline"
+											className="font-medium text-foreground transition-colors hover:text-primary"
 										>
 											{r.title}
 										</Link>
 									</td>
-									<td className={td}>{r.type}</td>
-									<td className={td}>{r.status}</td>
-									<td className={`${td} whitespace-nowrap`}>
+									<td className={td}>
+										<span className="text-muted-foreground">
+											{r.type === "blog" ? "Blog" : "Noticia"}
+										</span>
+									</td>
+									<td className={td}>
+										<Flag tone={r.status === "publicado" ? "hecho" : "espera"}>
+											{r.status === "publicado" ? "Publicado" : "Borrador"}
+										</Flag>
+									</td>
+									<td
+										className={`${td} whitespace-nowrap tabular-nums text-muted-foreground`}
+									>
 										{r.published_at
 											? new Date(r.published_at).toLocaleDateString("es")
 											: "—"}
 									</td>
-									<td className={td}>{r.views ?? 0}</td>
+									<td className={`${td} tabular-nums text-muted-foreground`}>
+										{r.views ?? 0}
+									</td>
 									<td className={td}>
 										{r.status === "publicado" ? (
 											<form action={unpublishArticle}>

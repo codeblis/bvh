@@ -4,12 +4,14 @@ import { requireAdmin } from "@/lib/admin";
 import { ENROLLMENT_STATUSES } from "../../_status";
 import {
 	AdminPageHeader,
+	buttonGhost,
 	EmptyState,
 	table,
 	tableWrap,
 	td,
 	th,
 } from "../../_ui";
+
 import { StatusSelect } from "../../StatusSelect";
 import { updateEnrollmentStatus } from "./actions";
 
@@ -57,10 +59,7 @@ export default async function CourseEnrollmentsPage({
 				}
 				action={
 					offeringId ? (
-						<Link
-							href="/admin/cursos/inscripciones"
-							className="rounded-md border border-border px-4 py-2 text-xs font-semibold uppercase tracking-wide"
-						>
+						<Link href="/admin/cursos/inscripciones" className={buttonGhost}>
 							Ver todas
 						</Link>
 					) : null

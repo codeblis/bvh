@@ -1,5 +1,6 @@
 import { requireAdmin } from "@/lib/admin";
 import type { Json } from "@/types/supabase";
+import { ACTION_LABELS, RESOURCE_LABELS } from "../_status";
 import { AdminPageHeader, EmptyState, table, tableWrap, td, th } from "../_ui";
 
 function first<T>(value: T | T[] | null): T | null {
@@ -69,9 +70,14 @@ export default async function AuditPage() {
 												{actor?.email ?? "—"}
 											</div>
 										</td>
-										<td className={td}>{row.action}</td>
 										<td className={td}>
-											<div>{row.resource_type}</div>
+											{ACTION_LABELS[row.action] ?? row.action}
+										</td>
+										<td className={td}>
+											<div>
+												{RESOURCE_LABELS[row.resource_type] ??
+													row.resource_type}
+											</div>
 											<code className="text-[10px] text-muted-foreground">
 												{row.resource_id ?? "—"}
 											</code>

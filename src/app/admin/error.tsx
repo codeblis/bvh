@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { buttonGhost, buttonPrimary } from "./_ui";
 
 export default function AdminError({ reset }: { reset: () => void }) {
 	return (
@@ -10,17 +11,10 @@ export default function AdminError({ reset }: { reset: () => void }) {
 				No se confirmó ningún cambio. Reintenta o vuelve al resumen.
 			</p>
 			<div className="mt-5 flex flex-wrap gap-3">
-				<button
-					type="button"
-					onClick={reset}
-					className="rounded-md bg-primary px-4 py-2 text-xs font-semibold uppercase tracking-wide text-primary-foreground"
-				>
+				<button type="button" onClick={reset} className={buttonPrimary}>
 					Reintentar
 				</button>
-				<Link
-					href="/admin"
-					className="rounded-md border border-border px-4 py-2 text-xs font-semibold uppercase tracking-wide"
-				>
+				<Link href="/admin" className={buttonGhost}>
 					Volver al resumen
 				</Link>
 			</div>
