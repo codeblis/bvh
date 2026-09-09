@@ -51,3 +51,54 @@ export const MODALITY_LABELS: Record<string, string> = {
 	hibrida: "Híbrida",
 	por_confirmar: "Modalidad por confirmar",
 };
+
+export const OFFERING_STATUS_LABELS: Record<string, string> = {
+	borrador: "Borrador",
+	abierta: "Abierta",
+	cerrada: "Cerrada",
+	cancelada: "Cancelada",
+	finalizada: "Finalizada",
+};
+
+export const COURSE_STATUS_LABELS: Record<string, string> = {
+	borrador: "Borrador",
+	activo: "Activo",
+	archivado: "Archivado",
+};
+
+export const APPLICATION_STATUS_LABELS: Record<string, string> = {
+	nueva: "Nueva",
+	en_revision: "En revisión",
+	contactada: "Contactada",
+	descartada: "Descartada",
+};
+
+export const CONTACT_STATUS_LABELS: Record<string, string> = {
+	pendiente: "Pendiente",
+	leído: "Leído",
+	respondido: "Respondido",
+};
+
+export const ENROLLMENT_STATUS_LABELS: Record<string, string> = {
+	pendiente: "Pendiente",
+	confirmada: "Confirmada",
+	lista_espera: "En lista de espera",
+	cancelada: "Cancelada",
+	completada: "Completada",
+};
+
+export const ARTICLE_TYPE_LABELS: Record<string, string> = {
+	noticia: "Noticia",
+	blog: "Blog",
+};
+
+export const ARTICLE_STATUS_LABELS: Record<string, string> = {
+	borrador: "Borrador",
+	publicado: "Publicado",
+};
+
+export const COMPANY_STATUS_LABELS: Record<string, string> = {
+	interesada: "Interesada",
+	cotizando: "Cotizando",
+	inactiva: "Inactiva",
+};

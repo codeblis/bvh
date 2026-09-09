@@ -7,11 +7,13 @@ export function StatusSelect({
 	id,
 	current,
 	options,
+	optionLabels,
 }: {
 	action: (formData: FormData) => Promise<void>;
 	id: string;
 	current: string;
 	options: readonly string[];
+	optionLabels?: Record<string, string>;
 }) {
 	const formRef = useRef<HTMLFormElement>(null);
 	const [pending, startTransition] = useTransition();
@@ -30,7 +32,7 @@ export function StatusSelect({
 			>
 				{options.map((o) => (
 					<option key={o} value={o}>
-						{o}
+						{optionLabels?.[o] ?? o}
 					</option>
 				))}
 			</select>

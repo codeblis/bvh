@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/admin";
 import type { Tables } from "@/types/supabase";
-import { buttonGhost, Field, SaveButton } from "../../../../_ui";
+import { MODALITY_LABELS, OFFERING_STATUS_LABELS } from "../../../../_status";
+import { buttonGhost, Field, panel, SaveButton } from "../../../../_ui";
 import { ConfirmSubmitButton } from "../../../../ConfirmSubmitButton";
 import { closeCourseOffering, saveCourseOffering } from "../actions";
 
@@ -110,35 +111,45 @@ export default async function OfferingEditor({
 				</p>
 			) : null}
 
-			<form action={saveCourseOffering} className="space-y-4">
+			<form action={saveCourseOffering} className="max-w-3xl space-y-7">
 				<input type="hidden" name="course_id" value={course.id} />
 				{offering ? (
 					<input type="hidden" name="offering_id" value={offering.id} />
 				) : null}
-				<div className="grid gap-4 sm:grid-cols-2">
-					<Field
-						label="Inicio"
-						name="starts_at"
-						type="datetime-local"
-						defaultValue={toDateTimeLocal(offering?.starts_at, timezone)}
-					/>
-					<Field
-						label="Fin"
-						name="ends_at"
-						type="datetime-local"
-						defaultValue={toDateTimeLocal(offering?.ends_at, timezone)}
-					/>
+
+				<fieldset className={`${panel} space-y-4 p-5`}>
+					<legend className="px-1 font-serif text-lg">Calendario</legend>
+					<div className="grid gap-4 sm:grid-cols-2">
+						<Field
+							label="Inicio"
+							name="starts_at"
+							type="datetime-local"
+							defaultValue={toDateTimeLocal(offering?.starts_at, timezone)}
+						/>
+						<Field
+							label="Fin"
+							name="ends_at"
+							type="datetime-local"
+							defaultValue={toDateTimeLocal(offering?.ends_at, timezone)}
+						/>
+					</div>
 					<Field
 						label="Zona horaria"
 						name="timezone"
 						defaultValue={timezone}
 						required
+						hint="Las fechas se guardan en esta zona y se muestran así al alumnado."
 					/>
+				</fieldset>
+
+				<fieldset className={`${panel} space-y-4 p-5`}>
+					<legend className="px-1 font-serif text-lg">Formato</legend>
 					<Field
 						label="Modalidad"
 						name="modality"
 						defaultValue={offering?.modality ?? "por_confirmar"}
 						options={MODALITIES}
+						optionLabels={MODALITY_LABELS}
 					/>
 					<Field
 						label="Ubicación pública"
@@ -146,33 +157,44 @@ export default async function OfferingEditor({
 						defaultValue={offering?.location}
 						hint="Obligatoria para presencial o híbrido. No publiques enlaces privados de clase."
 					/>
+				</fieldset>
+
+				<fieldset className={`${panel} space-y-4 p-5`}>
+					<legend className="px-1 font-serif text-lg">Plazas y precio</legend>
+					<div className="grid gap-4 sm:grid-cols-3">
+						<Field
+							label="Plazas"
+							name="capacity"
+							type="number"
+							defaultValue={offering?.capacity}
+							hint="Vacío: sin límite."
+						/>
+						<Field
+							label="Precio"
+							name="price"
+							type="number"
+							step="0.01"
+							defaultValue={offering?.price}
+							hint="0 se muestra como «Gratis»."
+						/>
+						<Field
+							label="Moneda"
+							name="currency"
+							defaultValue={offering?.currency ?? "USD"}
+							required
+						/>
+					</div>
+				</fieldset>
+
+				<div className={`${panel} flex flex-wrap items-end gap-4 p-5`}>
 					<Field
-						label="Plazas"
-						name="capacity"
-						type="number"
-						defaultValue={offering?.capacity}
+						className="min-w-52 flex-1"
+						label="Estado"
+						name="offering_status"
+						defaultValue={offering?.status ?? "borrador"}
+						options={OFFERING_STATUSES}
+						optionLabels={OFFERING_STATUS_LABELS}
 					/>
-					<Field
-						label="Precio"
-						name="price"
-						type="number"
-						step="0.01"
-						defaultValue={offering?.price}
-					/>
-					<Field
-						label="Moneda"
-						name="currency"
-						defaultValue={offering?.currency ?? "USD"}
-						required
-					/>
-				</div>
-				<Field
-					label="Estado"
-					name="offering_status"
-					defaultValue={offering?.status ?? "borrador"}
-					options={OFFERING_STATUSES}
-				/>
-				<div className="flex flex-wrap gap-3">
 					<SaveButton />
 					{offering ? (
 						<Link

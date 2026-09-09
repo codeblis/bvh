@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/admin";
-import { CONTACT_STATUSES } from "../_status";
+import { CONTACT_STATUS_LABELS, CONTACT_STATUSES } from "../_status";
 import { AdminPageHeader, EmptyState, table, tableWrap, td, th } from "../_ui";
 import {
 	NotificationResultBanner,
@@ -92,6 +92,7 @@ export default async function MensajesPage({
 											id={r.id}
 											current={r.status ?? "pendiente"}
 											options={CONTACT_STATUSES}
+											optionLabels={CONTACT_STATUS_LABELS}
 										/>
 									</td>
 									<td className={td}>

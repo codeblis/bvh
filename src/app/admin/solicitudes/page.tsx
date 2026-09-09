@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/admin";
-import { APPLICATION_STATUSES } from "../_status";
+import { APPLICATION_STATUS_LABELS, APPLICATION_STATUSES } from "../_status";
 import { AdminPageHeader, card, EmptyState, formatDateTime } from "../_ui";
 import {
 	NotificationResultBanner,
@@ -61,6 +61,7 @@ export default async function SolicitudesPage({
 									id={r.id}
 									current={r.status}
 									options={APPLICATION_STATUSES}
+									optionLabels={APPLICATION_STATUS_LABELS}
 								/>
 								<NotificationStatus
 									resourceType="company_application"

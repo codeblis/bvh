@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/admin";
 import type { Tables } from "@/types/supabase";
-import { COMPANY_STATUSES } from "../../_status";
+import { COMPANY_STATUS_LABELS, COMPANY_STATUSES } from "../../_status";
 import { Field, FormBanner, SaveButton } from "../../_ui";
 import { saveCompany } from "../actions";
 
@@ -90,6 +90,7 @@ export default async function EmpresaEditor({
 					name="status"
 					defaultValue={company?.status ?? "interesada"}
 					options={COMPANY_STATUSES}
+					optionLabels={COMPANY_STATUS_LABELS}
 				/>
 				<SaveButton />
 			</form>

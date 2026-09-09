@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/admin";
-import { ENROLLMENT_STATUSES, MODALITY_LABELS } from "../../_status";
+import {
+	ENROLLMENT_STATUS_LABELS,
+	ENROLLMENT_STATUSES,
+	MODALITY_LABELS,
+} from "../../_status";
 import {
 	AdminPageHeader,
 	buttonGhost,
@@ -136,6 +140,7 @@ export default async function CourseEnrollmentsPage({
 												id={row.id}
 												current={row.status}
 												options={ENROLLMENT_STATUSES}
+												optionLabels={ENROLLMENT_STATUS_LABELS}
 											/>
 										</td>
 									</tr>

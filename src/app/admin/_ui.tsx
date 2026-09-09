@@ -95,6 +95,7 @@ export function Field({
 	textarea,
 	rows = 8,
 	options,
+	optionLabels,
 	hint,
 	step,
 	className,
@@ -109,6 +110,7 @@ export function Field({
 	textarea?: boolean;
 	rows?: number;
 	options?: readonly string[];
+	optionLabels?: Record<string, string>;
 	hint?: string;
 	step?: string;
 	className?: string;
@@ -133,7 +135,7 @@ export function Field({
 				>
 					{options.map((o) => (
 						<option key={o} value={o}>
-							{o}
+							{optionLabels?.[o] ?? o}
 						</option>
 					))}
 				</select>

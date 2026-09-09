@@ -4,7 +4,12 @@ import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/admin";
 import { EDITORIAL_BUCKET } from "@/modules/content/media";
 import type { Tables } from "@/types/supabase";
-import { ARTICLE_STATUSES, ARTICLE_TYPES } from "../../_status";
+import {
+	ARTICLE_STATUS_LABELS,
+	ARTICLE_STATUSES,
+	ARTICLE_TYPE_LABELS,
+	ARTICLE_TYPES,
+} from "../../_status";
 import { buttonGhost, Field, Flag, panel, SaveButton } from "../../_ui";
 import { ConfirmSubmitButton } from "../../ConfirmSubmitButton";
 import { removeArticleCover, saveArticle } from "../actions";
@@ -219,6 +224,7 @@ export default async function ArticuloEditor({
 							name="status"
 							defaultValue={article?.status ?? "borrador"}
 							options={ARTICLE_STATUSES}
+							optionLabels={ARTICLE_STATUS_LABELS}
 						/>
 						<Field
 							form={FORM_ID}
@@ -226,6 +232,7 @@ export default async function ArticuloEditor({
 							name="type"
 							defaultValue={article?.type ?? "noticia"}
 							options={ARTICLE_TYPES}
+							optionLabels={ARTICLE_TYPE_LABELS}
 						/>
 						<div>
 							<label
