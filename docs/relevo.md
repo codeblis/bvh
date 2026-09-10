@@ -69,7 +69,7 @@ Cambio preexistente no rastreado: .claude/
 
 ## Próximo movimiento recomendado
 
-Con categorías y roles, el CMS ya cubre la lista del contrato. Quedan dos tareas de la sección 4 a falta de un paso cada una: 4.2 espera un recorrido manual con lector de pantalla y 4.4 espera la decisión del propietario sobre la exportación de datos. El resto —rotación de Resend, preview aislado, Turnstile y rate limit, aceptación y promoción— depende de cuentas y autorizaciones externas. Turnstile/rate limit espera la cuenta Cloudflare correcta. Los recorridos editoriales, de cursos e identidad se ejecutan con `pnpm test:e2e`.
+Las once tareas restantes están convertidas en pasos ejecutables con su comprobación en [Puesta en marcha](PUESTA-EN-MARCHA.md); ninguna se ha ejecutado. Con categorías y roles, el CMS ya cubre la lista del contrato. Quedan dos tareas de la sección 4 a falta de un paso cada una: 4.2 espera un recorrido manual con lector de pantalla y 4.4 espera la decisión del propietario sobre la exportación de datos. El resto —rotación de Resend, preview aislado, Turnstile y rate limit, aceptación y promoción— depende de cuentas y autorizaciones externas. Turnstile/rate limit espera la cuenta Cloudflare correcta. Los recorridos editoriales, de cursos e identidad se ejecutan con `pnpm test:e2e`.
 
 ## Comandos de trabajo
 

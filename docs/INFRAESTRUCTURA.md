@@ -65,7 +65,7 @@ Nombres esperados deben mantenerse en `.env.example`; valores viven en gestores 
 
 `NEXT_PUBLIC_SITE_URL` es obligatorio para callbacks y redirecciones de identidad y debe indicar el origen público exacto del entorno. No se infiere del host interno ni de encabezados reenviados. El stack local activa confirmación de email y admite callbacks de desarrollo en 3000 y E2E en `127.0.0.1:3100`; Mailpit captura el correo en 54324. Los comodines de callback locales no son una plantilla para producción.
 
-**Bloqueado:** revocar y rotar la clave Resend expuesta en historial; luego verificar que el valor anterior ya no funciona. No registrar ninguno de ambos valores.
+**Bloqueado:** revocar y rotar la clave Resend expuesta en historial; luego verificar que el valor anterior ya no funciona. No registrar ninguno de ambos valores. El procedimiento paso a paso, con su comprobación, está en [Puesta en marcha](PUESTA-EN-MARCHA.md).
 
 ## 6. Dominios, DNS y correo
 
