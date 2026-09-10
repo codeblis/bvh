@@ -1,23 +1,43 @@
 import { NextResponse } from "next/server";
-import { invalidRequest, persistenceUnavailable } from "@/lib/api-response";
+import {
+	invalidRequest,
+	persistenceUnavailable,
+	tooManyRequests,
+	verificationRequired,
+} from "@/lib/api-response";
 import { createReference, escapeHtml, newsletterSchema } from "@/lib/forms";
-import { readBoundedJson } from "@/lib/request";
+import { clientFingerprint, readBoundedJson } from "@/lib/request";
 import { emailConfig } from "@/lib/resend";
 import { createServiceClient } from "@/lib/supabase/service";
 import { deliverEmail } from "@/modules/forms/email.server";
+import { withinRateLimit } from "@/modules/forms/rate-limit.server";
+import { verifyTurnstile } from "@/modules/forms/turnstile.server";
 
 export async function POST(request: Request) {
-	const parsed = newsletterSchema.safeParse(await readBoundedJson(request));
+	const body = await readBoundedJson(request);
+	const parsed = newsletterSchema.safeParse(body);
 	if (!parsed.success) return invalidRequest();
 
-	const { email, nombre, perfil, source } = parsed.data;
-	const reference = createReference("BVH-NEWS");
+	// Primero el coste barato: quien excede el límite no llega a la base.
+	const fingerprint = await clientFingerprint(request);
 	let supabase: ReturnType<typeof createServiceClient>;
 	try {
 		supabase = createServiceClient();
 	} catch {
 		return persistenceUnavailable();
 	}
+	if (!(await withinRateLimit(supabase, fingerprint, "newsletter"))) {
+		return tooManyRequests();
+	}
+
+	const verified = await verifyTurnstile(
+		(body as { turnstileToken?: string })?.turnstileToken,
+		fingerprint,
+	);
+	if (!verified.ok) return verificationRequired();
+
+	const { email, nombre, perfil, source } = parsed.data;
+	const reference = createReference("BVH-NEWS");
 	const persisted = await supabase
 		.rpc("submit_newsletter_subscription", {
 			p_email: email,

@@ -42,6 +42,7 @@ Cambio preexistente no rastreado: .claude/
 - **Actual local:** las once vistas del panel pasan revisión por rol (admin, usuario y visitante) con E2E propio. Empresas e índices —los dos módulos que aún ignoraban errores de Supabase— ahora validan en servidor, suben la lectura fallida al límite de error, explican el fallo de escritura y confirman el borrado. Tarea 3.6 completa.
 - **Actual local:** existe `robots.txt` con las áreas privadas excluidas; home y los tres índices declaran título, descripción y canonical propios; el detalle publicado entra al sitemap y el borrador y su preview quedan fuera. Tarea 4.3 completa.
 - **Actual local:** ni el HTML ni los scripts públicos llevan la clave de servicio o la del proveedor de correo; los fallos de consulta no exponen SQL al navegador; el acuse de los formularios solo devuelve la referencia; la auditoría guarda el hecho y no el contenido personal. Tarea 4.4 verificada salvo la exportación.
+- **Actual local:** los formularios públicos tienen límite de envíos por cliente y ruta, con el contador en la base y la clave en forma de hash. Turnstile está implementado y queda inerte sin claves; con ellas rechaza envíos sin token y también los rechaza si el verificador no responde.
 - **Actual local:** el panel exporta los suscriptores del newsletter en CSV con las fórmulas neutralizadas y la descarga auditada (actor, recurso y número de filas, sin contenido). Tarea 4.4 completa. Exportar mensajes y solicitudes es trivial con el mismo ayudante, pero su retención la decide el propietario (6.1).
 - **Actual local:** el sitio respeta `prefers-reduced-motion`, las páginas públicas tienen región principal y salto al contenido, los flujos críticos no desbordan a 320/768/1280 px y contacto se envía solo con teclado. Tarea 4.2 verificada salvo el recorrido con lector de pantalla real.
 - **Actual local:** el panel se rediseñó como mesa de trabajo: la cabecera pública ofrece «Panel» a las cuentas administradoras —antes no había ningún enlace visible—, la navegación se agrupa por trabajo y muestra cuántos asuntos esperan, el resumen prioriza lo que requiere acción sobre las cifras, y el editor separa manuscrito de ficha de publicación con la acción principal siempre visible. El ticker de mercado ya no aparece en el panel.
@@ -52,15 +53,15 @@ Cambio preexistente no rastreado: .claude/
 ## Verificación observada
 
 - `pnpm check`: pasó con configuración local; incluye lint, typecheck, 35 unitarias y build.
-- `pnpm test:e2e`: 38/38 correctas (2,2 min), sobre servidor de producción local.
-- `pnpm test:db`: 70/70 correctas; concurrencia del último cupo e idempotencia también correctas.
+- `pnpm test:e2e`: 39/39 correctas (1,8 min), sobre servidor de producción local.
+- `pnpm test:db`: 79/79 correctas; concurrencia del último cupo e idempotencia también correctas.
 - Validación OpenSpec estricta y `git diff --check`: correctos.
 
 ## Bloqueos críticos
 
 1. Completar flujos restantes, gestión CMS faltante y validación en preview aislado antes de promover migraciones.
 2. Credencial histórica de Resend expuesta; requiere rotación en proveedor.
-3. Endpoints/formularios públicos carecen de rate limit/Turnstile.
+3. Turnstile espera claves de la cuenta Cloudflare correcta. El límite de envíos ya está activo y no depende de nadie.
 
 ## Otros defectos conocidos
 

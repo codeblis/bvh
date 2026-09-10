@@ -8,6 +8,12 @@ import {
 	signInPage,
 } from "./local";
 
+// Las pruebas comparten la misma identidad de cliente que el límite de envíos
+// usa para contar: cada una parte de cero para no heredar los de la anterior.
+test.beforeEach(async () => {
+	await service.from("form_rate_limit").delete().neq("bucket", "");
+});
+
 test("formularios: tipos inválidos, JSON roto y 32 KiB no persisten; anon no escribe", async ({
 	request,
 }) => {
@@ -347,5 +353,54 @@ test("newsletter: alta única, consentimiento, GET inocuo, POST de baja y reacti
 			.delete()
 			.eq("email", email);
 		expect.soft(removed.error).toBeNull();
+	}
+});
+
+test("el límite de envíos corta el abuso y no guarda lo que rechaza", async ({
+	request,
+}) => {
+	const email = `flood-${randomUUID()}@example.test`;
+	const payload = {
+		nombre: "Persona E2E",
+		email,
+		asunto: "Otro",
+		mensaje: "Envío repetido para comprobar el límite por cliente.",
+	};
+	try {
+		// El límite por defecto son 5 envíos por ventana: el sexto sobra.
+		const codes: number[] = [];
+		for (let attempt = 0; attempt < 6; attempt++) {
+			const response = await request.post("/api/contacto", { data: payload });
+			codes.push(response.status());
+		}
+		expect(codes.slice(0, 5)).toEqual([200, 200, 200, 200, 200]);
+		expect(codes[5]).toBe(429);
+
+		const stored = await service
+			.from("contact_messages")
+			.select("id")
+			.eq("email", email);
+		expect(stored.data).toHaveLength(5);
+
+		const rejected = await request.post("/api/contacto", { data: payload });
+		expect(await rejected.json()).toEqual({
+			ok: false,
+			message:
+				"Recibimos varios envíos desde tu conexión. Espera unos minutos e inténtalo otra vez.",
+		});
+
+		// Otra ruta conserva su propio cupo: el límite no es global.
+		const other = await request.post("/api/newsletter", {
+			data: { email, source: "e2e-limite" },
+		});
+		expect(other.status()).toBe(200);
+	} finally {
+		const removed = await service
+			.from("contact_messages")
+			.delete()
+			.eq("email", email);
+		expect.soft(removed.error).toBeNull();
+		await service.from("newsletter_subscriptions").delete().eq("email", email);
+		await service.from("form_rate_limit").delete().like("bucket", "contacto:%");
 	}
 });

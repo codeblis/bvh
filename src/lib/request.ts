@@ -43,3 +43,23 @@ export async function readBoundedJson(
 		return null;
 	}
 }
+
+// Identifica al cliente para limitar envíos sin guardar su dirección: se
+// deriva un hash y solo viaja ese. En Cloudflare la cabecera fiable es
+// `CF-Connecting-IP`; el resto son sugerencias del cliente.
+export async function clientFingerprint(request: Request): Promise<string> {
+	const address =
+		request.headers.get("cf-connecting-ip") ??
+		request.headers.get("x-real-ip") ??
+		request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+		"desconocido";
+	const salt = process.env.RATE_LIMIT_SALT ?? "bvh";
+	const digest = await crypto.subtle.digest(
+		"SHA-256",
+		new TextEncoder().encode(`${salt}:${address}`),
+	);
+	return Array.from(new Uint8Array(digest))
+		.map((byte) => byte.toString(16).padStart(2, "0"))
+		.join("")
+		.slice(0, 32);
+}

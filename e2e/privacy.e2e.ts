@@ -18,6 +18,12 @@ const SQL_MARKERS = [
 	"pg_catalog",
 ];
 
+// Las pruebas comparten la misma identidad de cliente que el límite de envíos
+// usa para contar: cada una parte de cero para no heredar los de la anterior.
+test.beforeEach(async () => {
+	await service.from("form_rate_limit").delete().neq("bucket", "");
+});
+
 test("ninguna página pública entrega secretos de servidor, ni en el HTML ni en sus scripts", async ({
 	page,
 	request,

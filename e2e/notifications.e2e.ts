@@ -9,6 +9,12 @@ import {
 	signInPage,
 } from "./local";
 
+// Las pruebas comparten la misma identidad de cliente que el límite de envíos
+// usa para contar: cada una parte de cero para no heredar los de la anterior.
+test.beforeEach(async () => {
+	await service.from("form_rate_limit").delete().neq("bucket", "");
+});
+
 test.afterEach(async () => {
 	await setEmailStub("reject", true);
 });

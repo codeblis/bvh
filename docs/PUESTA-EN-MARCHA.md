@@ -5,8 +5,9 @@
 
 Este documento existe porque las once tareas que quedan del cambio
 [`deliver-v1-core-platform`](../openspec/changes/deliver-v1-core-platform/proposal.md)
-no dependen de escribir más código, sino de credenciales, cuentas y decisiones
-que solo el propietario puede aportar. Aquí está cada una convertida en pasos
+dependen de credenciales, cuentas y decisiones que solo el propietario puede
+aportar. La protección antiabuso de 5.4 ya está escrita y probada; solo espera
+las claves. Aquí está cada una convertida en pasos
 concretos con su comprobación, para que ejecutarlas sea seguir la lista y
 guardar la evidencia.
 
@@ -140,33 +141,45 @@ parar aquí.
 
 ## 5.4 Rate limiting y Turnstile
 
-**Desbloquea:** el último bloqueo crítico del relevo. Hoy los formularios
-públicos aceptan cualquier volumen: validan la entrada, cortan cuerpos de más
-de 32 KiB y exigen JSON, pero nada impide mil envíos por minuto.
+**Desbloquea:** el último bloqueo crítico del relevo.
 
-**Aviso de estado:** a diferencia del resto de esta lista, esta tarea **no
-está implementada en el código**, solo pendiente de configuración. Antes de
-configurar hay que escribir: verificación de Turnstile en servidor contra
-`siteverify`, y un límite por IP y por ventana en las tres rutas de
-formulario. Puedo hacerlo detrás de variables de entorno, de modo que sin
-claves el sitio siga funcionando como hoy y con claves quede activo.
+**Estado: implementado, pendiente de claves.**
 
-Cuando exista el código, la configuración es:
+El **límite de envíos ya está activo** y no necesita ninguna cuenta externa:
+5 envíos por cliente y ruta cada 300 s, ajustables con `FORMS_RATE_LIMIT` y
+`FORMS_RATE_LIMIT_WINDOW`. El contador vive en la base a propósito —en
+Cloudflare cada isolate tendría el suyo y el límite sería una ilusión— y la
+clave del cubo es un hash: la base nunca ve una dirección IP.
+
+Si la comprobación del límite falla, el envío **pasa**: un formulario que
+rechaza solicitudes legítimas porque el contador está caído hace más daño que
+el abuso que evita.
+
+**Turnstile está implementado y queda inerte sin claves.** Sin
+`TURNSTILE_SECRET_KEY` el widget no se renderiza y la verificación no se
+interpone. Con la clave, un envío sin token se rechaza; y si el verificador no
+responde, el envío **también** se rechaza pidiendo reintentar, en vez de
+aceptar a ciegas.
+
+Solo queda la configuración:
 
 1. Crear el widget de Turnstile en la cuenta confirmada en 5.3 y anotar la
    clave pública; la privada va al gestor de secretos.
 2. Cargar `NEXT_PUBLIC_TURNSTILE_SITE_KEY` y `TURNSTILE_SECRET_KEY`.
 3. Definir el límite: qué ventana, cuántos envíos y por qué clave.
 
-**Comprobación.** Los tres casos que la tarea exige:
+**Comprobación.** Los tres casos que la tarea exige ya están cubiertos por
+pruebas locales —seis unitarias del verificador, seis del cableado de la ruta,
+nueve SQL del contador y un recorrido E2E del límite—, pero deben repetirse
+contra el widget real:
 
 - una persona completa el formulario y pasa;
-- una petición automatizada sin token es rechazada;
-- **si el verificador de Turnstile no responde**, el formulario no se queda
-  colgado ni acepta a ciegas: decide de forma explícita y segura.
+- una petición automatizada sin token recibe 403;
+- cortando la salida hacia `challenges.cloudflare.com`, el envío se rechaza
+  con aviso de reintento y **no** se acepta a ciegas.
 
-Ese tercer caso es el que suele olvidarse y el que conviene probar cortando la
-salida hacia `challenges.cloudflare.com`.
+Añadir a la comprobación: enviar seis veces seguidas el formulario de contacto
+y ver que el sexto recibe 429 y no deja fila en la base.
 
 ---
 

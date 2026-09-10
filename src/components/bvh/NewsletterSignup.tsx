@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
+import { useState } from "react";
+import { TurnstileField } from "./TurnstileField";
 
 type NewsletterSignupProps = {
 	cta: string;
@@ -22,6 +23,7 @@ export function NewsletterSignup({
 		"idle" | "loading" | "success" | "error"
 	>("idle");
 	const [message, setMessage] = useState("");
+	const [turnstileToken, setTurnstileToken] = useState("");
 
 	async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault();
@@ -39,6 +41,7 @@ export function NewsletterSignup({
 					nombre: formData.get("nombre") || undefined,
 					perfil: formData.get("perfil") || undefined,
 					source,
+					turnstileToken,
 				}),
 			});
 			const result = (await response.json()) as {
@@ -108,6 +111,7 @@ export function NewsletterSignup({
 					<option>Otro</option>
 				</select>
 			)}
+			<TurnstileField onToken={setTurnstileToken} />
 			<button
 				type="submit"
 				disabled={status === "loading"}

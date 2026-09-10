@@ -570,6 +570,24 @@ export type Database = {
         }
         Relationships: []
       }
+      form_rate_limit: {
+        Row: {
+          bucket: string
+          hits: number
+          window_start: string
+        }
+        Insert: {
+          bucket: string
+          hits?: number
+          window_start: string
+        }
+        Update: {
+          bucket?: string
+          hits?: number
+          window_start?: string
+        }
+        Relationships: []
+      }
       indices: {
         Row: {
           change: number | null
@@ -735,6 +753,10 @@ export type Database = {
     }
     Functions: {
       archive_course: { Args: { p_course_id: string }; Returns: undefined }
+      check_form_rate_limit: {
+        Args: { p_bucket: string; p_limit: number; p_window_seconds: number }
+        Returns: boolean
+      }
       enroll_in_course: { Args: { p_offering_id: string }; Returns: string }
       get_course_offering_availability: {
         Args: { p_offering_ids: string[] }
@@ -967,4 +989,3 @@ export const Constants = {
     Enums: {},
   },
 } as const
-

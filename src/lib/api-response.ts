@@ -17,3 +17,25 @@ export function persistenceUnavailable() {
 		{ status: 503 },
 	);
 }
+
+export function tooManyRequests() {
+	return NextResponse.json(
+		{
+			ok: false,
+			message:
+				"Recibimos varios envíos desde tu conexión. Espera unos minutos e inténtalo otra vez.",
+		},
+		{ status: 429 },
+	);
+}
+
+export function verificationRequired() {
+	return NextResponse.json(
+		{
+			ok: false,
+			message:
+				"No pudimos verificar que eres una persona. Vuelve a intentarlo.",
+		},
+		{ status: 403 },
+	);
+}

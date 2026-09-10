@@ -1,18 +1,19 @@
 "use client";
 
-import { useState } from "react";
-import { PageHero } from "@/components/bvh/PageHero";
-import { SiteHeader } from "@/components/bvh/SiteHeader";
-import { SiteFooter } from "@/components/bvh/SiteFooter";
 import {
+	Check,
 	CircleDollarSign,
 	Eye,
-	TrendingUp,
 	Gem,
-	RefreshCw,
 	Handshake,
-	Check,
+	RefreshCw,
+	TrendingUp,
 } from "lucide-react";
+import { useState } from "react";
+import { PageHero } from "@/components/bvh/PageHero";
+import { SiteFooter } from "@/components/bvh/SiteFooter";
+import { SiteHeader } from "@/components/bvh/SiteHeader";
+import { TurnstileField } from "@/components/bvh/TurnstileField";
 
 const SECTORS = [
 	"Agroindustria",
@@ -79,6 +80,7 @@ const initialForm: FormData = {
 
 export default function CotizarPage() {
 	const [form, setForm] = useState<FormData>(initialForm);
+	const [turnstileToken, setTurnstileToken] = useState("");
 	const [submitted, setSubmitted] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [submitError, setSubmitError] = useState("");
@@ -115,7 +117,7 @@ export default function CotizarPage() {
 			const response = await fetch("/api/cotizaciones", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(form),
+				body: JSON.stringify({ ...form, turnstileToken }),
 			});
 			const result = (await response.json()) as {
 				message?: string;
@@ -157,49 +159,49 @@ export default function CotizarPage() {
 			<div className="min-h-screen bg-background text-foreground">
 				<SiteHeader />
 				<main id="contenido">
-				<PageHero
-					eyebrow="Registro completado"
-					title={
-						<>
-							Solicitud <span className="italic text-primary">enviada</span>
-						</>
-					}
-					description="Gracias por registrar tu empresa. Un asesor BVH te contactará en 48–72 horas hábiles para la evaluación inicial."
-				>
-					<div className="mx-auto mt-8 max-w-md rounded-2xl border border-border bg-card/60 p-8 text-center">
-						<div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-bvh-up/15 text-bvh-up">
-							<Check className="w-7 h-7" aria-hidden="true" />
-						</div>
-						<p className="text-sm text-muted-foreground">
-							Referencia:{" "}
-							<span className="font-mono text-foreground">{reference}</span>
-						</p>
-						<p className="mt-2 text-sm text-muted-foreground">
-							La solicitud quedó registrada. Conserva esta referencia para
-							consultas futuras.
-						</p>
-						{notificationPending && (
-							<p role="status" className="mt-3 text-sm text-muted-foreground">
-								El aviso por correo está pendiente; no necesitas reenviar el
-								formulario.
+					<PageHero
+						eyebrow="Registro completado"
+						title={
+							<>
+								Solicitud <span className="italic text-primary">enviada</span>
+							</>
+						}
+						description="Gracias por registrar tu empresa. Un asesor BVH te contactará en 48–72 horas hábiles para la evaluación inicial."
+					>
+						<div className="mx-auto mt-8 max-w-md rounded-2xl border border-border bg-card/60 p-8 text-center">
+							<div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-bvh-up/15 text-bvh-up">
+								<Check className="w-7 h-7" aria-hidden="true" />
+							</div>
+							<p className="text-sm text-muted-foreground">
+								Referencia:{" "}
+								<span className="font-mono text-foreground">{reference}</span>
 							</p>
-						)}
-					</div>
-					<div className="mt-6 flex justify-center gap-3">
-						<a
-							href="/instituto"
-							className="rounded-md border border-border bg-card/60 px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-foreground transition hover:bg-card"
-						>
-							Ir al Instituto
-						</a>
-						<a
-							href="/mercados"
-							className="rounded-md bg-primary px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-primary-foreground shadow-[var(--shadow-gold)] transition hover:brightness-110"
-						>
-							Conocer HSE →
-						</a>
-					</div>
-				</PageHero>
+							<p className="mt-2 text-sm text-muted-foreground">
+								La solicitud quedó registrada. Conserva esta referencia para
+								consultas futuras.
+							</p>
+							{notificationPending && (
+								<p role="status" className="mt-3 text-sm text-muted-foreground">
+									El aviso por correo está pendiente; no necesitas reenviar el
+									formulario.
+								</p>
+							)}
+						</div>
+						<div className="mt-6 flex justify-center gap-3">
+							<a
+								href="/instituto"
+								className="rounded-md border border-border bg-card/60 px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-foreground transition hover:bg-card"
+							>
+								Ir al Instituto
+							</a>
+							<a
+								href="/mercados"
+								className="rounded-md bg-primary px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-primary-foreground shadow-[var(--shadow-gold)] transition hover:brightness-110"
+							>
+								Conocer HSE →
+							</a>
+						</div>
+					</PageHero>
 				</main>
 				<SiteFooter />
 			</div>
@@ -276,260 +278,263 @@ export default function CotizarPage() {
 		<div className="min-h-screen bg-background text-foreground">
 			<SiteHeader />
 			<main id="contenido">
-			<PageHero
-				eyebrow="RIE-BVH · Registro de Empresas"
-				title={
-					<>
-						El camino hacia{" "}
-						<span className="italic text-primary">Havana Stock Exchange</span>
-					</>
-				}
-				description="Registra tu MIPYME y comienza la preparación para listar tus títulos en el Havana Stock Exchange."
-			/>
+				<PageHero
+					eyebrow="RIE-BVH · Registro de Empresas"
+					title={
+						<>
+							El camino hacia{" "}
+							<span className="italic text-primary">Havana Stock Exchange</span>
+						</>
+					}
+					description="Registra tu MIPYME y comienza la preparación para listar tus títulos en el Havana Stock Exchange."
+				/>
 
-			<section className="relative overflow-hidden border-b border-border text-center">
-				<div className="mx-auto pointer-events-none absolute inset-0 opacity-[0.06]" />
-				<div className="relative mx-auto max-w-7xl px-6 py-12 md:py-15">
-					<div className="mb-3 text-[11px] uppercase tracking-[0.24em] text-primary">
-						Lo que ganas al listar tu empresa
+				<section className="relative overflow-hidden border-b border-border text-center">
+					<div className="mx-auto pointer-events-none absolute inset-0 opacity-[0.06]" />
+					<div className="relative mx-auto max-w-7xl px-6 py-12 md:py-15">
+						<div className="mb-3 text-[11px] uppercase tracking-[0.24em] text-primary">
+							Lo que ganas al listar tu empresa
+						</div>
+						<h2 className="font-serif text-3xl leading-tight text-foreground md:text-5xl">
+							¿Por qué cotizar en{" "}
+							<span className="italic text-primary">BVH </span>?
+						</h2>
+						<p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+							Cotizar en el Havana Stock Exchange no es solo captar capital. Es
+							transformar la forma en que tu empresa se proyecta, se gobierna y
+							compite.
+						</p>
+
+						<div className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
+							{(
+								[
+									{
+										icon: CircleDollarSign,
+										title: "Acceso a capital",
+										desc: "Captación de inversión de la diáspora cubana y fondos institucionales interesados en el mercado cubano.",
+									},
+									{
+										icon: Eye,
+										title: "Visibilidad",
+										desc: "Exposición nacional e internacional a través de la plataforma BVH/HSE y su red de medios aliados.",
+									},
+									{
+										icon: TrendingUp,
+										title: "Profesionalización",
+										desc: "Mejora en gobierno corporativo, estándares de reporting financiero y gestión empresarial.",
+									},
+									{
+										icon: Gem,
+										title: "Valoración de mercado",
+										desc: "Precio de referencia objetivo determinado por el mercado, no por estimaciones internas.",
+									},
+									{
+										icon: RefreshCw,
+										title: "Liquidez para socios",
+										desc: "Posibilidad de salida ordenada para accionistas iniciales y empleados mediante ESOPs.",
+									},
+									{
+										icon: Handshake,
+										title: "Red estratégica",
+										desc: "Conexión directa con el Club de Inversión BVH, fondos de inversión y partners institucionales.",
+									},
+								] as const
+							).map((b) => (
+								<div
+									key={b.title}
+									className="flex flex-col items-center text-center bg-background p-4 transition-colors hover:bg-card sm:p-6 md:p-8"
+								>
+									<b.icon className="mb-4 w-7 h-7" aria-hidden="true" />
+									<h3 className="font-semibold text-foreground">{b.title}</h3>
+									<p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+										{b.desc}
+									</p>
+								</div>
+							))}
+						</div>
 					</div>
-					<h2 className="font-serif text-3xl leading-tight text-foreground md:text-5xl">
-						¿Por qué cotizar en{" "}
-						<span className="italic text-primary">BVH </span>?
-					</h2>
-					<p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-						Cotizar en el Havana Stock Exchange no es solo captar capital. Es
-						transformar la forma en que tu empresa se proyecta, se gobierna y
-						compite.
-					</p>
+				</section>
 
-					<div className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
-						{(
-							[
-								{
-									icon: CircleDollarSign,
-									title: "Acceso a capital",
-									desc: "Captación de inversión de la diáspora cubana y fondos institucionales interesados en el mercado cubano.",
-								},
-								{
-									icon: Eye,
-									title: "Visibilidad",
-									desc: "Exposición nacional e internacional a través de la plataforma BVH/HSE y su red de medios aliados.",
-								},
-								{
-									icon: TrendingUp,
-									title: "Profesionalización",
-									desc: "Mejora en gobierno corporativo, estándares de reporting financiero y gestión empresarial.",
-								},
-								{
-									icon: Gem,
-									title: "Valoración de mercado",
-									desc: "Precio de referencia objetivo determinado por el mercado, no por estimaciones internas.",
-								},
-								{
-									icon: RefreshCw,
-									title: "Liquidez para socios",
-									desc: "Posibilidad de salida ordenada para accionistas iniciales y empleados mediante ESOPs.",
-								},
-								{
-									icon: Handshake,
-									title: "Red estratégica",
-									desc: "Conexión directa con el Club de Inversión BVH, fondos de inversión y partners institucionales.",
-								},
-							] as const
-						).map((b) => (
-							<div
-								key={b.title}
-								className="flex flex-col items-center text-center bg-background p-4 transition-colors hover:bg-card sm:p-6 md:p-8"
-							>
-								<b.icon className="mb-4 w-7 h-7" aria-hidden="true" />
-								<h3 className="font-semibold text-foreground">{b.title}</h3>
-								<p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-									{b.desc}
+				<section
+					id="form-registro"
+					className="mx-auto grid max-w-7xl gap-12 px-6 py-12 md:grid-cols-[1fr_360px] md:py-20"
+				>
+					<div>
+						<h2 className="font-serif text-2xl text-foreground md:text-3xl">
+							Formulario de registro
+						</h2>
+						<p className="mt-2 text-sm text-muted-foreground">
+							Completa tus datos y un asesor te contactará en 48–72 horas.
+						</p>
+
+						<form onSubmit={handleSubmit} className="mt-8 space-y-5" noValidate>
+							{submitError && (
+								<p
+									role="alert"
+									className="rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+								>
+									{submitError}
 								</p>
+							)}
+							<div className="grid gap-5 md:grid-cols-2">
+								{field("companyName", "Razón social", {
+									placeholder: "Empresa Ejemplo S.A.",
+								})}
+								{field("taxId", "NIT", { placeholder: "1234567890" })}
+								{field("legalRep", "Representante legal", {
+									placeholder: "Juan Pérez García",
+								})}
+								{field("email", "Email corporativo", {
+									type: "email",
+									placeholder: "contacto@empresa.cu",
+								})}
+								{field("phone", "Teléfono", {
+									type: "tel",
+									placeholder: "+53 5 123 4567",
+								})}
+								{field("sector", "Sector", {
+									options: SECTORS.map((s) => ({ value: s, label: s })),
+								})}
+								{field("founded", "Año de fundación", {
+									type: "number",
+									placeholder: "2020",
+								})}
+								{field("revenue", "Facturación anual (USD)", {
+									options: REVENUE_RANGES,
+								})}
 							</div>
-						))}
+
+							<div className="grid gap-5 md:grid-cols-2">
+								{field("employees", "Empleados", {
+									options: EMPLOYEE_RANGES.map((e) => ({ value: e, label: e })),
+								})}
+							</div>
+
+							{field("description", "Descripción del negocio", {
+								placeholder:
+									"Modelo de negocio, productos/servicios, mercado objetivo, ventajas competitivas…",
+								textarea: true,
+							})}
+
+							<label className="flex items-start gap-3 cursor-pointer">
+								<input
+									name="acceptedTerms"
+									type="checkbox"
+									checked={form.acceptedTerms}
+									onChange={update}
+									className="mt-0.5 h-4 w-4 rounded border-border bg-background text-primary focus:ring-primary"
+								/>
+								<span className="text-sm text-muted-foreground">
+									Acepto los{" "}
+									<a href="/terminos" className="text-primary hover:underline">
+										términos y condiciones
+									</a>{" "}
+									y la{" "}
+									<a
+										href="/privacidad"
+										className="text-primary hover:underline"
+									>
+										política de privacidad
+									</a>{" "}
+									de BVH.
+								</span>
+							</label>
+							{errors.acceptedTerms && (
+								<p className="text-[11px] text-destructive">
+									Debes aceptar los términos
+								</p>
+							)}
+
+							<label className="flex items-start gap-3 cursor-pointer">
+								<input
+									name="wantsAdvisor"
+									type="checkbox"
+									checked={form.wantsAdvisor}
+									onChange={update}
+									className="mt-0.5 h-4 w-4 rounded border-border bg-background text-primary focus:ring-primary"
+								/>
+								<span className="text-sm text-muted-foreground">
+									Quiero que un asesor me contacte (opcional)
+								</span>
+							</label>
+
+							<div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-border pt-6">
+								<p className="text-center sm:text-left sm:max-w-xs text-[11px] text-muted-foreground">
+									Al enviar, autorizas a BVH a procesar tus datos para fines de
+									evaluación de listado.
+								</p>
+								<TurnstileField onToken={setTurnstileToken} />
+								<button
+									type="submit"
+									disabled={loading}
+									className="shrink-0 rounded-lg bg-primary px-8 py-2.5 text-xs font-semibold uppercase tracking-wider text-primary-foreground shadow-[var(--shadow-gold)] transition hover:brightness-110"
+								>
+									{loading ? "Enviando…" : "Enviar solicitud"}
+								</button>
+							</div>
+						</form>
 					</div>
-				</div>
-			</section>
 
-			<section
-				id="form-registro"
-				className="mx-auto grid max-w-7xl gap-12 px-6 py-12 md:grid-cols-[1fr_360px] md:py-20"
-			>
-				<div>
-					<h2 className="font-serif text-2xl text-foreground md:text-3xl">
-						Formulario de registro
-					</h2>
-					<p className="mt-2 text-sm text-muted-foreground">
-						Completa tus datos y un asesor te contactará en 48–72 horas.
-					</p>
-
-					<form onSubmit={handleSubmit} className="mt-8 space-y-5" noValidate>
-						{submitError && (
-							<p
-								role="alert"
-								className="rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive"
-							>
-								{submitError}
-							</p>
-						)}
-						<div className="grid gap-5 md:grid-cols-2">
-							{field("companyName", "Razón social", {
-								placeholder: "Empresa Ejemplo S.A.",
-							})}
-							{field("taxId", "NIT", { placeholder: "1234567890" })}
-							{field("legalRep", "Representante legal", {
-								placeholder: "Juan Pérez García",
-							})}
-							{field("email", "Email corporativo", {
-								type: "email",
-								placeholder: "contacto@empresa.cu",
-							})}
-							{field("phone", "Teléfono", {
-								type: "tel",
-								placeholder: "+53 5 123 4567",
-							})}
-							{field("sector", "Sector", {
-								options: SECTORS.map((s) => ({ value: s, label: s })),
-							})}
-							{field("founded", "Año de fundación", {
-								type: "number",
-								placeholder: "2020",
-							})}
-							{field("revenue", "Facturación anual (USD)", {
-								options: REVENUE_RANGES,
-							})}
+					<aside className="space-y-6">
+						<div className="rounded-2xl border border-border bg-card/60 p-6">
+							<h3 className="font-semibold text-foreground">Requisitos</h3>
+							<ul className="mt-4 space-y-3 text-sm text-muted-foreground">
+								{[
+									"MIPYME formal con mínimo 2 años de operación",
+									"Estados financieros auditados de los últimos 2 años",
+									"Gobernanza definida (consejo, comités, estatutos)",
+									"Capital social mínimo de $50,000 USD",
+									"Plan de negocio a 3–5 años con proyecciones",
+									"Compromiso de transparencia post-listado",
+								].map((r) => (
+									<li key={r} className="flex items-start gap-2">
+										<span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary/60" />
+										{r}
+									</li>
+								))}
+							</ul>
 						</div>
-
-						<div className="grid gap-5 md:grid-cols-2">
-							{field("employees", "Empleados", {
-								options: EMPLOYEE_RANGES.map((e) => ({ value: e, label: e })),
-							})}
-						</div>
-
-						{field("description", "Descripción del negocio", {
-							placeholder:
-								"Modelo de negocio, productos/servicios, mercado objetivo, ventajas competitivas…",
-							textarea: true,
-						})}
-
-						<label className="flex items-start gap-3 cursor-pointer">
-							<input
-								name="acceptedTerms"
-								type="checkbox"
-								checked={form.acceptedTerms}
-								onChange={update}
-								className="mt-0.5 h-4 w-4 rounded border-border bg-background text-primary focus:ring-primary"
-							/>
-							<span className="text-sm text-muted-foreground">
-								Acepto los{" "}
-								<a href="/terminos" className="text-primary hover:underline">
-									términos y condiciones
-								</a>{" "}
-								y la{" "}
-								<a href="/privacidad" className="text-primary hover:underline">
-									política de privacidad
-								</a>{" "}
-								de BVH.
-							</span>
-						</label>
-						{errors.acceptedTerms && (
-							<p className="text-[11px] text-destructive">
-								Debes aceptar los términos
-							</p>
-						)}
-
-						<label className="flex items-start gap-3 cursor-pointer">
-							<input
-								name="wantsAdvisor"
-								type="checkbox"
-								checked={form.wantsAdvisor}
-								onChange={update}
-								className="mt-0.5 h-4 w-4 rounded border-border bg-background text-primary focus:ring-primary"
-							/>
-							<span className="text-sm text-muted-foreground">
-								Quiero que un asesor me contacte (opcional)
-							</span>
-						</label>
-
-						<div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-border pt-6">
-							<p className="text-center sm:text-left sm:max-w-xs text-[11px] text-muted-foreground">
-								Al enviar, autorizas a BVH a procesar tus datos para fines de
-								evaluación de listado.
-							</p>
-							<button
-								type="submit"
-								disabled={loading}
-								className="shrink-0 rounded-lg bg-primary px-8 py-2.5 text-xs font-semibold uppercase tracking-wider text-primary-foreground shadow-[var(--shadow-gold)] transition hover:brightness-110"
-							>
-								{loading ? "Enviando…" : "Enviar solicitud"}
-							</button>
-						</div>
-					</form>
-				</div>
-
-				<aside className="space-y-6">
-					<div className="rounded-2xl border border-border bg-card/60 p-6">
-						<h3 className="font-semibold text-foreground">Requisitos</h3>
-						<ul className="mt-4 space-y-3 text-sm text-muted-foreground">
-							{[
-								"MIPYME formal con mínimo 2 años de operación",
-								"Estados financieros auditados de los últimos 2 años",
-								"Gobernanza definida (consejo, comités, estatutos)",
-								"Capital social mínimo de $50,000 USD",
-								"Plan de negocio a 3–5 años con proyecciones",
-								"Compromiso de transparencia post-listado",
-							].map((r) => (
-								<li key={r} className="flex items-start gap-2">
-									<span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary/60" />
-									{r}
-								</li>
-							))}
-						</ul>
-					</div>
-					<div className="rounded-2xl border border-border bg-card/60 p-6">
-						<h3 className="font-semibold text-foreground">Proceso</h3>
-						<ol className="mt-4 space-y-4">
-							{[
-								{
-									n: "01",
-									t: "Registro",
-									d: "Completa el formulario con los datos de tu empresa.",
-								},
-								{
-									n: "02",
-									t: "Evaluación",
-									d: "Analizamos tu perfil y agendamos una reunión inicial.",
-								},
-								{
-									n: "03",
-									t: "Preparación",
-									d: "Te acompañamos en gobernanza, finanzas y cumplimiento.",
-								},
-								{
-									n: "04",
-									t: "Cotización",
-									d: "Listado en HSE (Etapa 2, 2027+).",
-								},
-							].map((s) => (
-								<li key={s.n} className="flex gap-3">
-									<span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-primary/30 bg-primary/5 font-mono text-[10px] font-semibold text-primary">
-										{s.n}
-									</span>
-									<div>
-										<span className="text-sm font-medium text-foreground">
-											{s.t}
+						<div className="rounded-2xl border border-border bg-card/60 p-6">
+							<h3 className="font-semibold text-foreground">Proceso</h3>
+							<ol className="mt-4 space-y-4">
+								{[
+									{
+										n: "01",
+										t: "Registro",
+										d: "Completa el formulario con los datos de tu empresa.",
+									},
+									{
+										n: "02",
+										t: "Evaluación",
+										d: "Analizamos tu perfil y agendamos una reunión inicial.",
+									},
+									{
+										n: "03",
+										t: "Preparación",
+										d: "Te acompañamos en gobernanza, finanzas y cumplimiento.",
+									},
+									{
+										n: "04",
+										t: "Cotización",
+										d: "Listado en HSE (Etapa 2, 2027+).",
+									},
+								].map((s) => (
+									<li key={s.n} className="flex gap-3">
+										<span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-primary/30 bg-primary/5 font-mono text-[10px] font-semibold text-primary">
+											{s.n}
 										</span>
-										<p className="text-xs text-muted-foreground">{s.d}</p>
-									</div>
-								</li>
-							))}
-						</ol>
-					</div>
-				</aside>
-			</section>
-
+										<div>
+											<span className="text-sm font-medium text-foreground">
+												{s.t}
+											</span>
+											<p className="text-xs text-muted-foreground">{s.d}</p>
+										</div>
+									</li>
+								))}
+							</ol>
+						</div>
+					</aside>
+				</section>
 			</main>
 			<SiteFooter />
 		</div>
