@@ -759,6 +759,10 @@ export type Database = {
         }[]
       }
       is_admin: { Args: never; Returns: boolean }
+      record_data_export: {
+        Args: { p_resource_type: string; p_rows: number }
+        Returns: undefined
+      }
       record_form_notification: {
         Args: {
           p_error?: string
@@ -963,3 +967,4 @@ export const Constants = {
     Enums: {},
   },
 } as const
+

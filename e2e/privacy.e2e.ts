@@ -160,3 +160,71 @@ test("un usuario autenticado no alcanza los datos personales de otros", async ({
 		await deleteTestUser(student.id);
 	}
 });
+
+test("la exportación del newsletter neutraliza fórmulas, queda auditada y se niega a quien no es admin", async ({
+	page,
+	browser,
+}) => {
+	const run = randomUUID().slice(0, 8);
+	const admin = await createTestUser(`export-admin-${run}@example.test`, true);
+	const student = await createTestUser(`export-user-${run}@example.test`);
+	const member = await browser.newPage({ baseURL: "http://127.0.0.1:3100" });
+	// Un suscriptor cuyo nombre es una fórmula de hoja de cálculo.
+	const email = `export-${run}@example.test`;
+	const attack = "=cmd|' /C calc'!A0";
+	const seeded = await service.from("newsletter_subscriptions").insert({
+		email,
+		full_name: attack,
+		source: "e2e-export",
+		consented_at: new Date().toISOString(),
+		reference: `BVH-NEWS-EXP${run.toUpperCase()}`,
+	});
+	expect(seeded.error).toBeNull();
+	try {
+		await signInPage(page, admin.email ?? "", "/admin");
+		await page.goto("/admin/newsletter");
+		const link = page.getByRole("link", { name: "Exportar CSV" });
+		await expect(link).toBeVisible();
+
+		const response = await page.request.get("/admin/newsletter/exportar");
+		expect(response.status()).toBe(200);
+		expect(response.headers()["content-type"]).toContain("text/csv");
+		expect(response.headers()["content-disposition"]).toContain(
+			'attachment; filename="newsletter-',
+		);
+		const csv = await response.text();
+		expect(csv).toContain(email);
+		// El nombre viaja íntegro pero desactivado: ninguna celda empieza por «=».
+		expect(csv).toContain(`'${attack}`);
+		expect(csv).not.toMatch(/(^|,|\n)=/);
+
+		// La descarga queda registrada con actor y volumen, sin el contenido.
+		const audited = await service
+			.from("audit_events")
+			.select("action, resource_type, actor_id, metadata")
+			.eq("action", "export")
+			.order("created_at", { ascending: false })
+			.limit(1)
+			.single();
+		expect(audited.error).toBeNull();
+		expect(audited.data?.resource_type).toBe("newsletter_subscriptions");
+		expect(audited.data?.actor_id).toBe(admin.id);
+		expect(
+			Number((audited.data?.metadata as { rows?: number })?.rows),
+		).toBeGreaterThan(0);
+		expect(JSON.stringify(audited.data?.metadata)).not.toContain(email);
+
+		// Ni un usuario autenticado sin rol ni un visitante obtienen el archivo.
+		await signInPage(member, student.email ?? "", "/cuenta");
+		const denied = await member.request.get("/admin/newsletter/exportar", {
+			maxRedirects: 0,
+		});
+		expect(denied.status()).toBeGreaterThanOrEqual(300);
+		expect(await denied.text()).not.toContain(email);
+	} finally {
+		await member.close();
+		await service.from("newsletter_subscriptions").delete().eq("email", email);
+		await deleteTestUser(student.id);
+		await deleteTestUser(admin.id);
+	}
+});

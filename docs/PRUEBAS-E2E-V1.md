@@ -46,10 +46,10 @@ La prueba detectó que el historial perdía título/calendario al cerrar una ofe
 
 ## Resultado conjunto
 
-- `pnpm test:e2e`: **37/37 correctas**, 2,3 min de ejecución de Playwright, después de compilar y arrancar el servidor; incluye editorial, cursos, identidad, formularios, avisos, CMS por rol, categorías y roles, SEO, privacidad y accesibilidad pública y administrativa.
-- `pnpm test:db`: **66/66 correctas** (28 autorización, 10 historial privado, 7 capacidad administrativa, 9 privacidad de auditoría, 12 gestión de roles).
+- `pnpm test:e2e`: **38/38 correctas**, 2,2 min de ejecución de Playwright, después de compilar y arrancar el servidor; incluye editorial, cursos, identidad, formularios, avisos, CMS por rol, categorías y roles, SEO, privacidad y accesibilidad pública y administrativa.
+- `pnpm test:db`: **70/70 correctas** (28 autorización, 10 historial privado, 7 capacidad administrativa, 13 privacidad de auditoría, 12 gestión de roles).
 - `pnpm test:concurrency`: un único ganador del último cupo y reintento idempotente correctos.
-- `pnpm check`: lint (164 archivos), tipos, **35 unitarias** y build correctos, con las variables de Supabase local inyectadas.
+- `pnpm check`: lint (167 archivos), tipos, **42 unitarias** y build correctos, con las variables de Supabase local inyectadas.
 - `openspec validate deliver-v1-core-platform --strict --no-interactive`: correcto.
 - `git diff --check` y comprobación Biome de las nuevas pruebas y módulo de identidad: correctos.
 
@@ -124,9 +124,9 @@ Cambios y comprobaciones:
 - `/cuenta`, `/actualizar-password` y la baja del newsletter declaran `noindex`, además de quedar excluidas por `robots.txt`.
 - El Open Graph del layout usa rutas relativas resueltas contra `metadataBase`, que ya dependía de `NEXT_PUBLIC_SITE_URL`.
 
-## Fugas de datos y auditoría: tarea 4.4 (parcial)
+## Fugas de datos y auditoría: tarea 4.4
 
-`pnpm test:e2e privacy`: **4/4 correctas**. `supabase/tests/audit_privacy.test.sql`: **9/9 correctas**.
+`pnpm test:e2e privacy`: **5/5 correctas**. `supabase/tests/audit_privacy.test.sql`: **13/13 correctas**. `tests/csv.test.ts`: **7/7 correctas**.
 
 - Ni el HTML ni los scripts que carga la home contienen la clave de servicio, el nombre de esa variable ni la credencial del proveedor de correo. Se comprueba sobre seis rutas públicas y sobre cada script enlazado.
 - Un fallo real de consulta detrás de una sesión administrativa muestra el límite de error de sección; el HTML no contiene el texto SQL —«invalid input syntax», «permission denied for», «duplicate key value»— que sí queda en el registro del servidor.
@@ -135,7 +135,14 @@ Cambios y comprobaciones:
 - Un usuario autenticado no ve datos de terceros en su área ni alcanza las vistas que los contienen; el correo ajeno no aparece en ninguna de las respuestas que recibe.
 - La auditoría registra el hecho, no el contenido: cambiar nombre y correo de un perfil deja un evento con metadatos vacíos y sin rastro de esos valores, mientras que un cambio de estado sí conserva `old_status` y `new_status`. Ningún evento guarda claves distintas del estado. Un usuario sin rol lee cero eventos y un cliente anónimo ni siquiera puede consultar la tabla.
 
-**Pendiente de esta tarea:** el producto no tiene ninguna exportación de datos, de modo que la neutralización de fórmulas en CSV no tiene sujeto que verificar y el escenario «Exportación segura» de `admin-cms` sigue sin demostrarse. Construir esa exportación es una decisión de producto con implicaciones de privacidad que la tarea 6.1 reserva al propietario.
+La exportación que el contrato anticipaba no existía, así que la neutralización de fórmulas no tenía sujeto. Ahora el panel exporta la lista de suscriptores del newsletter en CSV, que es el caso que un operador necesita para trabajar fuera del panel:
+
+- Una hoja de cálculo ejecuta como fórmula cualquier celda que empiece por `=`, `+`, `-`, `@`, tabulador o retorno. El exportador antepone una comilla simple a esas celdas: el contenido viaja íntegro pero ninguna se ejecuta al abrir el archivo. Siete pruebas unitarias cubren el ataque clásico `=cmd|' /C calc'!A0`, el escapado de comillas, comas y saltos de línea, y que un valor corriente no se altera.
+- El recorrido E2E siembra un suscriptor cuyo nombre **es** esa fórmula, descarga el archivo como administrador y comprueba que ninguna celda empieza por `=` y que el dato sigue completo.
+- La descarga queda auditada como acción `export` con actor, recurso y número de filas. El evento no guarda ninguna de las filas exportadas, y así lo comprueban tanto el E2E como las pruebas SQL.
+- `record_data_export` exige rol de administrador: un usuario autenticado sin rol recibe `forbidden`. La ruta de descarga redirige a quien no es administrador y no entrega ni una dirección.
+
+**Nota de alcance:** solo se exporta el newsletter. Los mensajes de contacto y las solicitudes RIE-BVH contienen texto libre y más datos personales; añadir sus exportaciones es trivial con el mismo ayudante, pero es una decisión de retención que la tarea 6.1 reserva al propietario.
 
 ## Accesibilidad y responsive: tarea 4.2 (parcial)
 

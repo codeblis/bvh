@@ -26,7 +26,7 @@
 - [x] 4.1 Ejecutar `pnpm check` y `openspec validate deliver-v1-core-platform --strict --no-interactive`; corregir toda regresión y guardar el resumen de resultados.
 - [ ] 4.2 Ejecutar los flujos críticos a 320 px, tablet y escritorio solo con teclado y con lector de pantalla básico; verificar foco, etiquetas, errores, contraste, movimiento reducido y ausencia de scroll accidental.
 - [x] 4.3 Verificar SEO de home, índices y detalles publicados: title, description, canonical, Open Graph, robots, sitemap y exclusión de borradores/previews mediante pruebas automatizadas o evidencia reproducible.
-- [ ] 4.4 Revisar logs, respuestas públicas y exportaciones para impedir secretos, tokens, SQL y PII ajena; verificar que CSV neutraliza fórmulas y que auditoría no duplica cuerpos personales.
+- [x] 4.4 Revisar logs, respuestas públicas y exportaciones para impedir secretos, tokens, SQL y PII ajena; verificar que CSV neutraliza fórmulas y que auditoría no duplica cuerpos personales.
 
 ## 5. Entornos e integraciones externas autorizadas
 

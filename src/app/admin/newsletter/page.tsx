@@ -1,5 +1,14 @@
+import { Download } from "lucide-react";
 import { requireAdmin } from "@/lib/admin";
-import { AdminPageHeader, EmptyState, table, tableWrap, td, th } from "../_ui";
+import {
+	AdminPageHeader,
+	buttonGhost,
+	EmptyState,
+	table,
+	tableWrap,
+	td,
+	th,
+} from "../_ui";
 import {
 	NotificationResultBanner,
 	NotificationStatus,
@@ -30,6 +39,14 @@ export default async function NewsletterPage({
 				error={query.error}
 			/>
 			<AdminPageHeader
+				action={
+					rows.length > 0 ? (
+						<a href="/admin/newsletter/exportar" className={buttonGhost}>
+							<Download className="h-4 w-4" aria-hidden="true" />
+							Exportar CSV
+						</a>
+					) : null
+				}
 				title="Newsletter"
 				description={`${
 					active === 1

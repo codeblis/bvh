@@ -4,7 +4,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
 
-select plan(9);
+select plan(13);
 
 insert into auth.users (
   instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
@@ -110,18 +110,58 @@ select is(
 select is(
   (select count(*) from public.audit_events e,
      lateral jsonb_object_keys(e.metadata) as k
-   where k not in ('old_status', 'new_status', 'old_role', 'new_role')),
+   where e.action <> 'export'
+     and k not in ('old_status', 'new_status', 'old_role', 'new_role')),
   0::bigint,
-  'ningún evento guarda claves distintas del estado o el rol'
+  'ningún evento de cambio guarda claves distintas del estado o el rol'
 );
 
 select is(
   (select count(*) from public.audit_events
-   where resource_id is null),
+   where action <> 'export' and resource_id is null),
   0::bigint,
-  'todo evento identifica el recurso afectado'
+  'todo evento de cambio identifica el recurso afectado'
 );
 
+-- Una exportación se registra como hecho, con su volumen y sin su contenido.
+set local role authenticated;
+select set_config(
+  'request.jwt.claim.sub',
+  '81000000-0000-0000-0000-000000000002',
+  true
+);
+select throws_ok(
+  $$select public.record_data_export('newsletter_subscriptions', 3)$$,
+  'forbidden',
+  'un usuario sin rol no puede registrar una exportación'
+);
+
+reset role;
+set local role authenticated;
+select set_config(
+  'request.jwt.claim.sub',
+  '81000000-0000-0000-0000-000000000001',
+  true
+);
+select lives_ok(
+  $$select public.record_data_export('newsletter_subscriptions', 3)$$,
+  'un administrador registra la exportación'
+);
+select is(
+  (select metadata->>'rows' from public.audit_events
+   where action = 'export' limit 1),
+  '3',
+  'el evento guarda cuántas filas salieron'
+);
+select is(
+  (select count(*) from public.audit_events e,
+     lateral jsonb_object_keys(e.metadata) as k
+   where e.action = 'export' and k <> 'rows'),
+  0::bigint,
+  'la exportación no guarda ningún dato exportado'
+);
+
+reset role;
 -- Solo los administradores consultan la auditoría.
 reset role;
 set local role authenticated;
