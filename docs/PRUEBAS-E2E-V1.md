@@ -46,7 +46,7 @@ La prueba detectó que el historial perdía título/calendario al cerrar una ofe
 
 ## Resultado conjunto
 
-- `pnpm test:e2e`: **33/33 correctas**, 1,9 min de ejecución de Playwright, después de compilar y arrancar el servidor; incluye editorial, cursos, identidad, formularios, avisos, CMS por rol, categorías y roles, SEO, privacidad y accesibilidad.
+- `pnpm test:e2e`: **37/37 correctas**, 2,3 min de ejecución de Playwright, después de compilar y arrancar el servidor; incluye editorial, cursos, identidad, formularios, avisos, CMS por rol, categorías y roles, SEO, privacidad y accesibilidad pública y administrativa.
 - `pnpm test:db`: **66/66 correctas** (28 autorización, 10 historial privado, 7 capacidad administrativa, 9 privacidad de auditoría, 12 gestión de roles).
 - `pnpm test:concurrency`: un único ganador del último cupo y reintento idempotente correctos.
 - `pnpm check`: lint (164 archivos), tipos, **35 unitarias** y build correctos, con las variables de Supabase local inyectadas.
@@ -151,6 +151,14 @@ Lo verificado:
 - Con `prefers-reduced-motion: reduce`, el ticker y el pulso quedan sin animación.
 - El titular de la página y el botón de acción superan el contraste AA (3:1 para texto grande, 4,5:1 para el control). El cálculo resuelve los colores OKLCH del tema pintándolos en un lienzo, no interpretando su texto.
 - En cada página pública hay exactamente una región principal y una cabecera; el primer tabulado enfoca el salto al contenido y activarlo lleva a `#contenido`.
+
+Tras rediseñar el panel, la cobertura se extendió a las trece vistas administrativas:
+
+- Ninguna desborda a 320, 768 ni 1280 px. La comprobación encontró que la ficha de una solicitud RIE-BVH sí lo hacía: la etiqueta de ancho fijo más un correo largo no caben en 320 px. Ahora la fila se apila en móvil y los valores largos se parten.
+- Cada vista tiene un único encabezado y una única región principal, y la navegación declara la sección actual con `aria-current`, no solo con color.
+- Los contadores de la navegación se anuncian: el número va acompañado de «sin atender» para lectores de pantalla, porque un número suelto junto a «Mensajes de contacto» no dice nada a quien escucha.
+- Todos los controles visibles del editor de artículos y de la gestión de roles tienen nombre accesible.
+- El editor de artículos se recorre y se guarda **solo con teclado**: el foco pasa del manuscrito a la ficha de publicación —estado, tipo, categoría, fecha y slug— y llega al botón de guardar sin ratón y sin bajar la página; el borrador queda persistido.
 
 **Pendiente de esta tarea:** el recorrido con lector de pantalla real (VoiceOver o NVDA) no puede automatizarse y sigue sin hacerse. Las comprobaciones anteriores cubren estructura, foco, nombres y contraste, que es lo que ese recorrido verificaría, pero no lo sustituyen.
 

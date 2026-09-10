@@ -52,7 +52,7 @@ Cambio preexistente no rastreado: .claude/
 ## Verificación observada
 
 - `pnpm check`: pasó con configuración local; incluye lint, typecheck, 35 unitarias y build.
-- `pnpm test:e2e`: 33/33 correctas (1,9 min), sobre servidor de producción local.
+- `pnpm test:e2e`: 37/37 correctas (2,3 min), sobre servidor de producción local.
 - `pnpm test:db`: 66/66 correctas; concurrencia del último cupo e idempotencia también correctas.
 - Validación OpenSpec estricta y `git diff --check`: correctos.
 
