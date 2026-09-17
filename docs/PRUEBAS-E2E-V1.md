@@ -1,6 +1,6 @@
 # Evidencia E2E local de la V1
 
-**Fecha:** 2026-09-08  
+**Fecha:** 2026-09-17  
 **Cambio:** `deliver-v1-core-platform`  
 **Entorno:** Next.js 16.2.10, build de producción servido en Node, Chrome headless y Supabase local desechable.
 
@@ -46,10 +46,10 @@ La prueba detectó que el historial perdía título/calendario al cerrar una ofe
 
 ## Resultado conjunto
 
-- `pnpm test:e2e`: **38/38 correctas**, 2,2 min de ejecución de Playwright, después de compilar y arrancar el servidor; incluye editorial, cursos, identidad, formularios, avisos, CMS por rol, categorías y roles, SEO, privacidad y accesibilidad pública y administrativa.
-- `pnpm test:db`: **70/70 correctas** (28 autorización, 10 historial privado, 7 capacidad administrativa, 13 privacidad de auditoría, 12 gestión de roles).
+- `pnpm test:e2e`: **39/39 correctas**, 1,6 min de ejecución de Playwright, después de compilar y arrancar el servidor; incluye editorial, cursos, identidad, formularios, avisos, CMS por rol, categorías y roles, SEO, privacidad y accesibilidad pública y administrativa.
+- `pnpm test:db`: **79/79 correctas** (28 autorización, 10 historial privado, 7 capacidad administrativa, 13 privacidad de auditoría, 12 gestión de roles, 9 límite de envíos).
 - `pnpm test:concurrency`: un único ganador del último cupo y reintento idempotente correctos.
-- `pnpm check`: lint (167 archivos), tipos, **42 unitarias** y build correctos, con las variables de Supabase local inyectadas.
+- `pnpm check`: lint (172 archivos), tipos, **55 unitarias** y build correctos, con las variables de Supabase local inyectadas.
 - `openspec validate deliver-v1-core-platform --strict --no-interactive`: correcto.
 - `git diff --check` y comprobación Biome de las nuevas pruebas y módulo de identidad: correctos.
 
@@ -184,6 +184,38 @@ Lo verificado en navegador:
 - Categorías: alta con slug propio, edición en línea, nombre duplicado rechazado con su motivo, y borrado que exige confirmación. Una categoría con artículos asignados no ofrece borrado y se marca «En uso», para que publicar no quede sin taxonomía.
 - Usuarios: la búsqueda acota el listado y explica el vacío; promover abre el panel a esa cuenta de verdad y retirar el rol lo cierra otra vez; la fila propia no ofrece cambio de rol.
 - Un usuario autenticado sin rol termina en `/cuenta` y un visitante en `/login`; su rol sigue intacto tras los intentos.
+
+## Antiabuso de formularios: tarea 5.4 (implementación)
+
+`tests/turnstile.test.ts`: **7/7**. `tests/form-guards.test.ts`: **6/6**.
+`supabase/tests/form_rate_limit.test.sql`: **9/9**. Un recorrido E2E en
+`forms` comprueba el límite de extremo a extremo.
+
+El límite de envíos queda activo sin configurar nada: cinco por cliente y ruta
+cada 300 s. El contador vive en la base porque en Cloudflare cada isolate
+tendría el suyo y el límite sería una ilusión; la clave del cubo es un hash, de
+modo que la base nunca ve una dirección. El recorrido E2E envía seis veces el
+formulario de contacto: las cinco primeras responden 200, la sexta 429 y la
+base conserva exactamente cinco filas. Otra ruta del mismo cliente mantiene su
+propio cupo.
+
+Si la comprobación del límite falla, el envío pasa: rechazar solicitudes
+legítimas porque el contador está caído hace más daño que el abuso que evita.
+
+Turnstile está implementado y permanece inerte sin claves. Con secreto
+configurado, un envío sin token se rechaza sin consultar a Cloudflare, un token
+rechazado no pasa, y —el caso que suele olvidarse— **si el verificador no
+responde el envío también se rechaza**, pidiendo reintentar, en vez de aceptar
+a ciegas.
+
+La revisión de esta implementación encontró un fallo propio: se enviaba una
+`idempotency_key` derivada del cliente. Cloudflare devuelve el resultado
+**cacheado** de esa clave, así que un cliente que acertara una vez habría
+convertido ese acierto en un permiso permanente para tokens posteriores.
+Se eliminó, y una prueba fija que el cuerpo de la verificación no la lleva.
+
+**Pendiente:** la comprobación con el widget real, que necesita las claves de
+la cuenta confirmada en 5.3.
 
 ## Límites
 

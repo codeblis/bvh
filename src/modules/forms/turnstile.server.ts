@@ -21,14 +21,15 @@ export function isTurnstileEnabled() {
  */
 export async function verifyTurnstile(
 	token: string | undefined,
-	fingerprint?: string,
 ): Promise<TurnstileResult> {
 	const secret = process.env.TURNSTILE_SECRET_KEY;
 	if (!secret) return { ok: true };
 	if (!token) return { ok: false, reason: "missing" };
 
+	// Sin `idempotency_key`: Cloudflare devuelve el resultado cacheado de esa
+	// clave, así que reutilizar una por cliente convertiría un único acierto en
+	// un permiso permanente. Cada token se verifica por sí mismo.
 	const body = new URLSearchParams({ secret, response: token });
-	if (fingerprint) body.set("idempotency_key", fingerprint);
 
 	try {
 		const response = await fetch(

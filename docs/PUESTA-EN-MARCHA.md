@@ -1,7 +1,7 @@
 # Puesta en marcha de la V1
 
 **Estado:** Procedimiento preparado, ninguna ejecución realizada
-**Corte:** 2026-09-09
+**Corte:** 2026-09-17
 
 Este documento existe porque las once tareas que quedan del cambio
 [`deliver-v1-core-platform`](../openspec/changes/deliver-v1-core-platform/proposal.md)

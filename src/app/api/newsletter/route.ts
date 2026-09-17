@@ -32,7 +32,6 @@ export async function POST(request: Request) {
 
 	const verified = await verifyTurnstile(
 		(body as { turnstileToken?: string })?.turnstileToken,
-		fingerprint,
 	);
 	if (!verified.ok) return verificationRequired();
 

@@ -1,7 +1,7 @@
 # Relevo — BVH
 
 **Estado:** Fotografía transitoria, no fuente canónica  
-**Corte:** 2026-09-08
+**Corte:** 2026-09-17
 
 Para decisiones y alcance usar [ADR](ADR-Arquitectura-BVH.md), [SPEC V1](SPEC-V1-BVH.md) y el cambio OpenSpec activo [`deliver-v1-core-platform`](../openspec/changes/deliver-v1-core-platform/proposal.md). La relación detallada con el código está en [Trazabilidad OpenSpec V1](TRAZABILIDAD-OPEN-SPEC-V1.md).
 
@@ -52,8 +52,8 @@ Cambio preexistente no rastreado: .claude/
 
 ## Verificación observada
 
-- `pnpm check`: pasó con configuración local; incluye lint, typecheck, 35 unitarias y build.
-- `pnpm test:e2e`: 39/39 correctas (1,8 min), sobre servidor de producción local.
+- `pnpm check`: pasó con configuración local; incluye lint, typecheck, 55 unitarias y build.
+- `pnpm test:e2e`: 39/39 correctas (1,6 min), sobre servidor de producción local.
 - `pnpm test:db`: 79/79 correctas; concurrencia del último cupo e idempotencia también correctas.
 - Validación OpenSpec estricta y `git diff --check`: correctos.
 

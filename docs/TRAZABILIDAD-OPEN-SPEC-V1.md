@@ -1,7 +1,7 @@
 # Trazabilidad OpenSpec — V1 BVH
 
 **Estado:** Implementación y verificación local en curso  
-**Corte:** 2026-09-08  
+**Corte:** 2026-09-17  
 **Cambio:** `deliver-v1-core-platform`
 
 Este documento relaciona el cambio OpenSpec con la implementación y pruebas locales observadas. No demuestra estado remoto, aceptación del propietario ni preparación productiva.

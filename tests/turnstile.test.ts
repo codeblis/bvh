@@ -51,6 +51,16 @@ test("un token aceptado por Cloudflare deja pasar", async () => {
 	expect(String((init as RequestInit).body)).toContain("response=token-valido");
 });
 
+test("cada token se verifica por sí mismo, sin clave de idempotencia", () => {
+	// Cloudflare devuelve el resultado cacheado de una `idempotency_key`:
+	// reutilizar una por cliente convertiría un acierto en permiso permanente.
+	const fetchSpy = respondWith({ success: true });
+	return verifyTurnstile("token-valido").then(() => {
+		const body = String((fetchSpy.mock.calls[0][1] as RequestInit).body);
+		expect(body).not.toContain("idempotency_key");
+	});
+});
+
 test("un token rechazado no pasa", async () => {
 	respondWith({ success: false, "error-codes": ["invalid-input-response"] });
 	expect(await verifyTurnstile("token-falso")).toEqual({
