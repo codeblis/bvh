@@ -42,7 +42,7 @@ const SERVICIOS = [
 	{
 		n: "06",
 		t: "Habana Stock Exchange",
-		d: "El núcleo operativo del mercado. Libro de órdenes, participantes y liquidez en tiempo real.",
+		d: "El núcleo operativo del mercado: libro de órdenes, participantes y liquidez. En preparación; lo que hoy se muestra son datos simulados.",
 	},
 ];
 
@@ -80,7 +80,7 @@ export default function Home() {
 						href="/mercados#hse"
 						className="rounded-md border border-border bg-card/40 px-6 py-4 text-[12px] font-semibold uppercase tracking-[0.14em] text-foreground transition hover:bg-card"
 					>
-						Accede a la plataforma de negociación HSE →
+						Plataforma de negociación HSE (en preparación) →
 					</Link>
 				</div>
 				<div className="mt-14 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[11px] uppercase tracking-widest text-muted-foreground">
@@ -232,7 +232,7 @@ export default function Home() {
 							boletín diario de noticias y a los ensayos semanales del blog.
 						</p>
 						<div className="mt-6">
-							<NewsletterSignup detailed source="portada" cta="Suscribirme al boletín institucional" placeholder="tu@correo.cu" hint="Un correo al mes · sin spam · puedes darte de baja cuando quieras." />
+							<NewsletterSignup detailed lista="institucional" source="portada" cta="Suscribirme al boletín institucional" placeholder="tu@correo.cu" hint="Un correo al mes · sin spam · puedes darte de baja cuando quieras." />
 						</div>
 						<div className="mt-6 flex flex-wrap gap-2 border-t border-border pt-5 text-[11px]">
 							<Link

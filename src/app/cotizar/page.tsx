@@ -10,10 +10,22 @@ import {
 	TrendingUp,
 } from "lucide-react";
 import { useState } from "react";
+import { DemoNotice } from "@/components/bvh/DemoNotice";
 import { PageHero } from "@/components/bvh/PageHero";
 import { SiteFooter } from "@/components/bvh/SiteFooter";
 import { SiteHeader } from "@/components/bvh/SiteHeader";
 import { TurnstileField } from "@/components/bvh/TurnstileField";
+
+const AVISO_REGISTRO = (
+	<>
+		<strong className="text-foreground">
+			Registro en preparación, aún no disponible.
+		</strong>{" "}
+		Puedes dejar tu solicitud y quedará registrada, pero la evaluación y la
+		cotización en el Havana Stock Exchange todavía no están operativas. Las
+		cifras de mercado que muestra el sitio son datos simulados.
+	</>
+);
 
 const SECTORS = [
 	"Agroindustria",
@@ -158,6 +170,7 @@ export default function CotizarPage() {
 		return (
 			<div className="min-h-screen bg-background text-foreground">
 				<SiteHeader />
+				<DemoNotice message={AVISO_REGISTRO} />
 				<main id="contenido">
 					<PageHero
 						eyebrow="Registro completado"
@@ -277,6 +290,7 @@ export default function CotizarPage() {
 	return (
 		<div className="min-h-screen bg-background text-foreground">
 			<SiteHeader />
+			<DemoNotice message={AVISO_REGISTRO} />
 			<main id="contenido">
 				<PageHero
 					eyebrow="RIE-BVH · Registro de Empresas"

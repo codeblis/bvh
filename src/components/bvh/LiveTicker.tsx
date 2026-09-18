@@ -47,11 +47,14 @@ export function LiveTicker() {
   const doubled = useMemo(() => [...rows, ...rows], [rows]);
 
   return (
-    <div className="border-b border-border bg-card/80 backdrop-blur">
+    <section
+      className="border-b border-border bg-card/80 backdrop-blur"
+      aria-label="Demostración de mercado con datos simulados: el mercado aún no está disponible"
+    >
       <div className="flex items-center gap-3 overflow-hidden">
         <div className="flex shrink-0 items-center gap-2 border-r border-border px-4 py-2.5 text-[11px] font-semibold uppercase tracking-widest text-primary">
           <span className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-primary" aria-hidden="true" />
-			Demo de mercado · <span className="tabular-nums">{now}</span>
+			Datos simulados · <span className="tabular-nums">{now}</span>
         </div>
         <div className="relative flex-1 overflow-hidden">
           <div className="ticker-track flex w-max gap-8 py-2.5 text-[12px] font-mono">
@@ -68,6 +71,6 @@ export function LiveTicker() {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
