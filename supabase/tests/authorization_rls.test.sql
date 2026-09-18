@@ -122,10 +122,17 @@ insert into public.company_applications (
 );
 
 insert into public.newsletter_subscriptions (
-  id, email, full_name, source, consented_at, reference, notification_status
+  id, email, full_name
 ) values (
   '79000000-0000-0000-0000-000000000001', 'newsletter@example.test',
-  'RLS Subscriber', 'rls-test', now(), 'rls-newsletter-0001', 'pending'
+  'RLS Subscriber'
+);
+insert into public.newsletter_list_subscriptions (
+  subscriber_id, list_id, source, consented_at, reference, notification_status
+) values (
+  '79000000-0000-0000-0000-000000000001',
+  (select id from public.newsletter_lists where slug = 'institucional'),
+  'rls-test', now(), 'rls-newsletter-0001', 'pending'
 );
 
 select ok(

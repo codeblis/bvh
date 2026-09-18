@@ -22,7 +22,8 @@ export function NotificationStatus({
 	resourceType:
 		| "contact_message"
 		| "company_application"
-		| "newsletter_subscription";
+		| "newsletter_subscription"
+		| "course_enrollment";
 	id: string;
 	status: string;
 	attempts: number;

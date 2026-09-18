@@ -35,6 +35,8 @@ export const RESOURCE_LABELS: Record<string, string> = {
 	course_enrollments: "inscripción",
 	course_offerings: "edición de curso",
 	courses: "curso",
+	newsletter_campaigns: "campaña",
+	newsletter_list_subscriptions: "suscripción a lista",
 	newsletter_subscriptions: "suscripción",
 	profiles: "perfil",
 };

@@ -18,6 +18,10 @@ import {
 	th,
 } from "../../_ui";
 
+import {
+	NotificationResultBanner,
+	NotificationStatus,
+} from "../../NotificationStatus";
 import { StatusSelect } from "../../StatusSelect";
 import { updateEnrollmentStatus } from "./actions";
 
@@ -25,10 +29,20 @@ function first<T>(value: T | T[] | null): T | null {
 	return Array.isArray(value) ? (value[0] ?? null) : value;
 }
 
+// El reintento del aviso y el cambio de estado comparten `?error=`; solo el
+// primero se explica en el banner de notificaciones.
+function isNotificationError(error?: string) {
+	return error === "not-found" || error === "notification-state";
+}
+
 export default async function CourseEnrollmentsPage({
 	searchParams,
 }: {
-	searchParams: Promise<{ error?: string; offering?: string }>;
+	searchParams: Promise<{
+		error?: string;
+		offering?: string;
+		notification?: string;
+	}>;
 }) {
 	const query = await searchParams;
 	const parsedOffering = z.string().uuid().safeParse(query.offering);
@@ -37,7 +51,7 @@ export default async function CourseEnrollmentsPage({
 	let request = supabase
 		.from("course_enrollments")
 		.select(
-			"id, status, enrolled_at, completed_at, profiles(full_name, email), course_offerings(id, starts_at, modality, courses(id, title, slug))",
+			"id, status, enrolled_at, completed_at, notification_status, notification_attempts, profiles(full_name, email), course_offerings(id, starts_at, modality, courses(id, title, slug))",
 		)
 		.order("enrolled_at", { ascending: false });
 	if (offeringId) request = request.eq("offering_id", offeringId);
@@ -67,7 +81,11 @@ export default async function CourseEnrollmentsPage({
 					) : null
 				}
 			/>
-			{query.error ? (
+			<NotificationResultBanner
+				result={query.notification}
+				error={isNotificationError(query.error) ? query.error : undefined}
+			/>
+			{query.error && !isNotificationError(query.error) ? (
 				<p
 					className="mb-4 rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
 					role="alert"
@@ -89,6 +107,7 @@ export default async function CourseEnrollmentsPage({
 								<th className={th}>Participante</th>
 								<th className={th}>Curso / edición</th>
 								<th className={th}>Estado</th>
+								<th className={th}>Aviso</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -141,6 +160,14 @@ export default async function CourseEnrollmentsPage({
 												current={row.status}
 												options={ENROLLMENT_STATUSES}
 												optionLabels={ENROLLMENT_STATUS_LABELS}
+											/>
+										</td>
+										<td className={td}>
+											<NotificationStatus
+												resourceType="course_enrollment"
+												id={row.id}
+												status={row.notification_status}
+												attempts={row.notification_attempts}
 											/>
 										</td>
 									</tr>

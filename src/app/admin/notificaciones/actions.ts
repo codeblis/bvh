@@ -6,6 +6,7 @@ import { z } from "zod";
 import { requireAdmin } from "@/lib/admin";
 import { createReference, escapeHtml } from "@/lib/forms";
 import { emailConfig } from "@/lib/resend";
+import { enrollmentConfirmationEmail } from "@/modules/courses/notifications.server";
 import { deliverEmail } from "@/modules/forms/email.server";
 import { notificationIdempotencyKey } from "@/modules/forms/idempotency";
 
@@ -15,13 +16,20 @@ const retrySchema = z.object({
 		"contact_message",
 		"company_application",
 		"newsletter_subscription",
+		"course_enrollment",
 	]),
 });
 
 function pathFor(resourceType: z.infer<typeof retrySchema>["resourceType"]) {
 	if (resourceType === "contact_message") return "/admin/mensajes";
 	if (resourceType === "company_application") return "/admin/solicitudes";
+	if (resourceType === "course_enrollment")
+		return "/admin/cursos/inscripciones";
 	return "/admin/newsletter";
+}
+
+function first<T>(value: T | T[] | null): T | null {
+	return Array.isArray(value) ? (value[0] ?? null) : value;
 }
 
 function resultPayload(
@@ -131,24 +139,79 @@ export async function retryFormNotification(formData: FormData) {
 			.update(resultPayload(delivery, read.data.notification_attempts))
 			.eq("id", id);
 		if (update.error) redirect(`${returnPath}?error=notification-state`);
-	} else {
+	} else if (resourceType === "course_enrollment") {
 		const read = await supabase
-			.from("newsletter_subscriptions")
+			.from("course_enrollments")
 			.select(
-				"id, email, full_name, profile, source, reference, notification_attempts, notification_status, is_active",
+				"id, reference, notification_attempts, notification_status, profiles(full_name, email), course_offerings(starts_at, modality, location, courses(title))",
 			)
 			.eq("id", id)
 			.maybeSingle();
 		if (read.error || !read.data) redirect(`${returnPath}?error=not-found`);
 		if (read.data.notification_status === "sent") redirect(returnPath);
 
+		const student = first(read.data.profiles);
+		if (!student?.email) redirect(`${returnPath}?error=not-found`);
+
+		const offering = first(read.data.course_offerings);
+		const course = first(offering?.courses ?? null);
+		// Se fija la referencia al reintentar para que la clave lógica del
+		// proveedor no cambie entre un intento y el siguiente.
+		const reference = read.data.reference ?? createReference("BVH-INS");
+		const delivery = await deliverEmail(
+			enrollmentConfirmationEmail({
+				reference,
+				studentEmail: student.email,
+				studentName: student.full_name,
+				courseTitle: course?.title ?? "Instituto BVH",
+				startsAt: offering?.starts_at ?? null,
+				modality: offering?.modality ?? null,
+				location: offering?.location ?? null,
+			}),
+			notificationIdempotencyKey(
+				reference,
+				read.data.notification_status,
+				read.data.notification_attempts,
+			),
+		);
+		outcome = delivery.success ? "sent" : "failed";
+		// La tabla no admite escritura directa ni siquiera desde el panel.
+		const update = await supabase.rpc("record_enrollment_notification_retry", {
+			p_enrollment_id: id,
+			p_reference: reference,
+			p_success: delivery.success,
+			...(delivery.success
+				? delivery.providerId
+					? { p_provider_id: delivery.providerId }
+					: {}
+				: { p_error: delivery.error }),
+		});
+		if (update.error || update.data !== true) {
+			redirect(`${returnPath}?error=notification-state`);
+		}
+	} else {
+		// El aviso cuelga de la suscripción a una lista, no de la persona.
+		const read = await supabase
+			.from("newsletter_list_subscriptions")
+			.select(
+				"id, source, reference, notification_attempts, notification_status, newsletter_subscriptions(email, full_name, profile), newsletter_lists(name)",
+			)
+			.eq("id", id)
+			.maybeSingle();
+		if (read.error || !read.data) redirect(`${returnPath}?error=not-found`);
+		if (read.data.notification_status === "sent") redirect(returnPath);
+
+		const person = first(read.data.newsletter_subscriptions);
+		if (!person?.email) redirect(`${returnPath}?error=not-found`);
+		const list = first(read.data.newsletter_lists);
+
 		const reference = read.data.reference ?? createReference("BVH-NEWS");
 		const delivery = await deliverEmail(
 			{
 				from: emailConfig.from,
 				to: emailConfig.to,
-				subject: `[${reference}] Nueva suscripción BVH`,
-				html: `<h1>Nueva suscripción</h1><p><strong>Email:</strong> ${escapeHtml(read.data.email)}</p><p><strong>Nombre:</strong> ${escapeHtml(read.data.full_name ?? "—")}</p><p><strong>Perfil:</strong> ${escapeHtml(read.data.profile ?? "—")}</p><p><strong>Origen:</strong> ${escapeHtml(read.data.source ?? "sitio")}</p>`,
+				subject: `[${reference}] Nueva suscripción BVH · ${list?.name ?? "lista"}`,
+				html: `<h1>Nueva suscripción</h1><p><strong>Email:</strong> ${escapeHtml(person.email)}</p><p><strong>Nombre:</strong> ${escapeHtml(person.full_name ?? "—")}</p><p><strong>Lista:</strong> ${escapeHtml(list?.name ?? "—")}</p><p><strong>Perfil:</strong> ${escapeHtml(person.profile ?? "—")}</p><p><strong>Origen:</strong> ${escapeHtml(read.data.source ?? "sitio")}</p>`,
 			},
 			notificationIdempotencyKey(
 				reference,
@@ -158,7 +221,7 @@ export async function retryFormNotification(formData: FormData) {
 		);
 		outcome = delivery.success ? "sent" : "failed";
 		const update = await supabase
-			.from("newsletter_subscriptions")
+			.from("newsletter_list_subscriptions")
 			.update(resultPayload(delivery, read.data.notification_attempts))
 			.eq("id", id);
 		if (update.error) redirect(`${returnPath}?error=notification-state`);

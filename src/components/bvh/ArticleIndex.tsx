@@ -6,6 +6,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Search } from "lucide-react";
 import type { ArticleSummary } from "@/modules/content/types";
 import { ArticleCover } from "./ArticleCover";
+import type { NewsletterList } from "@/lib/forms";
 import { NewsletterSignup } from "./NewsletterSignup";
 
 function fmtDate(iso: string) {
@@ -33,6 +34,7 @@ export function ArticleIndex({
 		placeholder: string;
 		cta: string;
 		hint: string;
+		lista: NewsletterList;
 	};
 	accentLabel: string;
 	basePath: string;
@@ -380,6 +382,7 @@ export function ArticleIndex({
 						cta={newsletter.cta}
 						placeholder={newsletter.placeholder}
 						hint={newsletter.hint}
+						lista={newsletter.lista}
 						source={basePath}
 					/>
 				</div>

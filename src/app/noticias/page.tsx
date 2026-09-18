@@ -44,6 +44,7 @@ export default async function NoticiasPage() {
 				accentLabel="Noticias"
 				basePath="/noticias"
 				newsletter={{
+					lista: "noticias",
 					title: "Suscríbete al boletín diario",
 					description:
 						"Recibe cada mañana el resumen ejecutivo de lo que importa en la economía cubana. Sin spam. Un correo al día. Cancela cuando quieras.",

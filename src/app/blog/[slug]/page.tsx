@@ -174,6 +174,8 @@ export default async function BlogPostPage({
 					</p>
 					<div className="mt-6">
 						<NewsletterSignup
+							lista="blog"
+							source="detalle-blog"
 							cta="Suscribirme"
 							placeholder="tu@correo.cu"
 							hint=""

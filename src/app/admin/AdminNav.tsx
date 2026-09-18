@@ -43,6 +43,7 @@ const GROUPS = [
 				count: "solicitudes" as const,
 			},
 			{ href: "/admin/newsletter", label: "Newsletter", icon: Mail },
+			{ href: "/admin/campanas", label: "Campañas", icon: Send },
 		],
 	},
 	{

@@ -19,6 +19,18 @@ test.afterEach(async () => {
 	await setEmailStub("reject", true);
 });
 
+// El estado del aviso cuelga de la suscripción a una lista, no de la persona.
+async function listSubscription(email: string, listSlug = "institucional") {
+	return service
+		.from("newsletter_list_subscriptions")
+		.select(
+			"id, reference, is_active, notification_status, notification_attempts, newsletter_subscriptions!inner(email), newsletter_lists!inner(slug)",
+		)
+		.eq("newsletter_subscriptions.email", email)
+		.eq("newsletter_lists.slug", listSlug)
+		.single();
+}
+
 test("aviso rechazado conserva la solicitud y el reintento administrativo la marca enviada", async ({
 	page,
 	request,
@@ -131,7 +143,12 @@ test("resultado incierto del proveedor reutiliza la clave idempotente en el rein
 		// puede saber si fue aceptado.
 		await setEmailStub("drop", true);
 		const submitted = await request.post("/api/newsletter", {
-			data: { email, nombre: "Persona E2E", source: "e2e-uncertain" },
+			data: {
+				email,
+				nombre: "Persona E2E",
+				source: "e2e-uncertain",
+				lista: "institucional",
+			},
 		});
 		expect(submitted.status()).toBe(200);
 		expect(await submitted.json()).toMatchObject({ ok: true });
@@ -141,11 +158,7 @@ test("resultado incierto del proveedor reutiliza la clave idempotente en el rein
 		const originalKey = accepted[0].idempotencyKey;
 		expect(originalKey).toMatch(/^BVH-NEWS-/);
 
-		const created = await service
-			.from("newsletter_subscriptions")
-			.select("id, reference, notification_status, notification_attempts")
-			.eq("email", email)
-			.single();
+		const created = await listSubscription(email);
 		expect(created.error).toBeNull();
 		expect(created.data?.reference).toBe(originalKey);
 		expect(created.data?.notification_status).toBe("failed");
@@ -153,7 +166,7 @@ test("resultado incierto del proveedor reutiliza la clave idempotente en el rein
 		// Simula que la confirmación del proveedor no llegó a guardarse: el
 		// registro se queda como al salir del formulario, sin resultado.
 		const reset = await service
-			.from("newsletter_subscriptions")
+			.from("newsletter_list_subscriptions")
 			.update({
 				notification_status: "pending",
 				notification_attempts: 0,
@@ -177,11 +190,7 @@ test("resultado incierto del proveedor reutiliza la clave idempotente en el rein
 		expect(attempts).toHaveLength(2);
 		expect(attempts[1].idempotencyKey).toBe(originalKey);
 
-		const stored = await service
-			.from("newsletter_subscriptions")
-			.select("notification_status, notification_attempts, is_active")
-			.eq("email", email)
-			.single();
+		const stored = await listSubscription(email);
 		expect(stored.data?.notification_status).toBe("sent");
 		expect(stored.data?.notification_attempts).toBe(1);
 		expect(stored.data?.is_active).toBe(true);
@@ -207,7 +216,7 @@ test("el estado de entrega del newsletter solo es visible para administradores",
 	try {
 		await setEmailStub("reject", true);
 		const submitted = await request.post("/api/newsletter", {
-			data: { email, source: "e2e-guard" },
+			data: { email, source: "e2e-guard", lista: "institucional" },
 		});
 		expect(submitted.status()).toBe(200);
 
@@ -220,11 +229,7 @@ test("el estado de entrega del newsletter solo es visible para administradores",
 			page.getByRole("row").filter({ hasText: email }),
 		).toContainText("Falló");
 		// El fallo del proveedor no oculta la suscripción ni la marca inactiva.
-		const stored = await service
-			.from("newsletter_subscriptions")
-			.select("is_active, notification_status")
-			.eq("email", email)
-			.single();
+		const stored = await listSubscription(email);
 		expect(stored.data?.is_active).toBe(true);
 		expect(stored.data?.notification_status).toBe("failed");
 	} finally {

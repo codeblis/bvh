@@ -112,6 +112,12 @@ test("formularios: tipos inválidos, JSON roto y 32 KiB no persisten; anon no es
 				p_profile: "",
 				p_source: "e2e",
 				p_reference: "E2E-REJECT",
+				p_list_slug: "institucional",
+			}),
+			// UUID válidos a propósito: lo único que debe rechazar es el permiso.
+			await anon.from("newsletter_list_subscriptions").insert({
+				subscriber_id: randomUUID(),
+				list_id: randomUUID(),
 			}),
 		];
 		for (const result of writes) expect(result.error?.code).toBe("42501");
@@ -240,6 +246,18 @@ test("contacto y RIE-BVH: web registra, muestra aviso pendiente y CMS conserva s
 	}
 });
 
+// El consentimiento vive por lista: estas consultas siempre nombran cuál.
+async function listSubscription(email: string, listSlug: string) {
+	return service
+		.from("newsletter_list_subscriptions")
+		.select(
+			"id, is_active, consented_at, unsubscribed_at, unsubscribe_token, notification_attempts, reference, newsletter_subscriptions!inner(email, is_active), newsletter_lists!inner(slug)",
+		)
+		.eq("newsletter_subscriptions.email", email)
+		.eq("newsletter_lists.slug", listSlug)
+		.maybeSingle();
+}
+
 test("newsletter: alta única, consentimiento, GET inocuo, POST de baja y reactivación", async ({
 	page,
 	request,
@@ -260,93 +278,139 @@ test("newsletter: alta única, consentimiento, GET inocuo, POST de baja y reacti
 		await expect(form.getByRole("status")).toContainText(
 			"Suscripción recibida",
 		);
-		const first = await service
-			.from("newsletter_subscriptions")
-			.select(
-				"id, is_active, consented_at, unsubscribe_token, notification_attempts, reference",
-			)
-			.eq("email", email)
-			.single();
+		// La portada consiente a la lista institucional, no a todas.
+		const first = await listSubscription(email, "institucional");
 		expect(first.error).toBeNull();
 		if (!first.data) throw new Error("Missing subscription fixture");
 		expect(first.data.is_active).toBe(true);
 		expect(first.data.consented_at).toBeTruthy();
+
 		const duplicate = await request.post("/api/newsletter", {
-			data: { email: ` ${email.toUpperCase()} `, source: "e2e-repeat" },
+			data: {
+				email: ` ${email.toUpperCase()} `,
+				source: "e2e-repeat",
+				lista: "institucional",
+			},
 		});
 		expect(duplicate.status()).toBe(200);
 		expect(await duplicate.json()).toEqual({
 			ok: true,
 			alreadySubscribed: true,
 		});
-		const repeated = await service
-			.from("newsletter_subscriptions")
-			.select("id, notification_attempts, reference")
-			.eq("email", email);
-		expect(repeated.data).toHaveLength(1);
-		expect(repeated.data?.[0].notification_attempts).toBe(
+		const repeated = await listSubscription(email, "institucional");
+		expect(repeated.data?.id).toBe(first.data.id);
+		expect(repeated.data?.notification_attempts).toBe(
 			first.data.notification_attempts,
 		);
-		expect(repeated.data?.[0].reference).toBe(first.data.reference);
+		expect(repeated.data?.reference).toBe(first.data.reference);
+
 		const oldToken = first.data.unsubscribe_token;
 		await page.goto(`/newsletter/baja?token=${oldToken}`);
 		await expect(
 			page.getByRole("button", { name: "Confirmar baja" }),
 		).toBeVisible();
-		const before = await service
-			.from("newsletter_subscriptions")
-			.select("is_active")
-			.eq("id", first.data.id)
-			.single();
+		const before = await listSubscription(email, "institucional");
 		expect(before.data?.is_active).toBe(true);
 		await page.getByRole("button", { name: "Confirmar baja" }).click();
 		await expect(page.getByRole("status")).toHaveText(
 			"Tu suscripción quedó desactivada.",
 		);
-		const inactive = await service
-			.from("newsletter_subscriptions")
-			.select("is_active, unsubscribed_at")
-			.eq("id", first.data.id)
-			.single();
+		const inactive = await listSubscription(email, "institucional");
 		expect(inactive.data?.is_active).toBe(false);
 		expect(inactive.data?.unsubscribed_at).toBeTruthy();
+
 		await page.goto(`/newsletter/baja?token=${oldToken}`);
 		await page.getByRole("button", { name: "Confirmar baja" }).click();
 		await expect(page.getByRole("status")).toContainText("ya estaba inactiva");
+
 		const reactivated = await request.post("/api/newsletter", {
-			data: { email, nombre: "Persona E2E", source: "e2e-reactivation" },
+			data: {
+				email,
+				nombre: "Persona E2E",
+				source: "e2e-reactivation",
+				lista: "institucional",
+			},
 		});
 		expect(reactivated.status()).toBe(200);
 		const response = await reactivated.json();
 		expect(response).not.toHaveProperty("unsubscribe_token");
 		expect(response).not.toHaveProperty("notification_token");
-		const active = await service
-			.from("newsletter_subscriptions")
-			.select(
-				"id, is_active, consented_at, unsubscribe_token, notification_attempts",
-			)
-			.eq("email", email)
-			.single();
+		const active = await listSubscription(email, "institucional");
 		expect(active.data?.id).toBe(first.data.id);
 		expect(active.data?.is_active).toBe(true);
 		expect(active.data?.consented_at).not.toBe(first.data.consented_at);
 		expect(active.data?.unsubscribe_token === oldToken).toBe(false);
 		expect(active.data?.notification_attempts).toBe(1);
+
 		await page.goto(`/newsletter/baja?token=${oldToken}`);
 		await page.getByRole("button", { name: "Confirmar baja" }).click();
 		await expect(page.getByRole("status")).toContainText(
 			"el enlace dejó de ser válido",
 		);
-		const untouched = await service
-			.from("newsletter_subscriptions")
-			.select("is_active")
-			.eq("id", first.data.id)
-			.single();
+		const untouched = await listSubscription(email, "institucional");
 		expect(untouched.data?.is_active).toBe(true);
 		await page.goto("/newsletter/baja?token=invalid");
 		await expect(
 			page.getByRole("button", { name: "Confirmar baja" }),
 		).toHaveCount(0);
+	} finally {
+		const removed = await service
+			.from("newsletter_subscriptions")
+			.delete()
+			.eq("email", email);
+		expect.soft(removed.error).toBeNull();
+	}
+});
+
+test("las listas son independientes: darse de baja de una no toca la otra", async ({
+	request,
+}) => {
+	const email = `listas-${randomUUID()}@example.test`;
+	try {
+		for (const lista of ["noticias", "blog"]) {
+			const created = await request.post("/api/newsletter", {
+				data: { email, nombre: "Persona E2E", source: "e2e-listas", lista },
+			});
+			expect(created.status(), lista).toBe(200);
+		}
+		const news = await listSubscription(email, "noticias");
+		const blog = await listSubscription(email, "blog");
+		expect(news.data?.is_active).toBe(true);
+		expect(blog.data?.is_active).toBe(true);
+		// Una sola persona, dos consentimientos, dos tokens distintos.
+		expect(news.data?.unsubscribe_token).not.toBe(blog.data?.unsubscribe_token);
+		const people = await service
+			.from("newsletter_subscriptions")
+			.select("id")
+			.eq("email", email);
+		expect(people.data).toHaveLength(1);
+
+		// Una lista no consentida no aparece por arrastre.
+		const institutional = await listSubscription(email, "institucional");
+		expect(institutional.data).toBeNull();
+
+		const unsubscribed = await service.rpc("unsubscribe_newsletter", {
+			p_token: news.data?.unsubscribe_token ?? "",
+		});
+		expect(unsubscribed.data).toBe(true);
+		expect((await listSubscription(email, "noticias")).data?.is_active).toBe(
+			false,
+		);
+		expect((await listSubscription(email, "blog")).data?.is_active).toBe(true);
+
+		// La baja global silencia lo que quede activo y marca a la persona.
+		const all = await service.rpc("unsubscribe_newsletter_all", {
+			p_token: blog.data?.unsubscribe_token ?? "",
+		});
+		expect(all.data).toBe(true);
+		expect((await listSubscription(email, "blog")).data?.is_active).toBe(false);
+		const person = await service
+			.from("newsletter_subscriptions")
+			.select("is_active, unsubscribed_at")
+			.eq("email", email)
+			.single();
+		expect(person.data?.is_active).toBe(false);
+		expect(person.data?.unsubscribed_at).toBeTruthy();
 	} finally {
 		const removed = await service
 			.from("newsletter_subscriptions")
@@ -391,7 +455,7 @@ test("el límite de envíos corta el abuso y no guarda lo que rechaza", async ({
 
 		// Otra ruta conserva su propio cupo: el límite no es global.
 		const other = await request.post("/api/newsletter", {
-			data: { email, source: "e2e-limite" },
+			data: { email, source: "e2e-limite", lista: "institucional" },
 		});
 		expect(other.status()).toBe(200);
 	} finally {

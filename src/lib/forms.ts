@@ -25,11 +25,17 @@ export const contactSchema = z.object({
 	mensaje: z.string().trim().min(10).max(5000),
 });
 
+// Las tres listas del contrato V1. Nombrar la lista es obligatorio: sin ella
+// no se sabe a qué consintió quien se suscribe.
+export const NEWSLETTER_LISTS = ["noticias", "blog", "institucional"] as const;
+export type NewsletterList = (typeof NEWSLETTER_LISTS)[number];
+
 export const newsletterSchema = z.object({
 	email,
 	nombre: z.string().trim().max(160).optional(),
 	perfil: z.string().trim().max(100).optional(),
 	source: z.string().trim().max(80).optional(),
+	lista: z.enum(NEWSLETTER_LISTS),
 });
 
 export const unsubscribeSchema = z.object({ token: z.string().uuid() });

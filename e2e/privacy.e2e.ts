@@ -144,7 +144,12 @@ test("un usuario autenticado no alcanza los datos personales de otros", async ({
 	const email = `privacy-form-${run}@example.test`;
 	try {
 		const submitted = await request.post("/api/newsletter", {
-			data: { email, nombre: "Persona ajena", source: "e2e-privacy" },
+			data: {
+				email,
+				nombre: "Persona ajena",
+				source: "e2e-privacy",
+				lista: "institucional",
+			},
 		});
 		expect(submitted.status()).toBe(200);
 
@@ -178,14 +183,28 @@ test("la exportación del newsletter neutraliza fórmulas, queda auditada y se n
 	// Un suscriptor cuyo nombre es una fórmula de hoja de cálculo.
 	const email = `export-${run}@example.test`;
 	const attack = "=cmd|' /C calc'!A0";
-	const seeded = await service.from("newsletter_subscriptions").insert({
-		email,
-		full_name: attack,
-		source: "e2e-export",
-		consented_at: new Date().toISOString(),
-		reference: `BVH-NEWS-EXP${run.toUpperCase()}`,
-	});
+	const seeded = await service
+		.from("newsletter_subscriptions")
+		.insert({ email, full_name: attack })
+		.select("id")
+		.single();
 	expect(seeded.error).toBeNull();
+	const institutional = await service
+		.from("newsletter_lists")
+		.select("id")
+		.eq("slug", "institucional")
+		.single();
+	expect(institutional.error).toBeNull();
+	const consented = await service
+		.from("newsletter_list_subscriptions")
+		.insert({
+			subscriber_id: seeded.data?.id ?? "",
+			list_id: institutional.data?.id ?? "",
+			source: "e2e-export",
+			consented_at: new Date().toISOString(),
+			reference: `BVH-NEWS-EXP${run.toUpperCase()}`,
+		});
+	expect(consented.error).toBeNull();
 	try {
 		await signInPage(page, admin.email ?? "", "/admin");
 		await page.goto("/admin/newsletter");

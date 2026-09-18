@@ -27,13 +27,25 @@ test("contactSchema accepts a complete contact and rejects malformed email", () 
 	).toBe(false);
 });
 
-test("newsletterSchema normalizes optional fields", () => {
+test("newsletterSchema normalizes optional fields and demands a list", () => {
 	const parsed = newsletterSchema.parse({
 		email: " Lector@Example.com ",
 		source: "portada",
+		lista: "institucional",
 	});
 	expect(parsed.email).toBe("lector@example.com");
 	expect(parsed.source).toBe("portada");
+	expect(parsed.lista).toBe("institucional");
+	// Sin lista no se sabe a qué consintió quien se suscribe: no se acepta.
+	expect(
+		newsletterSchema.safeParse({ email: "lector@example.com" }).success,
+	).toBe(false);
+	expect(
+		newsletterSchema.safeParse({
+			email: "lector@example.com",
+			lista: "inventada",
+		}).success,
+	).toBe(false);
 });
 
 test("quoteSchema requires consent and a complete business description", () => {

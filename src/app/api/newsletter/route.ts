@@ -35,7 +35,7 @@ export async function POST(request: Request) {
 	);
 	if (!verified.ok) return verificationRequired();
 
-	const { email, nombre, perfil, source } = parsed.data;
+	const { email, nombre, perfil, source, lista } = parsed.data;
 	const reference = createReference("BVH-NEWS");
 	const persisted = await supabase
 		.rpc("submit_newsletter_subscription", {
@@ -44,6 +44,7 @@ export async function POST(request: Request) {
 			p_profile: perfil ?? "",
 			p_source: source ?? "sitio",
 			p_reference: reference,
+			p_list_slug: lista,
 		})
 		.single();
 	if (persisted.error || !persisted.data) return persistenceUnavailable();
@@ -56,8 +57,8 @@ export async function POST(request: Request) {
 		{
 			from: emailConfig.from,
 			to: emailConfig.to,
-			subject: `[${reference}] Nueva suscripción BVH`,
-			html: `<h1>Nueva suscripción</h1><p><strong>Email:</strong> ${escapeHtml(email)}</p><p><strong>Nombre:</strong> ${escapeHtml(nombre ?? "—")}</p><p><strong>Perfil:</strong> ${escapeHtml(perfil ?? "—")}</p><p><strong>Origen:</strong> ${escapeHtml(source ?? "sitio")}</p>`,
+			subject: `[${reference}] Nueva suscripción BVH · ${lista}`,
+			html: `<h1>Nueva suscripción</h1><p><strong>Email:</strong> ${escapeHtml(email)}</p><p><strong>Nombre:</strong> ${escapeHtml(nombre ?? "—")}</p><p><strong>Perfil:</strong> ${escapeHtml(perfil ?? "—")}</p><p><strong>Lista:</strong> ${escapeHtml(lista)}</p><p><strong>Origen:</strong> ${escapeHtml(source ?? "sitio")}</p>`,
 		},
 		reference,
 	);

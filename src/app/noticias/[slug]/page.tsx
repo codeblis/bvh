@@ -175,6 +175,8 @@ export default async function NoticiaPage({
 					</p>
 					<div className="mt-6">
 						<NewsletterSignup
+							lista="noticias"
+							source="detalle-noticias"
 							cta="Suscribirme"
 							placeholder="tu@correo.cu"
 							hint=""

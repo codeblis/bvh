@@ -241,6 +241,7 @@ const ADMIN_VIEWS = [
 	"/admin/categorias",
 	"/admin/cursos",
 	"/admin/cursos/inscripciones",
+	"/admin/campanas",
 	"/admin/usuarios",
 	"/admin/auditoria",
 	"/admin/empresas",

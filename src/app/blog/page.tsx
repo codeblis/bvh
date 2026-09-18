@@ -44,6 +44,7 @@ export default async function BlogPage() {
 				accentLabel="Blog"
 				basePath="/blog"
 				newsletter={{
+					lista: "blog",
 					title: "Suscríbete al boletín semanal",
 					description:
 						"Un ensayo cada domingo en tu bandeja. Profundo, sin ruido, con perspectiva de largo plazo.",

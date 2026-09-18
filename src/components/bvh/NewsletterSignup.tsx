@@ -2,12 +2,16 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import type { NewsletterList } from "@/lib/forms";
 import { TurnstileField } from "./TurnstileField";
 
 type NewsletterSignupProps = {
 	cta: string;
 	placeholder: string;
 	hint: string;
+	// A qué consiente quien se suscribe aquí. Sin valor por defecto a
+	// propósito: cada sitio donde aparece el formulario debe declararlo.
+	lista: NewsletterList;
 	source?: string;
 	detailed?: boolean;
 };
@@ -16,6 +20,7 @@ export function NewsletterSignup({
 	cta,
 	placeholder,
 	hint,
+	lista,
 	source = "sitio",
 	detailed = false,
 }: NewsletterSignupProps) {
@@ -41,6 +46,7 @@ export function NewsletterSignup({
 					nombre: formData.get("nombre") || undefined,
 					perfil: formData.get("perfil") || undefined,
 					source,
+					lista,
 					turnstileToken,
 				}),
 			});

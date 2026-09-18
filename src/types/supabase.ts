@@ -414,7 +414,14 @@ export type Database = {
           course_id: string
           enrolled_at: string | null
           id: string
+          notification_attempts: number
+          notification_last_error: string | null
+          notification_provider_id: string | null
+          notification_status: string
+          notification_token: string | null
+          notified_at: string | null
           offering_id: string
+          reference: string | null
           status: string
           updated_at: string
           user_id: string
@@ -424,7 +431,14 @@ export type Database = {
           course_id: string
           enrolled_at?: string | null
           id?: string
+          notification_attempts?: number
+          notification_last_error?: string | null
+          notification_provider_id?: string | null
+          notification_status?: string
+          notification_token?: string | null
+          notified_at?: string | null
           offering_id: string
+          reference?: string | null
           status?: string
           updated_at?: string
           user_id: string
@@ -434,7 +448,14 @@ export type Database = {
           course_id?: string
           enrolled_at?: string | null
           id?: string
+          notification_attempts?: number
+          notification_last_error?: string | null
+          notification_provider_id?: string | null
+          notification_status?: string
+          notification_token?: string | null
+          notified_at?: string | null
           offering_id?: string
+          reference?: string | null
           status?: string
           updated_at?: string
           user_id?: string
@@ -654,62 +675,280 @@ export type Database = {
           },
         ]
       }
-      newsletter_subscriptions: {
+      newsletter_campaign_recipients: {
         Row: {
-          consented_at: string | null
+          attempts: number
+          campaign_id: string
+          created_at: string
           email: string
+          enrollment_id: string | null
           full_name: string | null
           id: string
-          is_active: boolean | null
+          last_error: string | null
+          provider_id: string | null
+          sent_at: string | null
+          status: string
+          subscriber_id: string | null
+          unsubscribe_token: string | null
+        }
+        Insert: {
+          attempts?: number
+          campaign_id: string
+          created_at?: string
+          email: string
+          enrollment_id?: string | null
+          full_name?: string | null
+          id?: string
+          last_error?: string | null
+          provider_id?: string | null
+          sent_at?: string | null
+          status?: string
+          subscriber_id?: string | null
+          unsubscribe_token?: string | null
+        }
+        Update: {
+          attempts?: number
+          campaign_id?: string
+          created_at?: string
+          email?: string
+          enrollment_id?: string | null
+          full_name?: string | null
+          id?: string
+          last_error?: string | null
+          provider_id?: string | null
+          sent_at?: string | null
+          status?: string
+          subscriber_id?: string | null
+          unsubscribe_token?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "newsletter_campaign_recipients_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "newsletter_campaign_recipients_enrollment_id_fkey"
+            columns: ["enrollment_id"]
+            isOneToOne: false
+            referencedRelation: "course_enrollments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "newsletter_campaign_recipients_subscriber_id_fkey"
+            columns: ["subscriber_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      newsletter_campaigns: {
+        Row: {
+          audience_kind: string
+          body: string
+          created_at: string
+          created_by: string | null
+          id: string
+          list_id: string | null
+          offering_id: string | null
+          offering_scope: string | null
+          reference: string
+          sent_at: string | null
+          status: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          audience_kind: string
+          body: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          list_id?: string | null
+          offering_id?: string | null
+          offering_scope?: string | null
+          reference: string
+          sent_at?: string | null
+          status?: string
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          audience_kind?: string
+          body?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          list_id?: string | null
+          offering_id?: string | null
+          offering_scope?: string | null
+          reference?: string
+          sent_at?: string | null
+          status?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "newsletter_campaigns_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "newsletter_campaigns_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_lists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "newsletter_campaigns_offering_id_fkey"
+            columns: ["offering_id"]
+            isOneToOne: false
+            referencedRelation: "course_offerings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      newsletter_list_subscriptions: {
+        Row: {
+          consented_at: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          list_id: string
           notification_attempts: number
           notification_last_error: string | null
           notification_provider_id: string | null
           notification_status: string
           notification_token: string | null
           notified_at: string | null
-          profile: string | null
           reference: string | null
           source: string | null
-          subscribed_at: string | null
+          subscribed_at: string
+          subscriber_id: string
           unsubscribe_token: string
           unsubscribed_at: string | null
+          updated_at: string
         }
         Insert: {
           consented_at?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          list_id: string
+          notification_attempts?: number
+          notification_last_error?: string | null
+          notification_provider_id?: string | null
+          notification_status?: string
+          notification_token?: string | null
+          notified_at?: string | null
+          reference?: string | null
+          source?: string | null
+          subscribed_at?: string
+          subscriber_id: string
+          unsubscribe_token?: string
+          unsubscribed_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          consented_at?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          list_id?: string
+          notification_attempts?: number
+          notification_last_error?: string | null
+          notification_provider_id?: string | null
+          notification_status?: string
+          notification_token?: string | null
+          notified_at?: string | null
+          reference?: string | null
+          source?: string | null
+          subscribed_at?: string
+          subscriber_id?: string
+          unsubscribe_token?: string
+          unsubscribed_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "newsletter_list_subscriptions_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_lists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "newsletter_list_subscriptions_subscriber_id_fkey"
+            columns: ["subscriber_id"]
+            isOneToOne: false
+            referencedRelation: "newsletter_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      newsletter_lists: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      newsletter_subscriptions: {
+        Row: {
+          email: string
+          full_name: string | null
+          id: string
+          is_active: boolean | null
+          profile: string | null
+          subscribed_at: string | null
+          unsubscribed_at: string | null
+        }
+        Insert: {
           email: string
           full_name?: string | null
           id?: string
           is_active?: boolean | null
-          notification_attempts?: number
-          notification_last_error?: string | null
-          notification_provider_id?: string | null
-          notification_status?: string
-          notification_token?: string | null
-          notified_at?: string | null
           profile?: string | null
-          reference?: string | null
-          source?: string | null
           subscribed_at?: string | null
-          unsubscribe_token?: string
           unsubscribed_at?: string | null
         }
         Update: {
-          consented_at?: string | null
           email?: string
           full_name?: string | null
           id?: string
           is_active?: boolean | null
-          notification_attempts?: number
-          notification_last_error?: string | null
-          notification_provider_id?: string | null
-          notification_status?: string
-          notification_token?: string | null
-          notified_at?: string | null
           profile?: string | null
-          reference?: string | null
-          source?: string | null
           subscribed_at?: string | null
-          unsubscribe_token?: string
           unsubscribed_at?: string | null
         }
         Relationships: []
@@ -757,7 +996,17 @@ export type Database = {
         Args: { p_bucket: string; p_limit: number; p_window_seconds: number }
         Returns: boolean
       }
-      enroll_in_course: { Args: { p_offering_id: string }; Returns: string }
+      enroll_in_course:
+        | { Args: { p_offering_id: string }; Returns: string }
+        | {
+            Args: { p_offering_id: string; p_reference: string }
+            Returns: {
+              enrollment_id: string
+              notification_token: string
+              should_notify: boolean
+            }[]
+          }
+      finish_campaign: { Args: { p_campaign_id: string }; Returns: string }
       get_course_offering_availability: {
         Args: { p_offering_ids: string[] }
         Returns: {
@@ -781,9 +1030,32 @@ export type Database = {
         }[]
       }
       is_admin: { Args: never; Returns: boolean }
+      prepare_campaign_recipients: {
+        Args: { p_campaign_id: string }
+        Returns: number
+      }
+      record_campaign_delivery: {
+        Args: {
+          p_error?: string
+          p_provider_id?: string
+          p_recipient_id: string
+          p_success: boolean
+        }
+        Returns: boolean
+      }
       record_data_export: {
         Args: { p_resource_type: string; p_rows: number }
         Returns: undefined
+      }
+      record_enrollment_notification_retry: {
+        Args: {
+          p_enrollment_id: string
+          p_error?: string
+          p_provider_id?: string
+          p_reference: string
+          p_success: boolean
+        }
+        Returns: boolean
       }
       record_form_notification: {
         Args: {
@@ -842,6 +1114,7 @@ export type Database = {
         Args: {
           p_email: string
           p_full_name: string
+          p_list_slug: string
           p_profile: string
           p_reference: string
           p_source: string
@@ -853,6 +1126,10 @@ export type Database = {
         }[]
       }
       unsubscribe_newsletter: { Args: { p_token: string }; Returns: boolean }
+      unsubscribe_newsletter_all: {
+        Args: { p_token: string }
+        Returns: boolean
+      }
       update_course_enrollment_status: {
         Args: { p_enrollment_id: string; p_status: string }
         Returns: undefined
