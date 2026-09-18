@@ -50,6 +50,13 @@ test("home e índices declaran title, description y canonical propios", async ({
 			canonical: `${BASE}/instituto`,
 			title: /^Instituto \|/,
 		},
+		{
+			path: "/acerca",
+			canonical: `${BASE}/acerca`,
+			title: /^Acerca de la BVH \|/,
+		},
+		{ path: "/historia", canonical: `${BASE}/historia`, title: /^Historia \|/ },
+		{ path: "/contacto", canonical: `${BASE}/contacto`, title: /^Contacto \|/ },
 	];
 	const seen = new Map<string, string>();
 	for (const entry of pages) {
@@ -91,6 +98,19 @@ test("las áreas privadas y con token declaran noindex", async ({
 
 		await page.goto("/newsletter/baja?token=invalid");
 		expect(await robotsMeta(page)).toContain("noindex");
+
+		// Identidad: título y canonical propios, pero fuera del índice.
+		for (const path of ["/login", "/registro", "/recuperar-password"]) {
+			await page.goto(path);
+			expect(await robotsMeta(page), path).toContain("noindex");
+			expect(await page.title(), path).not.toMatch(
+				/^BVH \| Bolsa de Valores de La Habana$/,
+			);
+			expect(
+				await page.locator('link[rel="canonical"]').getAttribute("href"),
+				path,
+			).toBe(`${BASE}${path}`);
+		}
 	} finally {
 		await context.close();
 		await deleteTestUser(student.id);
