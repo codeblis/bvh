@@ -223,7 +223,7 @@ export default async function AdminHome() {
 										key={event.id}
 										className="flex items-baseline justify-between gap-4 px-5 py-3.5 text-sm"
 									>
-										<span className="min-w-0">
+										<span className="min-w-0 break-words">
 											<span className="text-foreground">
 												{actor?.full_name || actor?.email || "Sistema"}
 											</span>{" "}
