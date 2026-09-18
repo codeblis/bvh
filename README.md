@@ -6,11 +6,31 @@ Portal institucional en desarrollo para presentar la iniciativa BVH, publicar co
 
 ## Desarrollo local
 
+El esquema vive en `supabase/migrations` y **solo está aplicado en el stack
+local**. Apuntar `pnpm dev` a un proyecto Supabase remoto sin esas migraciones
+deja el panel inaccesible y los formularios rotos, porque el código llama a
+tablas y funciones que allí no existen.
+
 ```bash
 pnpm install
-cp .env.example .env.local
+supabase start          # requiere Docker en marcha
+supabase db reset       # aplica todas las migraciones
 pnpm dev
 ```
+
+Las variables las toma `.env.development.local`, que Next antepone a
+`.env.local`. Así puedes conservar en `.env.local` la configuración de un
+proyecto remoto sin que interfiera con el desarrollo. Como mínimo necesita
+`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
+`SUPABASE_SERVICE_ROLE_KEY` y `NEXT_PUBLIC_SITE_URL`: sin la clave de servicio
+ningún formulario público persiste, y sin el origen canónico los callbacks de
+identidad pierden la sesión.
+
+Para entrar al panel hace falta una cuenta con rol `admin`; un `supabase db
+reset` borra las cuentas y hay que volver a crearla. El correo transaccional
+puede quedarse sin configurar: el formulario se guarda igual y el aviso queda
+reintentable desde el panel. Los correos de identidad llegan a Mailpit, en
+<http://127.0.0.1:54324>.
 
 ## Validación
 

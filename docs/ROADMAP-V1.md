@@ -43,7 +43,7 @@ El orden sigue riesgo y dependencia. Seguridad y fuente única preceden al pulid
 - [x] Crear catálogo y detalle público; reparar CTAs 404.
 - [x] Implementar inscripción autenticada idempotente y cupo atómico mediante RPC.
 - [x] Completar CMS para varias ofertas e inscripciones.
-- Completar emails reintentables para inscripciones.
+- [x] Completar emails reintentables para inscripciones.
 
 **Salida:** AC-04, AC-05, AC-06 y [SPEC de cursos](specs/CURSOS.md) pasan.
 
@@ -84,4 +84,10 @@ El orden sigue riesgo y dependencia. Seguridad y fuente única preceden al pulid
 
 ## Después de V1
 
-Pagos, campañas, comentarios/likes/bookmarks, WYSIWYG, analítica avanzada, multiidioma, datos bursátiles reales y posible R2 se evalúan con uso y requisitos reales; no se adelantan por conveniencia técnica.
+Pagos, comentarios/likes/bookmarks, WYSIWYG, analítica avanzada, multiidioma, datos bursátiles reales y posible R2 se evalúan con uso y requisitos reales; no se adelantan por conveniencia técnica.
+
+**Adelantado a la V1 por decisión del propietario (2026-09-18):** las campañas de
+newsletter, que este documento situaba después de la V1. El alcance acordado son
+listas de consentimiento (Noticias, Blog, Institucional) y audiencias de curso
+tratadas como correo operativo, no como marketing. Queda por hacer la edición de
+las páginas institucionales por bloques desde el CMS.

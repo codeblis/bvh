@@ -1,7 +1,7 @@
 # Relevo — BVH
 
 **Estado:** Fotografía transitoria, no fuente canónica  
-**Corte:** 2026-09-17
+**Corte:** 2026-09-18
 
 Para decisiones y alcance usar [ADR](ADR-Arquitectura-BVH.md), [SPEC V1](SPEC-V1-BVH.md) y el cambio OpenSpec activo [`deliver-v1-core-platform`](../openspec/changes/deliver-v1-core-platform/proposal.md). La relación detallada con el código está en [Trazabilidad OpenSpec V1](TRAZABILIDAD-OPEN-SPEC-V1.md).
 
@@ -47,14 +47,21 @@ Cambio preexistente no rastreado: .claude/
 - **Actual local:** el sitio respeta `prefers-reduced-motion`, las páginas públicas tienen región principal y salto al contenido, los flujos críticos no desbordan a 320/768/1280 px y contacto se envía solo con teclado. Tarea 4.2 verificada salvo el recorrido con lector de pantalla real.
 - **Actual local:** el panel se rediseñó como mesa de trabajo: la cabecera pública ofrece «Panel» a las cuentas administradoras —antes no había ningún enlace visible—, la navegación se agrupa por trabajo y muestra cuántos asuntos esperan, el resumen prioriza lo que requiere acción sobre las cifras, y el editor separa manuscrito de ficha de publicación con la acción principal siempre visible. El ticker de mercado ya no aparece en el panel.
 - **Actual local:** el CMS gestiona categorías y roles. `set_profile_role` es la única vía de cambio de rol: exige administrador y prohíbe cambiar el propio, de modo que siempre queda alguien con acceso al panel. La auditoría describe además el rol anterior y el nuevo.
-- **Pendiente:** antiabuso, correo de cursos y operación productiva verificada.
+- **Actual local:** la inscripción a un curso confirma por correo al alumno con el mismo estado reintentable que los formularios: la plaza se persiste antes del envío, un fallo la deja en `failed` y el panel la reintenta sin duplicar. La tabla de inscripciones sigue sin escritura directa: tanto el alta (`enroll_in_course`) como el reintento (`record_enrollment_notification_retry`) pasan por RPC transaccional. Inscribirse dos veces no encola un segundo correo.
+- **Actual local:** las páginas institucionales (`/acerca`, `/historia`, `/contacto`) declaran título, descripción y canonical propios; las de identidad (`/login`, `/registro`, `/recuperar-password`) declaran título y canonical pero quedan fuera del índice, como `actualizar-password`.
+- **Actual local:** los tres módulos fuera del MVP se anuncian como tales: `/indices`, `/mercados` y `/cotizar` llevan aviso de sección en preparación y datos simulados, el ticker global se etiqueta «Datos simulados» con región accesible, y el home ya no promete una plataforma de negociación disponible.
+- **Actual local:** el newsletter dejó de ser una sola lista. `newsletter_subscriptions` es la PERSONA y el consentimiento vive por lista en `newsletter_list_subscriptions`: tres listas (Noticias, Blog, Institucional), cada formulario declara la suya, cada consentimiento tiene su token de baja y existe además una baja global. Antes el email era UNIQUE y `source` solo decía dónde se dio de alta, no a qué; los formularios del pie de noticias y blog ni siquiera lo enviaban.
+- **Actual local:** el panel redacta y envía campañas. Una campaña apunta a una lista consentida (lleva enlace de baja) o a una audiencia de curso —inscritos, lista de espera o ambos— que es correo operativo y no lleva baja de boletín. La restricción está en el esquema, no solo en la interfaz: `campaign_audience_check` impide que una campaña apunte a las dos cosas. La audiencia se congela al enviar, cada destinatario guarda su propio estado y la clave idempotente es por destinatario y campaña.
+- **Pendiente:** antiabuso y operación productiva verificada.
+- **Pendiente:** el resumen del panel sigue contando como «avisos que no salieron» solo los de contacto; ignora solicitudes, newsletter e inscripciones. Viene de antes de este corte.
+- **Pendiente:** páginas institucionales por bloques editables desde el CMS. Decidido con el propietario, no empezado: hoy el home, `/acerca`, `/historia`, los buzones de `/contacto` y el texto legal siguen en el código.
 - **Nota:** `companies` e `indices` se administran desde el CMS pero ninguna página pública los consume todavía; `/mercados` e `/indices` siguen con datos estáticos.
 
 ## Verificación observada
 
 - `pnpm check`: pasó con configuración local; incluye lint, typecheck, 55 unitarias y build.
-- `pnpm test:e2e`: 39/39 correctas (1,6 min), sobre servidor de producción local.
-- `pnpm test:db`: 79/79 correctas; concurrencia del último cupo e idempotencia también correctas.
+- `pnpm test:e2e`: 43 recorridos. Cada archivo pasa por separado sobre un stack recién arrancado. La tanda completa encadenada exige reiniciar el stack antes: con Supabase local llevando horas en marcha aparecen `AuthRetryableFetchError` y expiraciones que no son del producto sino del reenvío de puertos de Docker.
+- `pnpm test:db`: 128/128 correctas; concurrencia del último cupo e idempotencia también correctas.
 - Validación OpenSpec estricta y `git diff --check`: correctos.
 
 ## Bloqueos críticos
@@ -66,7 +73,8 @@ Cambio preexistente no rastreado: .claude/
 ## Otros defectos conocidos
 
 - Auth pasa E2E local; falta validar SMTP externo, callbacks del preview y apertura de enlaces entre dispositivos.
-- Las páginas institucionales y de autenticación siguen siendo componentes cliente sin metadata propia: heredan título y descripción del layout raíz y no declaran canonical.
+- Las páginas institucionales y de autenticación siguen siendo componentes cliente; su metadata vive ahora en un `layout.tsx` propio, no en la página.
+- `/mercados`, `/indices` y `/cotizar` quedan fuera del MVP por decisión del propietario: se anuncian como secciones en preparación con datos simulados, pero su metadata propia sigue pendiente porque no se promocionan.
 
 ## Próximo movimiento recomendado
 
