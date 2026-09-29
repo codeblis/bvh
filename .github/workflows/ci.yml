@@ -20,4 +20,14 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
+
       - run: pnpm check
+        env:
+          # Aquí solo se comprueba que el proyecto compila y pasa sus pruebas;
+          # no se despliega nada, así que estos valores son marcadores. Están
+          # porque `next.config.ts` exige las variables en todo build de
+          # producción: sin ellas el artefacto saldría sin configuración de
+          # Supabase y el sitio respondería 500. Un valor real aquí no añadiría
+          # cobertura y sí una credencial que no hace falta.
+          NEXT_PUBLIC_SUPABASE_URL: https://marcador.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: marcador-de-ci

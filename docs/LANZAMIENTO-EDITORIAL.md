@@ -208,14 +208,44 @@ revocarla en el panel de Resend cuando haya ocasión. No bloquea nada.
 
 ## 6. Los dos destinos
 
-El proyecto publica dos Workers desde la misma rama `production`, con builds
-distintos porque `NEXT_PUBLIC_MVP_EDITORIAL` y `NEXT_PUBLIC_SITE_URL` se
-incrustan al compilar:
+### Cómo se despliega de verdad
 
-| Comando | Worker | Dominio | Alcance |
+**El despliegue lo dispara el push.** Los Workers tienen la integración con
+GitHub activada: un cambio en la rama que vigilan y Cloudflare compila y publica
+por su cuenta. `scripts/deploy.mjs` es el camino manual, útil para `--dry-run` y
+para publicar desde una máquina, pero **no es el que se usa normalmente**.
+
+Eso tiene una consecuencia que costó un sitio caído: **las variables tienen que
+estar en la configuración de build del Worker en Cloudflare**, no en un archivo
+local. `.env.production.local` está en `.gitignore` y no viaja con el
+repositorio, así que el runner de Cloudflare no lo ve. Un build sin ellas no
+falla por su cuenta: publica un sitio que responde 500 y no deja entrar a nadie.
+
+Por eso `next.config.ts` corta el build si faltan `NEXT_PUBLIC_SUPABASE_URL` o
+`NEXT_PUBLIC_SUPABASE_ANON_KEY`. Un build fallido es mejor que un sitio mudo.
+Si el build de Cloudflare falla con ese mensaje, lo que falta son las variables
+en su configuración, no en el código.
+
+En el panel de Cloudflare, por cada Worker: *Settings → Build → Variables and
+Secrets*, y ahí las `NEXT_PUBLIC_*` de §3.5 con el valor que corresponda a su
+dominio. Cada Worker necesita su propio `NEXT_PUBLIC_MVP_EDITORIAL` y su propio
+`NEXT_PUBLIC_SITE_URL`; es lo que hace que un mismo repositorio publique dos
+sitios distintos.
+
+### La tabla
+
+Dos Workers desde la misma rama `production`, con builds distintos porque
+`NEXT_PUBLIC_MVP_EDITORIAL` y `NEXT_PUBLIC_SITE_URL` se incrustan al compilar:
+
+| Worker | Dominio | `NEXT_PUBLIC_MVP_EDITORIAL` | Comando manual |
 | --- | --- | --- | --- |
-| `pnpm deploy:sitio` | `bvh` | `bolsadelahabana.com` | MVP editorial |
-| `pnpm deploy:app` | `bvh-app` | `app.bolsadelahabana.com` | Sitio completo |
+| `bvh` | `bolsadelahabana.com` | `1` | `pnpm deploy:sitio` |
+| `bvh-app` | `app.bolsadelahabana.com` | `0` | `pnpm deploy:app` |
+
+**La cuenta de Cloudflare importa.** El Worker `bvh` vive en la cuenta
+`0105dae2…`, la que declara `.env.app`. Un `wrangler` autenticado en otra cuenta
+responde «This Worker does not exist on your account» y no puede publicar ahí;
+comprobar con `wrangler whoami` antes de intentarlo.
 
 Ambos exigen estar en `production` y comprueban antes que `.env.production.local`
 declare lo que cada uno necesita: el sitio completo persiste formularios y por
