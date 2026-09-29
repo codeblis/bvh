@@ -1,5 +1,6 @@
 import { execFileSync, spawnSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import path from "node:path";
 
 /**
  * Despliega uno de los dos destinos del proyecto.
@@ -97,10 +98,7 @@ if (passthrough.length > 0) {
 	console.log(`  argumentos para wrangler: ${passthrough.join(" ")}\n`);
 }
 
-for (const args of [
-	["build"],
-	["deploy", ...target.deployArgs, ...passthrough],
-]) {
+function run(args) {
 	const result = spawnSync("pnpm", ["exec", "opennextjs-cloudflare", ...args], {
 		stdio: "inherit",
 		env,
@@ -108,3 +106,47 @@ for (const args of [
 	if (result.error) throw result.error;
 	if (result.status !== 0) process.exit(result.status ?? 1);
 }
+
+run(["build"]);
+
+/**
+ * Comprobar el artefacto, no la intención.
+ *
+ * `NEXT_PUBLIC_*` se incrusta al compilar. Si el build corre donde no existe
+ * `.env.production.local` —otra máquina, un runner de CI— Next no falla: emite
+ * un sitio sin credenciales de Supabase. El resultado es un despliegue que
+ * parece correcto, sirve 500 en todas las páginas y rechaza cualquier intento
+ * de entrar al panel. Pasó de verdad. Así que antes de publicar se mira dentro
+ * del paquete y se comprueba que la URL del proyecto está ahí.
+ */
+const chunksDir = path.join(".open-next", "assets", "_next", "static", "chunks");
+const supabaseHost = (readFileSync(envFile, "utf8")
+	.split("\n")
+	.find((line) => line.startsWith("NEXT_PUBLIC_SUPABASE_URL=")) ?? "")
+	.split("=")[1]
+	?.trim()
+	.replace(/^https?:\/\//, "")
+	.replace(/\/$/, "");
+
+if (supabaseHost) {
+	const inlined = readdirSync(chunksDir, { recursive: true }).some((file) => {
+		const full = path.join(chunksDir, String(file));
+		try {
+			return readFileSync(full, "utf8").includes(supabaseHost);
+		} catch {
+			return false;
+		}
+	});
+	if (!inlined) {
+		console.error(
+			"\n⛔ El paquete no lleva dentro la configuración de Supabase.\n" +
+				"   Next compiló sin leer las variables NEXT_PUBLIC_*, así que el sitio\n" +
+				"   respondería 500 y nadie podría entrar al panel. No se publica.\n" +
+				`   Comprueba que ${envFile} existe en la máquina que compila.\n`,
+		);
+		process.exit(1);
+	}
+	console.log("✓ El paquete lleva la configuración de Supabase incrustada.\n");
+}
+
+run(["deploy", ...target.deployArgs, ...passthrough]);
