@@ -1,5 +1,13 @@
-import { expect, test } from "vitest";
-import { getSafeAuthRedirect } from "../src/lib/safe-redirect.ts";
+import { afterEach, beforeEach, expect, test, vi } from "vitest";
+import {
+	defaultAuthDestination,
+	getSafeAuthRedirect,
+} from "../src/lib/safe-redirect.ts";
+
+// Esta lista de destinos es la del sitio completo. El MVP editorial recorta la
+// suya —solo el panel— y se comprueba aparte al final.
+beforeEach(() => vi.stubEnv("NEXT_PUBLIC_MVP_EDITORIAL", "0"));
+afterEach(() => vi.unstubAllEnvs());
 
 test("acepta únicamente destinos internos autorizados", () => {
 	expect(getSafeAuthRedirect("/cuenta")).toBe("/cuenta");
@@ -31,4 +39,23 @@ test("rechaza redirecciones externas, codificadas o ambiguas", () => {
 	]) {
 		expect(getSafeAuthRedirect(destination)).toBe("/cuenta");
 	}
+});
+
+test("en el MVP editorial el único destino es el panel", () => {
+	vi.stubEnv("NEXT_PUBLIC_MVP_EDITORIAL", "1");
+
+	// Tras entrar no hay área personal a la que ir: `/cuenta` responde 404.
+	expect(defaultAuthDestination()).toBe("/admin");
+	expect(getSafeAuthRedirect(null)).toBe("/admin");
+
+	// Y un destino retirado no se respeta ni viniendo en la URL, porque
+	// llevaría a una página que no existe.
+	expect(getSafeAuthRedirect("/cuenta")).toBe("/admin");
+	expect(getSafeAuthRedirect("/instituto/cursos/valoracion")).toBe("/admin");
+	expect(getSafeAuthRedirect("/actualizar-password")).toBe("/admin");
+
+	// El panel sigue aceptándose con su consulta intacta.
+	expect(getSafeAuthRedirect("/admin/articulos?status=borrador")).toBe(
+		"/admin/articulos?status=borrador",
+	);
 });
