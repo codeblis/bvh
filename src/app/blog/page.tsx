@@ -3,6 +3,7 @@ import { ArticleIndex } from "@/components/bvh/ArticleIndex";
 import { PageHero } from "@/components/bvh/PageHero";
 import { SiteFooter } from "@/components/bvh/SiteFooter";
 import { SiteHeader } from "@/components/bvh/SiteHeader";
+import { isEditorialScope } from "@/lib/scope";
 import { listPublishedArticles } from "@/modules/content/repository.server";
 
 export const metadata: Metadata = {
@@ -43,15 +44,19 @@ export default async function BlogPage() {
 				categories={categories}
 				accentLabel="Blog"
 				basePath="/blog"
-				newsletter={{
-					lista: "blog",
-					title: "Suscríbete al boletín semanal",
-					description:
-						"Un ensayo cada domingo en tu bandeja. Profundo, sin ruido, con perspectiva de largo plazo.",
-					placeholder: "tu@correo.cu",
-					cta: "Suscribirme al boletín semanal",
-					hint: "Un correo a la semana · sin spam · puedes darte de baja cuando quieras.",
-				}}
+				newsletter={
+					isEditorialScope()
+						? undefined
+						: {
+								lista: "blog",
+								title: "Suscríbete al boletín semanal",
+								description:
+									"Un ensayo cada domingo en tu bandeja. Profundo, sin ruido, con perspectiva de largo plazo.",
+								placeholder: "tu@correo.cu",
+								cta: "Suscribirme al boletín semanal",
+								hint: "Un correo a la semana · sin spam · puedes darte de baja cuando quieras.",
+							}
+				}
 			/>
 			</main>
 			<SiteFooter />

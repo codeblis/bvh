@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { SignOutButton } from "@/components/bvh/SignOutButton";
 import { SiteFooter } from "@/components/bvh/SiteFooter";
 import { SiteHeader } from "@/components/bvh/SiteHeader";
+import { blockOutsideEditorialScope } from "@/lib/scope";
 import { createClient } from "@/lib/supabase/server";
 import { listMyCourseEnrollments } from "@/modules/courses/enrollments.server";
 
@@ -24,6 +25,8 @@ function formatDate(value: string | null, timeZone: string) {
 }
 
 export default async function CuentaPage() {
+	// El historial propio es de cursos: fuera del MVP editorial no se publica.
+	blockOutsideEditorialScope();
 	if (
 		!process.env.NEXT_PUBLIC_SUPABASE_URL ||
 		!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY

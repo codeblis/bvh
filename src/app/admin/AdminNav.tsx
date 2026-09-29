@@ -6,6 +6,7 @@ import {
 	FileText,
 	Inbox,
 	LineChart,
+	type LucideIcon,
 	Mail,
 	Menu,
 	ScrollText,
@@ -18,6 +19,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { isEditorialScope } from "@/lib/scope";
 
 export type NavCounts = {
 	mensajes: number;
@@ -26,7 +28,16 @@ export type NavCounts = {
 	borradores: number;
 };
 
-const GROUPS = [
+type NavItem = {
+	href: string;
+	label: string;
+	icon: LucideIcon;
+	count?: keyof NavCounts;
+};
+
+type NavGroup = { name: string; items: readonly NavItem[] };
+
+const FULL_GROUPS: readonly NavGroup[] = [
 	{
 		name: "Bandejas",
 		items: [
@@ -34,13 +45,13 @@ const GROUPS = [
 				href: "/admin/mensajes",
 				label: "Mensajes de contacto",
 				icon: Inbox,
-				count: "mensajes" as const,
+				count: "mensajes",
 			},
 			{
 				href: "/admin/solicitudes",
 				label: "Solicitudes RIE-BVH",
 				icon: Send,
-				count: "solicitudes" as const,
+				count: "solicitudes",
 			},
 			{ href: "/admin/newsletter", label: "Newsletter", icon: Mail },
 			{ href: "/admin/campanas", label: "Campañas", icon: Send },
@@ -53,7 +64,7 @@ const GROUPS = [
 				href: "/admin/articulos",
 				label: "Artículos",
 				icon: FileText,
-				count: "borradores" as const,
+				count: "borradores",
 			},
 			{ href: "/admin/categorias", label: "Categorías", icon: Tags },
 		],
@@ -66,7 +77,7 @@ const GROUPS = [
 				href: "/admin/cursos/inscripciones",
 				label: "Inscripciones",
 				icon: Users,
-				count: "inscripciones" as const,
+				count: "inscripciones",
 			},
 		],
 	},
@@ -84,7 +95,37 @@ const GROUPS = [
 			{ href: "/admin/indices", label: "Índices", icon: LineChart },
 		],
 	},
-] as const;
+];
+
+/**
+ * El panel no ofrece trabajo que el sitio no publica: sin formularios ni
+ * cursos, esas bandejas solo serían casillas vacías. Las rutas siguen
+ * accesibles por URL para quien las necesite; lo que desaparece es la
+ * invitación a usarlas.
+ */
+const EDITORIAL_GROUPS: readonly NavGroup[] = [
+	{
+		name: "Contenido",
+		items: [
+			{
+				href: "/admin/articulos",
+				label: "Artículos",
+				icon: FileText,
+				count: "borradores",
+			},
+			{ href: "/admin/categorias", label: "Categorías", icon: Tags },
+		],
+	},
+	{
+		name: "Gobierno",
+		items: [
+			{ href: "/admin/usuarios", label: "Usuarios y roles", icon: UserCog },
+			{ href: "/admin/auditoria", label: "Auditoría", icon: ScrollText },
+		],
+	},
+];
+
+const GROUPS = isEditorialScope() ? EDITORIAL_GROUPS : FULL_GROUPS;
 
 const OWN_ROUTES = GROUPS.flatMap((group) =>
 	group.items.map((item) => item.href),
@@ -134,8 +175,7 @@ function NavList({
 					<ul className="space-y-0.5">
 						{group.items.map((item) => {
 							const active = isActive(pathname, item.href);
-							const pending =
-								"count" in item && item.count ? counts[item.count] : 0;
+							const pending = item.count ? counts[item.count] : 0;
 							const Icon = item.icon;
 							return (
 								<li key={item.href}>

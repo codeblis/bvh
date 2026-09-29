@@ -1,9 +1,17 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { isEditorialScope } from "@/lib/scope";
 import type { Database } from "@/types/supabase";
 import { getAuthSiteOrigin } from "@/modules/identity/site-url";
 
 export async function proxy(request: NextRequest) {
+	// El historial propio queda fuera del MVP editorial. Sin esto, quien entre
+	// sin sesión acabaría en /login en vez de en el 404 que le corresponde:
+	// una sección que no se publica no puede pedir credenciales.
+	if (isEditorialScope() && request.nextUrl.pathname.startsWith("/cuenta")) {
+		return NextResponse.next();
+	}
+
 	const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 	const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 	if (!supabaseUrl || !supabaseKey) return NextResponse.next();

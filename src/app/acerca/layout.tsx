@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { blockOutsideEditorialScope } from "@/lib/scope";
 
 export const metadata: Metadata = {
 	title: "Acerca de la BVH | BVH",
@@ -12,5 +13,7 @@ export default function AcercaLayout({
 }: {
 	children: React.ReactNode;
 }) {
+	// Fuera del MVP editorial esta sección no se publica.
+	blockOutsideEditorialScope();
 	return children;
 }

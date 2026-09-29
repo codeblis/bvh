@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SignOutButton } from "@/components/bvh/SignOutButton";
 import { requireAdmin } from "@/lib/admin";
+import { isEditorialScope } from "@/lib/scope";
 import { AdminNav, type NavCounts } from "./AdminNav";
 
 export const metadata: Metadata = {
@@ -12,6 +13,21 @@ export const metadata: Metadata = {
 async function pendingWork(
 	supabase: Awaited<ReturnType<typeof requireAdmin>>["supabase"],
 ): Promise<NavCounts> {
+	// En el MVP editorial solo hay una bandeja con trabajo posible. Contar las
+	// otras tres sería consultar tablas que ninguna pantalla muestra.
+	if (isEditorialScope()) {
+		const borradores = await supabase
+			.from("articles")
+			.select("*", { count: "exact", head: true })
+			.eq("status", "borrador");
+		return {
+			mensajes: 0,
+			solicitudes: 0,
+			inscripciones: 0,
+			borradores: borradores.count ?? 0,
+		};
+	}
+
 	const [mensajes, solicitudes, inscripciones, borradores] = await Promise.all([
 		supabase
 			.from("contact_messages")

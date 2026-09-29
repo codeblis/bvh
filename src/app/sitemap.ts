@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { EDITORIAL_PATHS, isEditorialScope } from "@/lib/scope";
 import { listPublishedArticles } from "@/modules/content/repository.server";
 
 export const dynamic = "force-dynamic";
@@ -12,20 +13,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 		listPublishedArticles("noticia"),
 		listPublishedArticles("blog"),
 	]);
-	const staticPaths = [
-		"",
-		"/acerca",
-		"/blog",
-		"/contacto",
-		"/cotizar",
-		"/historia",
-		"/indices",
-		"/instituto",
-		"/mercados",
-		"/noticias",
-		"/privacidad",
-		"/terminos",
-	];
+	// Una ruta que responde 404 no se anuncia. El sitemap sigue al alcance
+	// publicado, no a la lista de carpetas que hay en el repositorio.
+	const staticPaths = isEditorialScope()
+		? [...EDITORIAL_PATHS]
+		: [
+				"",
+				"/acerca",
+				"/blog",
+				"/contacto",
+				"/cotizar",
+				"/historia",
+				"/indices",
+				"/instituto",
+				"/mercados",
+				"/noticias",
+				"/privacidad",
+				"/terminos",
+			];
 
 	return [
 		...staticPaths.map((path) => ({ url: `${siteUrl}${path}` })),

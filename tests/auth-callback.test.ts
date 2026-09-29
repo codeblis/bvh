@@ -6,6 +6,10 @@ vi.mock("@/lib/supabase/server", () => ({
 	createClient: async () => ({ auth: { exchangeCodeForSession: exchange } }),
 }));
 beforeEach(() => {
+	// El callback solo existe con el sitio completo: sirve a los enlaces de
+	// confirmación y recuperación, que llegan por correo. En el MVP editorial
+	// responde 404, y eso se comprueba en scope.test.ts.
+	vi.stubEnv("NEXT_PUBLIC_MVP_EDITORIAL", "0");
 	vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://bvh.example.test");
 	exchange.mockReset().mockResolvedValue({ error: null });
 });

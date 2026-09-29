@@ -8,12 +8,16 @@ import {
 import { contactSchema, createReference, escapeHtml } from "@/lib/forms";
 import { clientFingerprint, readBoundedJson } from "@/lib/request";
 import { emailConfig } from "@/lib/resend";
+import { outOfScopeResponse } from "@/lib/scope";
 import { createServiceClient } from "@/lib/supabase/service";
 import { deliverEmail } from "@/modules/forms/email.server";
 import { withinRateLimit } from "@/modules/forms/rate-limit.server";
 import { verifyTurnstile } from "@/modules/forms/turnstile.server";
 
 export async function POST(request: Request) {
+	// Sin formularios públicos en el MVP editorial el endpoint no existe.
+	const outOfScope = outOfScopeResponse();
+	if (outOfScope) return outOfScope;
 	const body = await readBoundedJson(request);
 	const parsed = contactSchema.safeParse(body);
 	if (!parsed.success) return invalidRequest();

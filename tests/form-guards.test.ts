@@ -60,6 +60,9 @@ const validBody = {
 beforeEach(() => {
 	vi.resetAllMocks();
 	deliverEmail.mockResolvedValue({ success: true, providerId: "sintetico" });
+	// Estas barreras son las del sitio completo: el MVP editorial no publica
+	// formularios y sus rutas responden 404 (se comprueba en scope.test.ts).
+	process.env.NEXT_PUBLIC_MVP_EDITORIAL = "0";
 	process.env.TURNSTILE_SECRET_KEY = "";
 	process.env.TURNSTILE_VERIFY_URL = "https://verificador.example.test/verify";
 });

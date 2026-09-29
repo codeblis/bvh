@@ -7,6 +7,7 @@ import { Logo } from "@/components/bvh/Logo";
 import { ThemeToggle } from "@/components/bvh/ThemeToggle";
 import { createClient } from "@/lib/supabase/client";
 import { getSafeAuthRedirect } from "@/lib/safe-redirect";
+import { isEditorialScope } from "@/lib/scope";
 import { Suspense } from "react";
 
 function LoginForm() {
@@ -142,12 +143,17 @@ function LoginForm() {
 								>
 									Contraseña
 								</label>
-								<Link
-									href="/recuperar-password"
-									className="text-[11px] text-primary hover:underline"
-								>
-									¿Olvidaste tu contraseña?
-								</Link>
+								{/* Recuperar la contraseña se hace por correo; sin correo, el
+								    enlace llevaría a un 404. La restablece quien administra
+								    el proyecto Supabase. */}
+								{isEditorialScope() ? null : (
+									<Link
+										href="/recuperar-password"
+										className="text-[11px] text-primary hover:underline"
+									>
+										¿Olvidaste tu contraseña?
+									</Link>
+								)}
 							</div>
 							<input
 								id="password"
@@ -186,15 +192,17 @@ function LoginForm() {
 						</button>
 					</form>
 
-					<p className="mt-6 text-center text-[13px] text-muted-foreground">
-						¿No tienes cuenta?{" "}
-						<Link
-							href="/registro"
-							className="text-primary hover:underline font-medium"
-						>
-							Regístrate
-						</Link>
-					</p>
+					{isEditorialScope() ? null : (
+						<p className="mt-6 text-center text-[13px] text-muted-foreground">
+							¿No tienes cuenta?{" "}
+							<Link
+								href="/registro"
+								className="text-primary hover:underline font-medium"
+							>
+								Regístrate
+							</Link>
+						</p>
+					)}
 				</div>
 
 				<div className="hidden lg:block fixed bottom-4 right-4">

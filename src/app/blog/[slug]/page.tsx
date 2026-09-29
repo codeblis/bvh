@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Clock, Eye, User } from "lucide-react";
 import { SiteHeader } from "@/components/bvh/SiteHeader";
+import { isEditorialScope } from "@/lib/scope";
 import { SiteFooter } from "@/components/bvh/SiteFooter";
 import { NewsletterSignup } from "@/components/bvh/NewsletterSignup";
 import { ArticleCover } from "@/components/bvh/ArticleCover";
@@ -161,6 +162,7 @@ export default async function BlogPostPage({
 					</section>
 				)}
 
+				{isEditorialScope() ? null : (
 				<div
 					className="mt-10 rounded-2xl border border-border p-6 md:p-10 text-center"
 					style={{ background: "var(--gradient-hero)" }}
@@ -182,6 +184,7 @@ export default async function BlogPostPage({
 						/>
 					</div>
 				</div>
+				)}
 			</article>
 
 			</main>

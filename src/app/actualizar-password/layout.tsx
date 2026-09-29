@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { blockOutsideEditorialScope } from "@/lib/scope";
 
 export const metadata: Metadata = {
 	title: "Actualizar contraseña | BVH",
@@ -10,5 +11,7 @@ export default function ActualizarPasswordLayout({
 }: {
 	children: React.ReactNode;
 }) {
+	// Depende del envío de correo, que este alcance no tiene.
+	blockOutsideEditorialScope();
 	return children;
 }

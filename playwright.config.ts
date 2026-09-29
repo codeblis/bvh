@@ -5,6 +5,10 @@ const supabaseUrl = process.env.E2E_SUPABASE_URL;
 const anonKey = process.env.E2E_SUPABASE_ANON_KEY;
 const serviceRoleKey = process.env.E2E_SUPABASE_SERVICE_ROLE_KEY;
 const emailStubPort = process.env.E2E_EMAIL_STUB_PORT ?? "3101";
+// Los recorridos de esta carpeta cubren el sitio completo: formularios, cursos
+// y campañas. Se construye con el alcance abierto salvo que la tanda pida el
+// MVP editorial, que tiene su propia configuración y su propio recorrido.
+const editorialScope = process.env.E2E_MVP_EDITORIAL ?? "0";
 const emailStubUrl = `http://127.0.0.1:${emailStubPort}`;
 
 if (!supabaseUrl || !anonKey || !serviceRoleKey) {
@@ -48,6 +52,7 @@ export default defineConfig({
 			reuseExistingServer: false,
 			timeout: 180_000,
 			env: {
+				NEXT_PUBLIC_MVP_EDITORIAL: editorialScope,
 				NEXT_PUBLIC_SITE_URL: baseURL,
 				NEXT_PUBLIC_SUPABASE_URL: supabaseUrl,
 				NEXT_PUBLIC_SUPABASE_ANON_KEY: anonKey,

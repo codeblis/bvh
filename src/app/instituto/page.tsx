@@ -3,6 +3,7 @@ import Link from "next/link";
 import { PageHero } from "@/components/bvh/PageHero";
 import { SiteFooter } from "@/components/bvh/SiteFooter";
 import { SiteHeader } from "@/components/bvh/SiteHeader";
+import { blockOutsideEditorialScope } from "@/lib/scope";
 import { CourseCatalog } from "@/modules/courses/CourseCatalog";
 import { listPublicCourses } from "@/modules/courses/repository.server";
 
@@ -23,6 +24,9 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function InstitutoPage() {
+	// Fuera del MVP editorial esta sección no se publica: el corte va antes
+	// de consultar, para que una ruta que no existe tampoco toque la base.
+	blockOutsideEditorialScope();
 	const courses = await listPublicCourses();
 
 	return (

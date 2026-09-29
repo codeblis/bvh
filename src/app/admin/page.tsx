@@ -1,6 +1,7 @@
 import { ArrowRight, PenLine } from "lucide-react";
 import Link from "next/link";
 import { requireAdmin } from "@/lib/admin";
+import { isEditorialScope } from "@/lib/scope";
 import { ACTION_LABELS, RESOURCE_LABELS } from "./_status";
 import {
 	AdminPageHeader,
@@ -25,6 +26,12 @@ function when(value: string) {
 
 export default async function AdminHome() {
 	const { supabase } = await requireAdmin();
+	const editorial = isEditorialScope();
+
+	// En el MVP editorial no hay formularios ni cursos. Esas cifras no se
+	// consultan en vez de mostrarse en cero: una consulta que nadie lee es
+	// latencia y un permiso ejercido sin motivo.
+	const skipped = Promise.resolve({ count: 0, error: null });
 
 	const [
 		messages,
@@ -37,22 +44,30 @@ export default async function AdminHome() {
 		subscribers,
 		activity,
 	] = await Promise.all([
-		supabase
-			.from("contact_messages")
-			.select("*", { count: "exact", head: true })
-			.eq("status", "pendiente"),
-		supabase
-			.from("company_applications")
-			.select("*", { count: "exact", head: true })
-			.eq("status", "nueva"),
-		supabase
-			.from("contact_messages")
-			.select("*", { count: "exact", head: true })
-			.eq("notification_status", "failed"),
-		supabase
-			.from("course_enrollments")
-			.select("*", { count: "exact", head: true })
-			.in("status", ["pendiente", "lista_espera"]),
+		editorial
+			? skipped
+			: supabase
+					.from("contact_messages")
+					.select("*", { count: "exact", head: true })
+					.eq("status", "pendiente"),
+		editorial
+			? skipped
+			: supabase
+					.from("company_applications")
+					.select("*", { count: "exact", head: true })
+					.eq("status", "nueva"),
+		editorial
+			? skipped
+			: supabase
+					.from("contact_messages")
+					.select("*", { count: "exact", head: true })
+					.eq("notification_status", "failed"),
+		editorial
+			? skipped
+			: supabase
+					.from("course_enrollments")
+					.select("*", { count: "exact", head: true })
+					.in("status", ["pendiente", "lista_espera"]),
 		supabase
 			.from("articles")
 			.select("*", { count: "exact", head: true })
@@ -61,14 +76,18 @@ export default async function AdminHome() {
 			.from("articles")
 			.select("*", { count: "exact", head: true })
 			.eq("status", "publicado"),
-		supabase
-			.from("courses")
-			.select("*", { count: "exact", head: true })
-			.eq("status", "activo"),
-		supabase
-			.from("newsletter_subscriptions")
-			.select("*", { count: "exact", head: true })
-			.eq("is_active", true),
+		editorial
+			? skipped
+			: supabase
+					.from("courses")
+					.select("*", { count: "exact", head: true })
+					.eq("status", "activo"),
+		editorial
+			? skipped
+			: supabase
+					.from("newsletter_subscriptions")
+					.select("*", { count: "exact", head: true })
+					.eq("is_active", true),
 		supabase
 			.from("audit_events")
 			.select(
@@ -126,11 +145,13 @@ export default async function AdminHome() {
 		},
 	].filter((item) => item.value > 0);
 
-	const site = [
-		{ label: "Artículos publicados", value: published.count ?? 0 },
-		{ label: "Cursos activos", value: courses.count ?? 0 },
-		{ label: "Suscriptores activos", value: subscribers.count ?? 0 },
-	];
+	const site = editorial
+		? [{ label: "Artículos publicados", value: published.count ?? 0 }]
+		: [
+				{ label: "Artículos publicados", value: published.count ?? 0 },
+				{ label: "Cursos activos", value: courses.count ?? 0 },
+				{ label: "Suscriptores activos", value: subscribers.count ?? 0 },
+			];
 
 	return (
 		<div>
@@ -155,7 +176,9 @@ export default async function AdminHome() {
 					>
 						<Flag tone="hecho">Al día</Flag>
 						<p className="text-muted-foreground">
-							No hay mensajes, solicitudes ni inscripciones esperando.
+							{editorial
+								? "No hay artículos en borrador esperando."
+								: "No hay mensajes, solicitudes ni inscripciones esperando."}
 						</p>
 					</div>
 				) : (

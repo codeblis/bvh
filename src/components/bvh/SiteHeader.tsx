@@ -4,11 +4,12 @@ import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { isEditorialScope } from "@/lib/scope";
 import { AuthButton } from "./AuthButton";
 import { Logo } from "./Logo";
 import { ThemeToggle } from "./ThemeToggle";
 
-const NAV = [
+const FULL_NAV = [
 	{ href: "/indices", label: "Índices" },
 	{ href: "/mercados", label: "Mercados" },
 	{ href: "/noticias", label: "Noticias" },
@@ -18,6 +19,19 @@ const NAV = [
 	{ href: "/historia", label: "Historia" },
 	{ href: "/contacto", label: "Contacto" },
 ] as const;
+
+/**
+ * Con solo tres destinos, «Inicio» deja de ser redundante con el logotipo:
+ * es el único modo evidente de volver a la portada desde un artículo.
+ */
+const EDITORIAL_NAV = [
+	{ href: "/", label: "Inicio" },
+	{ href: "/noticias", label: "Noticias" },
+	{ href: "/blog", label: "Blog" },
+] as const;
+
+const NAV: readonly { readonly href: string; readonly label: string }[] =
+	isEditorialScope() ? EDITORIAL_NAV : FULL_NAV;
 
 export function SiteHeader() {
 	const pathname = usePathname();

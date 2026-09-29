@@ -11,6 +11,7 @@
 		"test:db": "supabase test db --local",
 		"test:concurrency": "supabase/tests/course_enrollment_concurrency.test.sh",
 		"test:e2e": "node scripts/test-e2e.mjs",
+		"test:e2e:mvp": "E2E_MVP_EDITORIAL=1 node scripts/test-e2e.mjs --config=playwright.mvp.config.ts",
 		"start": "next start",
 		"lint": "biome lint",
 		"format": "biome format --write",

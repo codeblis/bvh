@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { isEditorialScope } from "@/lib/scope";
 import { createClient, hasSupabaseConfig } from "@/lib/supabase/client";
 
 type Session = { signedIn: boolean; isAdmin: boolean };
@@ -55,12 +56,16 @@ export function AuthButton() {
 					Panel
 				</Link>
 			) : null}
-			<Link
-				href={session.signedIn ? "/cuenta" : "/login"}
-				className="rounded-md border border-primary/40 bg-primary/10 px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-primary transition hover:bg-primary hover:text-primary-foreground sm:px-4 sm:text-[12px]"
-			>
-				{session.signedIn ? "Cuenta" : "Acceder"}
-			</Link>
+			{/* En el MVP editorial no hay área de cuenta: quien tiene sesión y no
+			    administra no tiene dónde ir, y ofrecerle «Cuenta» daría un 404. */}
+			{isEditorialScope() && session.signedIn ? null : (
+				<Link
+					href={session.signedIn ? "/cuenta" : "/login"}
+					className="rounded-md border border-primary/40 bg-primary/10 px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-primary transition hover:bg-primary hover:text-primary-foreground sm:px-4 sm:text-[12px]"
+				>
+					{session.signedIn ? "Cuenta" : "Acceder"}
+				</Link>
+			)}
 		</div>
 	);
 }

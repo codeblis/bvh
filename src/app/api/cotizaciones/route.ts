@@ -9,6 +9,7 @@ import type { EmployeeRange } from "@/lib/forms";
 import { createReference, escapeHtml, quoteSchema } from "@/lib/forms";
 import { clientFingerprint, readBoundedJson } from "@/lib/request";
 import { emailConfig } from "@/lib/resend";
+import { outOfScopeResponse } from "@/lib/scope";
 import { createServiceClient } from "@/lib/supabase/service";
 import { deliverEmail } from "@/modules/forms/email.server";
 import { withinRateLimit } from "@/modules/forms/rate-limit.server";
@@ -24,6 +25,9 @@ const EMPLOYEE_RANGE_FLOORS = {
 } satisfies Record<EmployeeRange, number>;
 
 export async function POST(request: Request) {
+	// Sin formularios públicos en el MVP editorial el endpoint no existe.
+	const outOfScope = outOfScopeResponse();
+	if (outOfScope) return outOfScope;
 	const body = await readBoundedJson(request);
 	const parsed = quoteSchema.safeParse(body);
 	if (!parsed.success) return invalidRequest();

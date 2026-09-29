@@ -3,6 +3,7 @@ import { ArticleIndex } from "@/components/bvh/ArticleIndex";
 import { PageHero } from "@/components/bvh/PageHero";
 import { SiteFooter } from "@/components/bvh/SiteFooter";
 import { SiteHeader } from "@/components/bvh/SiteHeader";
+import { isEditorialScope } from "@/lib/scope";
 import { listPublishedArticles } from "@/modules/content/repository.server";
 
 export const metadata: Metadata = {
@@ -43,15 +44,19 @@ export default async function NoticiasPage() {
 				categories={categories}
 				accentLabel="Noticias"
 				basePath="/noticias"
-				newsletter={{
-					lista: "noticias",
-					title: "Suscríbete al boletín diario",
-					description:
-						"Recibe cada mañana el resumen ejecutivo de lo que importa en la economía cubana. Sin spam. Un correo al día. Cancela cuando quieras.",
-					placeholder: "tu@correo.cu",
-					cta: "Suscribirme al boletín diario",
-					hint: "Un correo al día · sin spam · puedes darte de baja cuando quieras.",
-				}}
+				newsletter={
+					isEditorialScope()
+						? undefined
+						: {
+								lista: "noticias",
+								title: "Suscríbete al boletín diario",
+								description:
+									"Recibe cada mañana el resumen ejecutivo de lo que importa en la economía cubana. Sin spam. Un correo al día. Cancela cuando quieras.",
+								placeholder: "tu@correo.cu",
+								cta: "Suscribirme al boletín diario",
+								hint: "Un correo al día · sin spam · puedes darte de baja cuando quieras.",
+							}
+				}
 			/>
 			</main>
 			<SiteFooter />

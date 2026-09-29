@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSafeAuthRedirect } from "@/lib/safe-redirect";
+import { outOfScopeResponse } from "@/lib/scope";
 import { getAuthSiteOrigin } from "@/modules/identity/site-url";
 
 export async function GET(request: Request) {
+	// Solo lo usan los enlaces de confirmación y recuperación, que llegan
+	// por correo. En el MVP editorial no se envía ninguno.
+	const outOfScope = outOfScopeResponse();
+	if (outOfScope) return outOfScope;
 	const url = new URL(request.url);
 	const code = url.searchParams.get("code");
 	const next = getSafeAuthRedirect(url.searchParams.get("next"));

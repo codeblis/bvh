@@ -3,6 +3,7 @@ export { ThemeToggle } from "./ThemeToggle";
 export { SiteHeader } from "./SiteHeader";
 export { SiteFooter } from "./SiteFooter";
 export { PageHero } from "./PageHero";
+export { LatestArticles } from "./LatestArticles";
 export { LiveTicker } from "./LiveTicker";
 export { NewsletterSignup } from "./NewsletterSignup";
 export { DemoNotice } from "./DemoNotice";

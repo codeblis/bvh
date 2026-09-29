@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/bvh/SiteFooter";
 import { SiteHeader } from "@/components/bvh/SiteHeader";
+import { blockOutsideEditorialScope } from "@/lib/scope";
 import { getPublicCourse } from "@/modules/courses/repository.server";
 import type { CourseOffering } from "@/modules/courses/types";
 import { enrollInCourse } from "./actions";
@@ -54,6 +55,9 @@ export default async function CoursePage({
 	params: Promise<{ slug: string }>;
 	searchParams: Promise<{ enrolled?: string; enrollmentError?: string }>;
 }) {
+	// Fuera del MVP editorial esta sección no se publica: el corte va antes
+	// de consultar, para que una ruta que no existe tampoco toque la base.
+	blockOutsideEditorialScope();
 	const { slug } = await params;
 	const notices = await searchParams;
 	const course = await getPublicCourse(slug);

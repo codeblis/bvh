@@ -28,7 +28,9 @@ export function ArticleIndex({
 }: {
 	articles: ArticleSummary[];
 	categories: string[];
-	newsletter: {
+	// Sin formularios públicos el índice no lleva bloque de suscripción: quien
+	// lo usa decide si existe, no el componente.
+	newsletter?: {
 		title: string;
 		description: string;
 		placeholder: string;
@@ -362,6 +364,7 @@ export function ArticleIndex({
 			</div>
 
 			{/* Newsletter */}
+			{newsletter ? (
 			<div
 				className="mt-16 overflow-hidden rounded-2xl border border-border"
 				style={{ background: "var(--gradient-hero)" }}
@@ -387,6 +390,7 @@ export function ArticleIndex({
 					/>
 				</div>
 			</div>
+			) : null}
 		</section>
 	);
 }
