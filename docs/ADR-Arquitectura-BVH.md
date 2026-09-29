@@ -231,6 +231,20 @@ Los enlaces de correo, callback y redirección a login usan el origen confiable 
 
 **Consecuencias.** Cada entorno debe configurar un origen público y callbacks coherentes. Se mantiene PKCE: el recorrido probado abre el correo en el navegador que inició la solicitud; apertura entre dispositivos requiere un diseño y prueba adicionales. La respuesta pública genérica no demuestra entrega de correo; hacen falta supervisión operativa, SMTP y antiabuso en preview. Referencias oficiales consultadas: [Auth con contraseña](https://supabase.com/docs/guides/auth/passwords), [PKCE y SSR](https://supabase.com/docs/guides/auth/server-side/advanced-guide).
 
+## ADR-016 — Sin middleware: la autorización vive en cada ruta
+
+**Estado:** Aceptada  
+**Fecha:** 2026-09-29  
+**Implementación:** Local; `src/proxy.ts` eliminado
+
+**Contexto.** Al preparar el primer despliegue real, `opennextjs-cloudflare build` falló con `Node.js middleware is not currently supported`. La causa no es del proyecto: Next 16 sustituyó `middleware.ts` por `proxy.ts`, que se ejecuta **solo** en el runtime de Node; forzarlo a edge lo rechaza el propio compilador con `Proxy does not support Edge runtime`. OpenNext, que necesita middleware de edge, aborta. El síntoma importa: mientras existiera ese archivo, **la aplicación no se podía desplegar en Cloudflare en absoluto**, y eso no se había detectado porque toda la evidencia previa era `next build` local.
+
+**Decisión.** Eliminar `src/proxy.ts`. La autorización no se pierde porque nunca dependió de él: `/admin/**` la resuelve `requireAdmin()` en `src/app/admin/layout.tsx` —que redirige a `/login` sin sesión y fuera del panel sin rol— y `/cuenta` comprueba la suya en la propia página. El middleware era una segunda capa, no la única.
+
+**Alternativas descartadas.** Esperar a que OpenNext admita middleware de Node, que deja el despliegue bloqueado por un tercero. Volver a `middleware.ts`, que en Next 16 es el mismo archivo con otro nombre. Mover la comprobación a un punto único del runtime, que reintroduce el mismo acoplamiento que ahora estorba.
+
+**Consecuencias.** La sesión deja de refrescarse en el borde a cada navegación: el token lo renueva el cliente del navegador, así que una sesión de panel muy larga puede pedir volver a entrar antes que antes. A cambio, la autorización queda donde se puede leer y probar —junto a la ruta que protege— y deja de haber un archivo cuya ausencia abriría el panel. Cada ruta privada nueva debe llamar a `requireAdmin()` o comprobar su sesión: ya no hay una red que la cubra por omisión. Los recorridos E2E de acceso por rol siguen siendo la prueba de que la protección se mantiene.
+
 ## 4. Modelo lógico objetivo
 
 ```text

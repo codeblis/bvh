@@ -1,6 +1,7 @@
 # Lanzamiento del MVP editorial
 
-**Estado:** Código listo y verificado en local; infraestructura sin ejecutar
+**Estado:** Código listo; empaquetado para Cloudflare verificado en seco;
+infraestructura remota sin preparar
 **Corte:** 2026-09-28
 **Decisión del propietario:** publicar solo Inicio, Noticias y Blog
 
@@ -49,6 +50,13 @@ interruptor de operación.
 
 Las **22 migraciones** de `supabase/migrations/` son la única fuente del
 esquema. Hoy solo están aplicadas en local.
+
+> **Comprobado el 2026-09-29 contra el proyecto remoto configurado:** está en
+> el esquema de julio. `articles` existe, pero le falta `featured_image_path`,
+> así que la consulta de la portada responde `42703` y **todas las páginas
+> públicas darían error**. Tampoco existen `audit_events`, `course_offerings`,
+> `newsletter_lists` ni `newsletter_campaigns`. Desplegar sin aplicar las
+> migraciones sustituiría una cuenta atrás que funciona por un sitio roto.
 
 ```bash
 supabase link --project-ref <ref-del-proyecto>
@@ -198,7 +206,43 @@ clave de Resend. Este alcance no la usa y no la necesita, pero mientras exista,
 quien tenga acceso al historial puede enviar correo como BVH. Conviene
 revocarla en el panel de Resend cuando haya ocasión. No bloquea nada.
 
-## 6. Promoción
+## 6. Los dos destinos
+
+El proyecto publica dos Workers desde la misma rama `production`, con builds
+distintos porque `NEXT_PUBLIC_MVP_EDITORIAL` y `NEXT_PUBLIC_SITE_URL` se
+incrustan al compilar:
+
+| Comando | Worker | Dominio | Alcance |
+| --- | --- | --- | --- |
+| `pnpm deploy:sitio` | `bvh` | `bolsadelahabana.com` | MVP editorial |
+| `pnpm deploy:app` | `bvh-app` | `app.bolsadelahabana.com` | Sitio completo |
+
+Ambos exigen estar en `production` y comprueban antes que `.env.production.local`
+declare lo que cada uno necesita: el sitio completo persiste formularios y por
+eso pide además `SUPABASE_SERVICE_ROLE_KEY`, que el editorial no usa.
+
+Lo que se escriba después del destino se le pasa a wrangler. **`--dry-run`
+compila y empaqueta sin publicar**, y es la forma de comprobar el camino entero
+antes de tocar un dominio vivo:
+
+```bash
+pnpm deploy:sitio --dry-run
+```
+
+`pnpm deploy:sitio` no lleva `--env`: OpenNext descarta el entorno vacío, así
+que el destino es el nivel superior de `wrangler.jsonc`, que es justo el worker
+`bvh`. Wrangler avisa de que no se nombró entorno; es esperado y no indica que
+vaya a publicar en otro sitio.
+
+### Los dos dominios comparten base de datos
+
+Tal como está `.env.production.local`, ambos Workers apuntan al mismo proyecto
+Supabase. Eso significa que lo que se publique desde el panel del MVP aparece
+también en el sitio completo, y que una prueba en `app.` toca datos reales.
+Si `app.` debe ser un entorno de verdad aislado, necesita su propio proyecto
+Supabase y su propio archivo de variables.
+
+## 7. Promoción
 
 **Guardarraíl vigente:** la rama `production` es hoy un marcador y **no se
 fusiona ni se despliega sin que el propietario lo pida explícitamente**. Que la
@@ -213,7 +257,7 @@ publicado, un 404 de sección retirada, `robots.txt`, `sitemap.xml` y el acceso
 al panel. El rollback está en
 [Runbook §9](RUNBOOK-OPERACION.md).
 
-## 7. Verificación local de este recorte
+## 8. Verificación local de este recorte
 
 ```bash
 pnpm check          # lint, typecheck, unitarias y build
