@@ -78,7 +78,7 @@ producción, la aceptación no se puede hacer.
    supabase link --project-ref <ref-del-preview>
    supabase db push
    ```
-   Las dieciocho migraciones del repositorio son la única fuente del esquema;
+   Las veintidós migraciones del repositorio son la única fuente del esquema;
    no se aplican cambios a mano en el panel de Supabase.
 3. En Auth → URL Configuration, poner como *Site URL* la del preview y añadir
    `<url-del-preview>/auth/callback` a las redirecciones permitidas. Sin esto,

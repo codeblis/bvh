@@ -86,6 +86,21 @@ El orden sigue riesgo y dependencia. Seguridad y fuente única preceden al pulid
 
 Pagos, comentarios/likes/bookmarks, WYSIWYG, analítica avanzada, multiidioma, datos bursátiles reales y posible R2 se evalúan con uso y requisitos reales; no se adelantan por conveniencia técnica.
 
+**Alcance del primer lanzamiento recortado por decisión del propietario
+(2026-09-28):** se publica solo Inicio, Noticias y Blog. Los demás módulos
+quedan tras `NEXT_PUBLIC_MVP_EDITORIAL` y responden 404 sin salir del
+repositorio; el sitio público pierde además todos sus formularios, así que
+Turnstile, el límite de envíos y el correo transaccional dejan de ser bloqueos
+de salida —siguen implementados y probados—.
+
+El alcance **no usa correo por ninguna vía**: tampoco el de identidad. Registro,
+confirmación de cuenta, recuperación de contraseña y el callback quedan
+retirados; la cuenta que publica se crea ya confirmada desde el panel de
+Supabase y entra con contraseña. Resend no se configura en ningún entorno. La
+clave expuesta en el historial de Git conviene revocarla como higiene, pero no
+bloquea este lanzamiento porque nada la usa. La lista de puesta en marcha está
+en [Lanzamiento del MVP editorial](LANZAMIENTO-EDITORIAL.md).
+
 **Adelantado a la V1 por decisión del propietario (2026-09-18):** las campañas de
 newsletter, que este documento situaba después de la V1. El alcance acordado son
 listas de consentimiento (Noticias, Blog, Institucional) y audiencias de curso

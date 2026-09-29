@@ -4,6 +4,26 @@ Portal institucional en desarrollo para presentar la iniciativa BVH, publicar co
 
 > Los índices, cotizaciones, empresas, métricas y perfiles incluidos actualmente son datos demostrativos. No constituyen información bursátil en tiempo real ni una oferta de inversión.
 
+## Alcance publicado
+
+Por decisión del propietario, el primer lanzamiento expone **solo Inicio,
+Noticias y Blog**. Lo controla `NEXT_PUBLIC_MVP_EDITORIAL`, cuyo valor por
+defecto es ese alcance: si la variable falta, se publica de menos y no de más.
+El resto de los módulos —`/indices`, `/mercados`, `/cotizar`, `/instituto`,
+`/acerca`, `/historia`, `/contacto`, `/registro`, `/cuenta` y los endpoints de
+formulario— responde 404 y su código permanece en el repositorio.
+
+En este alcance **el sitio no envía ni recibe correo**: no hay formularios,
+boletín, registro de visitantes, confirmación de cuenta ni recuperación de
+contraseña. La cuenta que publica se crea ya confirmada desde el panel de
+Supabase y entra con contraseña. Resend, Turnstile y el límite de envíos
+quedan sin configurar porque nada los usa.
+
+Para trabajar sobre el sitio completo, `NEXT_PUBLIC_MVP_EDITORIAL=0` y
+reconstruir; la bandera se incrusta en el build. La lista de puesta en marcha
+de este alcance está en
+[docs/LANZAMIENTO-EDITORIAL.md](docs/LANZAMIENTO-EDITORIAL.md).
+
 ## Desarrollo local
 
 El esquema vive en `supabase/migrations` y **solo está aplicado en el stack
@@ -39,6 +59,14 @@ pnpm check
 ```
 
 El comando ejecuta lint, TypeScript, pruebas y build de producción.
+
+Los recorridos de Playwright van en dos tandas, porque el alcance se incrusta
+al construir y un mismo servidor no puede servir las dos versiones:
+
+```bash
+pnpm test:e2e       # sitio completo: formularios, cursos y campañas
+pnpm test:e2e:mvp   # MVP editorial: 404 de lo retirado, navegación y portada
+```
 
 ## Desarrollo dirigido por especificaciones
 

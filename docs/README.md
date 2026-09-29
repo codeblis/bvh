@@ -56,6 +56,7 @@ En los ADR se usan además `Propuesta`, `Aceptada`, `Reemplazada` y `Descartada`
 - [Flujo de desarrollo](FLUJO-DESARROLLO.md)
 - [Infraestructura](INFRAESTRUCTURA.md)
 - [Puesta en marcha de la V1](PUESTA-EN-MARCHA.md)
+- [Lanzamiento del MVP editorial](LANZAMIENTO-EDITORIAL.md)
 - [Operaciones periódicas](OPERACIONES-PERIODICAS.md)
 - [Runbook de operación](RUNBOOK-OPERACION.md)
 - [Roadmap V1](ROADMAP-V1.md)
