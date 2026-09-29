@@ -16,7 +16,8 @@
 		"lint": "biome lint",
 		"format": "biome format --write",
 		"preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-		"deploy": "bash -c 'if [ \"$(git branch --show-current)\" != \"production\" ]; then echo \"⛔ Debes estar en production para desplegar\"; exit 1; fi && opennextjs-cloudflare build && opennextjs-cloudflare deploy --env app'",
+		"deploy:sitio": "node scripts/deploy.mjs sitio",
+		"deploy:app": "node scripts/deploy.mjs app",
 		"cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
 		"gen:types": "supabase gen types typescript --local --schema public > src/types/supabase.ts",
 		"check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"

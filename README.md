@@ -89,7 +89,17 @@ Las integraciones fallan de forma segura cuando faltan variables de entorno: la 
 
 ## Despliegue
 
-El script `pnpm deploy` exige estar en la rama `production` y despliega el entorno `app` definido en `wrangler.jsonc`.
+Dos destinos, ambos desde la rama `production` y con builds distintos porque el
+alcance se incrusta al compilar:
+
+```bash
+pnpm deploy:sitio   # worker bvh     → bolsadelahabana.com      (MVP editorial)
+pnpm deploy:app     # worker bvh-app → app.bolsadelahabana.com  (sitio completo)
+```
+
+Lo que se pase después del destino llega a wrangler; `--dry-run` compila y
+empaqueta sin publicar. Detalles y comprobaciones en
+[docs/LANZAMIENTO-EDITORIAL.md](docs/LANZAMIENTO-EDITORIAL.md).
 
 ## Documentación
 
