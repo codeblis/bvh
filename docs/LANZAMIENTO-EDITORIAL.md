@@ -208,14 +208,51 @@ revocarla en el panel de Resend cuando haya ocasión. No bloquea nada.
 
 ## 6. Los dos destinos
 
-El proyecto publica dos Workers desde la misma rama `production`, con builds
-distintos porque `NEXT_PUBLIC_MVP_EDITORIAL` y `NEXT_PUBLIC_SITE_URL` se
-incrustan al compilar:
+### Cómo se despliega de verdad
 
-| Comando | Worker | Dominio | Alcance |
+**El despliegue lo dispara el push.** Los Workers tienen la integración con
+GitHub activada: un cambio en la rama que vigilan y Cloudflare compila y publica
+por su cuenta. `scripts/deploy.mjs` es el camino manual, útil para `--dry-run` y
+para publicar desde una máquina, pero **no es el que se usa normalmente**.
+
+Eso costó un sitio caído: el runner de Cloudflare no ve
+`.env.production.local` —está en `.gitignore`— y compiló sin las variables. Un
+build así no falla por su cuenta: publica un sitio que responde 500 y no deja
+entrar a nadie.
+
+**Los valores públicos viven ahora en `.env.production`, que sí se versiona.**
+Son los mismos que ya viajan en el JavaScript de cualquier visitante: la URL
+del proyecto y la clave `sb_publishable_`. Quien protege los datos es RLS, no
+su ocultación. Así el runner los tiene sin depender de que alguien configure
+nada a mano, que es justo el paso que falló.
+
+Lo que **nunca** va ahí es `SUPABASE_SERVICE_ROLE_KEY` ni ningún secreto de
+servidor: esos van en el gestor de secretos del Worker.
+
+Para el Worker del sitio completo, que necesita otro alcance y otro origen, se
+sobrescriben esas dos en su configuración de build: las variables reales del
+proceso mandan sobre el archivo.
+
+Como red adicional, `next.config.ts` corta cualquier build de producción al que
+le falten `NEXT_PUBLIC_SUPABASE_URL` o `NEXT_PUBLIC_SUPABASE_ANON_KEY`. Un build
+fallido es mejor que un sitio mudo: el fallo se ve en el momento, el sitio mudo
+solo cuando entra alguien. Y si aun así se colara, `/login` lo dice en pantalla
+en vez de culpar a la contraseña.
+
+### La tabla
+
+Dos Workers desde la misma rama `production`, con builds distintos porque
+`NEXT_PUBLIC_MVP_EDITORIAL` y `NEXT_PUBLIC_SITE_URL` se incrustan al compilar:
+
+| Worker | Dominio | `NEXT_PUBLIC_MVP_EDITORIAL` | Comando manual |
 | --- | --- | --- | --- |
-| `pnpm deploy:sitio` | `bvh` | `bolsadelahabana.com` | MVP editorial |
-| `pnpm deploy:app` | `bvh-app` | `app.bolsadelahabana.com` | Sitio completo |
+| `bvh` | `bolsadelahabana.com` | `1` | `pnpm deploy:sitio` |
+| `bvh-app` | `app.bolsadelahabana.com` | `0` | `pnpm deploy:app` |
+
+**La cuenta de Cloudflare importa.** El Worker `bvh` vive en la cuenta
+`0105dae2…`, la que declara `.env.app`. Un `wrangler` autenticado en otra cuenta
+responde «This Worker does not exist on your account» y no puede publicar ahí;
+comprobar con `wrangler whoami` antes de intentarlo.
 
 Ambos exigen estar en `production` y comprueban antes que `.env.production.local`
 declare lo que cada uno necesita: el sitio completo persiste formularios y por
