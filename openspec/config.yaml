@@ -1,0 +1,48 @@
+schema: spec-driven
+
+context: |
+  BVH es una aplicación web en español construida con Next.js 16 App Router,
+  TypeScript y pnpm. Supabase aporta Postgres, Auth y Storage. El objetivo de
+  despliegue es OpenNext sobre Cloudflare, pero ningún despliegue, migración
+  remota ni creación de recursos externos está implícitamente autorizado.
+
+  La V1 contractual debe entregar noticias, blog y cursos operables tanto en
+  la web pública como en el CMS, además de autenticación, roles, formularios,
+  correo transaccional, auditoría y bases operativas seguras.
+
+  La arquitectura es un monolito modular. La lógica de dominio vive en
+  src/modules; las rutas de App Router orquestan casos de uso y no sustituyen
+  repositorios, validación ni autorización. Supabase es la fuente única de
+  verdad para contenido y cursos; los datos TypeScript de demostración no son
+  una fuente productiva aceptable.
+
+  docs/ conserva visión, ADR, operación, riesgos y evidencia de estado.
+  openspec/ define cambios normativos mediante proposal, specs, design y tasks.
+  No describir como desplegado o verificado lo que solo existe localmente.
+
+rules:
+  proposal:
+    - Escribir en español y explicar el valor observable para la V1.
+    - Incluir explícitamente alcance, no objetivos, riesgos y dependencias externas.
+    - Distinguir trabajo local, estado remoto y decisiones aún no verificadas.
+  specs:
+    - Usar requisitos normativos con MUST o SHALL y al menos un escenario WHEN/THEN por requisito.
+    - Cubrir éxito, autorización insuficiente, estados vacíos y fallos externos cuando apliquen.
+    - No convertir detalles de implementación accidentales en contratos de producto.
+  design:
+    - Registrar alternativas y consecuencias para seguridad, datos, accesibilidad y operación.
+    - Para cambios de base, incluir compatibilidad, verificación ascendente y recuperación.
+  tasks:
+    - Usar tareas verificables y separar implementación local de acciones remotas autorizadas.
+    - Incluir pruebas, documentación y evidencia; no marcar una tarea completa sin comprobarla.
+
+operations:
+  apply:
+    guidance:
+      - Preservar cambios preexistentes del usuario y revisar el diff antes de editar.
+      - No desplegar, migrar producción, rotar credenciales ni crear recursos externos sin autorización explícita.
+      - Ejecutar pnpm check y validación OpenSpec proporcional al cambio.
+  archive:
+    guidance:
+      - Archivar solo cuando las tareas y criterios tengan evidencia suficiente.
+      - Actualizar docs/relevo.md y los documentos operativos afectados antes de cerrar.

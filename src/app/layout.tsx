@@ -1,64 +1,36 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Raleway, Playfair_Display } from "next/font/google";
 import "./globals.css";
-import { cn } from "@/lib/utils";
-
-const playfairDisplayHeading = Playfair_Display({
-	subsets: ["latin"],
-	variable: "--font-heading",
-});
-
-const raleway = Raleway({ subsets: ["latin"], variable: "--font-sans" });
-
-const geistSans = Geist({
-	variable: "--font-geist-sans",
-	subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-	variable: "--font-geist-mono",
-	subsets: ["latin"],
-});
+import { LiveTickerWrapper } from "@/components/bvh/LiveTickerWrapper";
 
 export const metadata: Metadata = {
+	metadataBase: new URL(
+		process.env.NEXT_PUBLIC_SITE_URL ?? "https://bolsadelahabana.com",
+	),
 	title: "BVH | Bolsa de Valores de La Habana",
-
-	description: "La casa del emprendedor cubano.",
-
+	description:
+		"Bolsa de Valores de La Habana: la plataforma independiente que profesionaliza el empresariado cubano, genera transparencia y conecta talento con capital.",
 	openGraph: {
-		title: "BVH | Bolsa de Valores de La Habana",
-
-		description: "La casa del emprendedor cubano.",
-
-		url: "https://bolsadelahabana.com/",
-
+		title: "BVH · Bolsa de Valores de La Habana",
+		description:
+			"Bolsa de Valores de La Habana: la plataforma independiente que profesionaliza el empresariado cubano, genera transparencia y conecta talento con capital.",
+		url: "/",
 		siteName: "Bolsa de Valores de La Habana",
-
 		images: [
 			{
-				url: "https://bolsadelahabana.com/logo.png",
-
+				url: "/logo.png",
 				width: 500,
-
 				height: 700,
-
 				alt: "Bolsa de Valores de La Habana",
 			},
 		],
-
 		locale: "es_ES",
-
 		type: "website",
 	},
-
 	twitter: {
 		card: "summary_large_image",
-
 		title: "BVH, Bolsa de Valores de La Habana",
-
 		description: "La casa del emprendedor cubano.",
-
-		images: ["https://bolsadelahabana.com/logo.svg"],
+		images: ["/logo.svg"],
 	},
 };
 
@@ -68,19 +40,11 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html
-			lang="en"
-			className={cn(
-				"h-full",
-				"antialiased",
-				geistSans.variable,
-				geistMono.variable,
-				"font-sans",
-				raleway.variable,
-				playfairDisplayHeading.variable,
-			)}
-		>
-			<body className="min-h-full flex flex-col">{children}</body>
+		<html lang="es" className="h-full antialiased dark">
+			<body className="min-h-full flex flex-col">
+				<LiveTickerWrapper />
+				{children}
+			</body>
 		</html>
 	);
 }

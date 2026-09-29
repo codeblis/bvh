@@ -1,0 +1,111 @@
+"use client";
+
+import { Menu, X } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
+import { isEditorialScope } from "@/lib/scope";
+import { AuthButton } from "./AuthButton";
+import { Logo } from "./Logo";
+import { ThemeToggle } from "./ThemeToggle";
+
+const FULL_NAV = [
+	{ href: "/indices", label: "Índices" },
+	{ href: "/mercados", label: "Mercados" },
+	{ href: "/noticias", label: "Noticias" },
+	{ href: "/blog", label: "Blog" },
+	{ href: "/instituto", label: "Instituto" },
+	{ href: "/cotizar", label: "Cotizar" },
+	{ href: "/historia", label: "Historia" },
+	{ href: "/contacto", label: "Contacto" },
+] as const;
+
+/**
+ * Con solo tres destinos, «Inicio» deja de ser redundante con el logotipo:
+ * es el único modo evidente de volver a la portada desde un artículo.
+ */
+const EDITORIAL_NAV = [
+	{ href: "/", label: "Inicio" },
+	{ href: "/noticias", label: "Noticias" },
+	{ href: "/blog", label: "Blog" },
+] as const;
+
+const NAV: readonly { readonly href: string; readonly label: string }[] =
+	isEditorialScope() ? EDITORIAL_NAV : FULL_NAV;
+
+export function SiteHeader() {
+	const pathname = usePathname();
+	const [mobileOpen, setMobileOpen] = useState(false);
+
+	const isActive = (href: string) => {
+		if (href === "/") return pathname === "/";
+		return pathname.startsWith(href);
+	};
+
+	return (
+		<header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
+			<a
+				href="#contenido"
+				className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-xs focus:font-semibold focus:text-primary-foreground"
+			>
+				Saltar al contenido
+			</a>
+			<div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+				<Link href="/" className="flex items-center gap-3 text-primary">
+					<Logo className="h-8 w-8 shrink-0 md:h-9 md:w-9" />
+					<div className="leading-tight">
+						<div className="font-serif text-[13px] font-semibold text-foreground md:text-[15px]">
+							Bolsa de Valores
+						</div>
+						<div className="text-[9px] uppercase tracking-[0.22em] text-muted-foreground md:text-[10px]">
+							de La Habana
+						</div>
+					</div>
+				</Link>
+				<nav className="hidden items-center gap-6 text-[13px] text-muted-foreground lg:flex">
+					{NAV.map((n) => (
+						<Link
+							key={n.href}
+							href={n.href}
+							className={`relative transition-colors hover:text-foreground ${isActive(n.href) ? "font-semibold text-foreground after:absolute after:-bottom-1 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-primary" : ""}`}
+						>
+							{n.label}
+						</Link>
+					))}
+				</nav>
+				<div className="flex items-center gap-2 md:gap-3">
+					<ThemeToggle />
+					<button
+						type="button"
+						className="flex h-9 w-9 items-center justify-center rounded-md border border-border lg:hidden"
+						onClick={() => setMobileOpen(!mobileOpen)}
+						aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
+					>
+						{mobileOpen ? (
+							<X className="w-5 h-5" aria-hidden="true" />
+						) : (
+							<Menu className="w-5 h-5" aria-hidden="true" />
+						)}
+					</button>
+					<AuthButton />
+				</div>
+			</div>
+			{mobileOpen && (
+				<div className="border-t border-border lg:hidden">
+					<nav className="mx-auto max-w-7xl px-6 py-4 space-y-1">
+						{NAV.map((n) => (
+							<Link
+								key={n.href}
+								href={n.href}
+								onClick={() => setMobileOpen(false)}
+								className={`block rounded-md px-3 py-2 text-[13px] transition-colors ${isActive(n.href) ? "font-semibold text-foreground bg-primary/5" : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"}`}
+							>
+								{n.label}
+							</Link>
+						))}
+					</nav>
+				</div>
+			)}
+		</header>
+	);
+}
