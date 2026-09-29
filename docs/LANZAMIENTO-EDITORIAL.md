@@ -1,8 +1,7 @@
 # Lanzamiento del MVP editorial
 
-**Estado:** Código listo; empaquetado para Cloudflare verificado en seco;
-infraestructura remota sin preparar
-**Corte:** 2026-09-28
+**Estado:** En producción y verificado de punta a punta el 2026-09-29
+**Corte:** 2026-09-29
 **Decisión del propietario:** publicar solo Inicio, Noticias y Blog
 
 Este documento es la lista corta. La versión completa de la V1 está en
@@ -51,12 +50,11 @@ interruptor de operación.
 Las **22 migraciones** de `supabase/migrations/` son la única fuente del
 esquema. Hoy solo están aplicadas en local.
 
-> **Comprobado el 2026-09-29 contra el proyecto remoto configurado:** está en
-> el esquema de julio. `articles` existe, pero le falta `featured_image_path`,
-> así que la consulta de la portada responde `42703` y **todas las páginas
-> públicas darían error**. Tampoco existen `audit_events`, `course_offerings`,
-> `newsletter_lists` ni `newsletter_campaigns`. Desplegar sin aplicar las
-> migraciones sustituiría una cuenta atrás que funciona por un sitio roto.
+> **Aplicadas el 2026-09-29.** El proyecto remoto estaba en el esquema de julio
+> —le faltaba hasta `articles.featured_image_path`, así que toda página pública
+> respondía 500— y se le aplicaron las trece que faltaban, en orden. Quedan las
+> 22 registradas, con el bucket `editorial` creado y sin tablas ni funciones
+> ausentes.
 
 ```bash
 supabase link --project-ref <ref-del-proyecto>
@@ -294,7 +292,26 @@ publicado, un 404 de sección retirada, `robots.txt`, `sitemap.xml` y el acceso
 al panel. El rollback está en
 [Runbook §9](RUNBOOK-OPERACION.md).
 
-## 8. Verificación local de este recorte
+## 8. Verificación en producción
+
+Recorrido real sobre `bolsadelahabana.com` el 2026-09-29, con navegador y
+cuenta administradora, no en local:
+
+| Paso | Resultado |
+| --- | --- |
+| Portada, `/noticias`, `/blog` | 200 |
+| Iniciar sesión | entra y aterriza en `/admin` |
+| Panel | solo Contenido y Gobierno, como define el alcance |
+| Guardar borrador | correcto |
+| Subir portada al bucket | correcta, en el runtime de Cloudflare |
+| Publicar | correcto |
+| Detalle público del artículo | 200 |
+| El artículo aparece en la portada | sí |
+| Auditoría del cambio | registrada con su actor |
+
+El artículo de prueba y su portada se borraron después; el bucket quedó vacío.
+
+## 9. Verificación local de este recorte
 
 ```bash
 pnpm check          # lint, typecheck, unitarias y build
