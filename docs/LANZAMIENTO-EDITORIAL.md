@@ -215,22 +215,29 @@ GitHub activada: un cambio en la rama que vigilan y Cloudflare compila y publica
 por su cuenta. `scripts/deploy.mjs` es el camino manual, útil para `--dry-run` y
 para publicar desde una máquina, pero **no es el que se usa normalmente**.
 
-Eso tiene una consecuencia que costó un sitio caído: **las variables tienen que
-estar en la configuración de build del Worker en Cloudflare**, no en un archivo
-local. `.env.production.local` está en `.gitignore` y no viaja con el
-repositorio, así que el runner de Cloudflare no lo ve. Un build sin ellas no
-falla por su cuenta: publica un sitio que responde 500 y no deja entrar a nadie.
+Eso costó un sitio caído: el runner de Cloudflare no ve
+`.env.production.local` —está en `.gitignore`— y compiló sin las variables. Un
+build así no falla por su cuenta: publica un sitio que responde 500 y no deja
+entrar a nadie.
 
-Por eso `next.config.ts` corta el build si faltan `NEXT_PUBLIC_SUPABASE_URL` o
-`NEXT_PUBLIC_SUPABASE_ANON_KEY`. Un build fallido es mejor que un sitio mudo.
-Si el build de Cloudflare falla con ese mensaje, lo que falta son las variables
-en su configuración, no en el código.
+**Los valores públicos viven ahora en `.env.production`, que sí se versiona.**
+Son los mismos que ya viajan en el JavaScript de cualquier visitante: la URL
+del proyecto y la clave `sb_publishable_`. Quien protege los datos es RLS, no
+su ocultación. Así el runner los tiene sin depender de que alguien configure
+nada a mano, que es justo el paso que falló.
 
-En el panel de Cloudflare, por cada Worker: *Settings → Build → Variables and
-Secrets*, y ahí las `NEXT_PUBLIC_*` de §3.5 con el valor que corresponda a su
-dominio. Cada Worker necesita su propio `NEXT_PUBLIC_MVP_EDITORIAL` y su propio
-`NEXT_PUBLIC_SITE_URL`; es lo que hace que un mismo repositorio publique dos
-sitios distintos.
+Lo que **nunca** va ahí es `SUPABASE_SERVICE_ROLE_KEY` ni ningún secreto de
+servidor: esos van en el gestor de secretos del Worker.
+
+Para el Worker del sitio completo, que necesita otro alcance y otro origen, se
+sobrescriben esas dos en su configuración de build: las variables reales del
+proceso mandan sobre el archivo.
+
+Como red adicional, `next.config.ts` corta cualquier build de producción al que
+le falten `NEXT_PUBLIC_SUPABASE_URL` o `NEXT_PUBLIC_SUPABASE_ANON_KEY`. Un build
+fallido es mejor que un sitio mudo: el fallo se ve en el momento, el sitio mudo
+solo cuando entra alguien. Y si aun así se colara, `/login` lo dice en pantalla
+en vez de culpar a la contraseña.
 
 ### La tabla
 

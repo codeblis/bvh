@@ -5,10 +5,13 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Logo } from "@/components/bvh/Logo";
 import { ThemeToggle } from "@/components/bvh/ThemeToggle";
-import { createClient } from "@/lib/supabase/client";
+import { createClient, hasSupabaseConfig } from "@/lib/supabase/client";
 import { getSafeAuthRedirect } from "@/lib/safe-redirect";
 import { isEditorialScope } from "@/lib/scope";
 import { Suspense } from "react";
+
+const SIN_CONFIGURAR =
+	"Este sitio no tiene configurado su acceso a la base de datos, así que no hay dónde validar las credenciales. No es tu contraseña: falta NEXT_PUBLIC_SUPABASE_URL en el build.";
 
 function LoginForm() {
 	const router = useRouter();
@@ -27,13 +30,28 @@ function LoginForm() {
 		password: "",
 		remember: false,
 	});
-	const [error, setError] = useState("");
+	/**
+	 * Sin configuración no es que las credenciales fallen: es que no hay a quién
+	 * preguntarle. Decirlo aparte importa porque el mensaje genérico manda a
+	 * revisar la contraseña, y eso hace perder horas buscando en el sitio
+	 * equivocado. Pasó. Y se dice al cargar, no al enviar: el botón está
+	 * deshabilitado, así que nadie llegaría a ver el aviso.
+	 */
+	const configurado = hasSupabaseConfig();
+
+	const [error, setError] = useState(configurado ? "" : SIN_CONFIGURAR);
 	const [loading, setLoading] = useState(false);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setError("");
 		setLoading(true);
+
+		if (!configurado) {
+			setError(SIN_CONFIGURAR);
+			setLoading(false);
+			return;
+		}
 
 		try {
 			const supabase = createClient();
@@ -185,7 +203,7 @@ function LoginForm() {
 						</div>
 						<button
 							type="submit"
-							disabled={loading}
+							disabled={loading || !configurado}
 							className="w-full rounded-md bg-primary px-6 py-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-primary-foreground shadow-[var(--shadow-gold)] transition hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed"
 						>
 							{loading ? "Entrando..." : "Iniciar sesión"}
